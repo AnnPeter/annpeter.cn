@@ -1,0 +1,148 @@
+---
+layout: post
+title: "mini2440--part08--Linux中断处理过程"
+date: 2016-02-01 17:59:45 +2890
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,Linux中断处理过程,博客,AnnPeter's Blog
+description: "mini2440--part08--Linux中断处理过程"
+zTree: true
+
+---
+
+
+Linux中断处理过程，不同平台在中断入口时的处理可能有所不同。
+1. 在entry-armv.S中定义了中断统一的入口__irq_svc。
+2. 然后执行entry-armv.S中的irq_handler，获取中断号
+3. 调用irq.c中的asm_do_IRQ
+4. 调用irq.c中的generic_handle_irq，在这个过程中取得irq_desc
+5. 调用irq.c中的generic_handle_irq_desc
+6. 最后根据irq_desc中action中的用户事先设置好的handler，调用处理例程。
+
+
+<!-- more -->
+
+###中断注册
+Linux使用request_irq函数注册中断。
+>int request_irq(unsigned int irq, void (*handler)(int, void*, struct pt_regs*), unsigned long flags, const char* devname, void* dev_id);<br>
+>参数:<br>
+>irq：中断号<br>
+>handler：中断处理函数<br>
+>flags：与中断管理有关的选项<br>
+>devname：设备名<br>
+>dev_id：共享中断时使用<br>
+
+在flag参数中，可以选择一些与中断管理有关的选项，如：
+* IRQF_DISABLED(SA_INTERRUPT)：如果设置该位，表示这是一个“快速”中断处理程序；如果没有设置这位，那么是一个“慢速”中断处理程序。
+* IRQF_SHARED(SA_SHIRQ)：该位表明该中断号是多个设备共享的。
+
+####中断处理函数的流程：
+1. 检查设备是否产生了中断
+2. 清除中断产生标志
+3. 相应的硬件操作
+
+快速中断和慢速中断的主要区别在于：快速中断保证中断处理的原子性(不被打断)，而慢速中断则不保证。也就是“开启中断”标志位(处理器IF)在运行快速中断处理程序时是关闭的，因次在服务该中断时，不会被其它类型的中断打断；而调用慢速中断处理时，其它类型中断仍然可以得到服务。
+
+中断处理程序的特别之处是在中断上下文中运行的，它的行为受到某些限制：
+
+1. 不能使用可能引起阻塞的函数
+2. 不能使用可能引起调度的函数
+
+###中断注销
+当设备不再需要使用中断时(通常在驱动卸载时), 应当把它们注销, 使用函数:void free_irq(unsigned int irq, void *dev_id)，dev_id用于共享中断时使用。
+
+
+##中断分层处理
+在Linux中断中，当中断类型为慢速中断时，同类设备中断不能嵌套；当中断类型为快速中断时，当一个中断例程在执行时，其它中断都会被忽略。
+
+中断分层技术主要是减少中断处理的时间。中断分层主要分为和硬件相关的操作(上半部，中断处理程序，即：中断上下文中执行)、检测和处理(下半部，内核中执行)。
+
+* 上半部:当中断发生时,它进行相应地硬件读写,并“登记”该中断。通常由中断处理程序充当上半部。
+* 下半部:在系统空闲的时候对上半部“登记”的中断进行后续处理。
+
+####中断分层技术主要有三种方式：
+1. 中断嵌套
+2. 中断分层方式
+3. 工作队列
+
+工作队列是一种将任务推后执行的形式,他把推后的任务交由一个内核线程去执行。这样下半部会在进程上下文执行,它允许重新调度甚至睡眠。 每个被推后的任务叫做“工作”,由这些工作组成的队列称为工作队列。
+
+![工作队列工作流程图](/upload/2016/FEB/06/imgs/1454705882.png)
+![工作队列流程数据结构](/upload/2016/FEB/06/imgs/1454705885.png)
+
+Linux内核使用struct workqueue_struct来描述一个工作队列,使用struct work_struct来描述一个工作项。
+```cpp
+struct workqueue_struct {
+    struct cpu_workqueue_struct *cpu_wq;
+    struct list_head list;
+    const char *name; /*workqueue name*/
+    int singlethread;
+    int freezeable; /* Freeze threads during suspend */
+    int rt;
+};
+
+struct work_struct {
+    atomic_long_t data;
+    struct list_head entry;
+    work_func_t func;
+};
+typedef void (*work_func_t)(struct work_struct *work);
+```
+
+1. 创建工作队列 create_workqueue
+2. 创建工作 INIT_WORK
+3. 提交工作 queue_work
+
+```cpp
+/*************************************************************************
+    > File Name: queue.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Sat 06 Feb 2016 05:05:59 AM CST
+ ************************************************************************/
+
+
+#include <linux/init.h>
+#include <linux/module.h>
+
+MODULE_LICENSE("GPL");	//工作队列必须遵守GPL协议
+
+struct workqueue_struct* ap_workqueue;
+
+struct work_struct* work1;
+
+void work1_func(struct work_struct* work)
+{
+	printk("this is work1\n");
+}
+
+int que_init(void)
+{
+	//1.创建工作队列
+	//在多数情况下，驱动程序并不需要自己创建工作队列，只需要定义工作，提交到
+	//内核默认的工作队列keventd_wq即可,在提交工作时，使用schedule_work函数
+	//简化操作int schedule_work(struct work_struct *work)；
+	ap_workqueue = create_workqueue("ap_workqueue");
+
+	work1 = kmalloc(sizeof(struct work_struct), GFP_KERNEL);
+	//2.创建工作
+	INIT_WORK(work1, work1_func);	
+
+	//3.提交工作到工作队列
+	queue_work(ap_workqueue, work1);
+
+	return 0;
+}
+
+void que_exit(void)
+{
+
+}
+
+module_init(que_init);
+module_exit(que_exit)
+
+
+```
+
+

@@ -1,0 +1,179 @@
+---
+layout: post
+title: "mini2440--part09--混杂设备驱动--按键驱动"
+date: 2016-02-03 19:06:15 +1023
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,混杂设备驱动,按键驱动,博客,AnnPeter's Blog
+description: "mini2440--part09--混杂设备驱动--按键驱动"
+zTree: true
+
+---
+
+在Linux系统中,存在一类字符设备,它们拥有相同的主设备号(10),但次设备号不同,我们称这类设备为混杂设备(miscdevice)。所有的混杂设备形成一个链表,对设备访问时内核根据次设备号查找到相应的混杂设备。
+
+<!-- more -->
+
+Linux中使用struct miscdevice来描述一个混杂设备，在这个结构中，共有6个成员，我们需要初始化前三个成员，链表成员由Linux内核管理。
+```cpp
+struct miscdevice {
+    int minor;
+    /* 次设备号*/
+    const char *name; /* 设备名*/
+    const struct file_operations *fops; /*文件操作*/
+    struct list_head list;
+    struct device *parent;
+    struct device *this_device;
+};
+```
+
+1. 首先，我们需要初始化miscdevice这个结构
+
+2. 然后使用misc_register函数来注册一个混杂设备驱动。int misc_register(struct miscdevice* misc)；
+
+3. 最后使用misc_deregister(struct miscdevice* misc);
+
+
+##按键去抖
+按键所用开关为机械弹性开关,当机械触点断开、闭合时,由于机械触点的弹性作用,开关不会马上稳定地接通或断开。因而在闭合及断开的瞬间总是伴随有一连串的抖动,当我们按下开关,可以发现有多次中断被触发。
+
+按键去抖动的方法主要有二种,一种是硬件电路去抖动;另一种就是软件延时去抖。而延时又一般分为二种,一种是for循环等待,另一种是定时器延时。在操作系统中,由于效率方面的原因,一般不允许使用for循环来等待,只能使用定时器。
+
+Linux内核使用struct timer_list来描述一个定时器:
+```cpp
+struct timer_list {
+    struct list_head entry;
+    unsigned long expires;	//超时时间
+    void (*function)(unsigned long);	//操作函数
+    unsigned long data;
+    struct tvec_base *base;
+};
+```
+
+去抖步骤：
+
+1. 定义定时器变量
+2. 初始化定时器，使用init\_timer初始化，设置超时函数
+3. add\_timer注册定时器
+4. mod\_timer启动定时器，设置超时时间，启动。(定时器只会超时一次，如果要实现循环，在超时函数中再次调用mod_timer即可)
+
+###按键驱动混杂实现
+```cpp
+/*************************************************************************
+    > File Name: key.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Thu 04 Feb 2016 09:31:04 AM CST
+ ************************************************************************/
+
+
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/miscdevice.h>
+#include <linux/fs.h>
+#include <asm/io.h>
+#include <linux/interrupt.h>
+
+struct irq_type
+{
+	int irq;
+	char* name;
+	int number;
+};
+
+static struct irq_type key_irq[6]=
+{
+	{IRQ_EINT8, "key0", 0},
+	{IRQ_EINT11, "key1", 1},
+	{IRQ_EINT13, "key2", 2},
+	{IRQ_EINT14, "key3", 3},
+	{IRQ_EINT15, "key4", 4},
+	{IRQ_EINT19, "key5", 5},
+};
+
+irqreturn_t key_int_handler(int irq, void* dev_id)
+{
+	//1. 检测是否发生按键中断
+	
+	//2.清除已经产生的按键中断
+	
+	//3.打印按下的按键，属于中断处理下半部，可以放在工作队列中，减少中断时间
+	struct irq_type* nirq = (struct irq_type*)(dev_id);
+	printk("the key is %d\n", nirq->number);
+	return 0;
+}
+
+#define GPGCON 0x56000060
+
+void key_hw_init()
+{
+	unsigned int data;
+	unsigned int* gpg_con;
+
+	gpg_con = ioremap(GPGCON, 4);
+	
+	data = readl(gpg_con);
+	data &= ~((0x3<<0)|(0x3<<6)|(0x3<<10)|(0x3<<12)|(0x3<<14|(0x3<<22)));
+	data |= ((0x2<<0)|(0x2<<6)|(0x2<<10)|(0x2<<12)|(0x2<<14)|(0x2<<22));
+	
+	writel(data, gpg_con);
+}
+
+int key_open(struct inode* node, struct file* filp)
+{
+	return 0;
+}
+
+const struct file_operations key_fops=
+{
+	.open = key_open,
+};
+
+struct miscdevice key_miscdevice=
+{
+	.minor = 200,
+	.name  = "ap_key",
+	.fops  = &key_fops,
+};
+
+int key_init(void)
+{
+	misc_register(&key_miscdevice);
+	
+	key_hw_init();
+
+	//注册中断
+	int i = 0;
+	int ret = 0;
+	for(i = 0; i < 6; i++)
+	{
+		ret = request_irq(key_irq[i].irq, key_int_handler, IRQF_SHARED,
+					key_irq[i].name, (void*)&(key_irq[i]));
+	}
+
+	if(ret == 0)
+	{
+		printk("key int success\n");
+	}
+	else
+	{
+		printk("key int error, return code is %d", ret);
+	}
+
+	return 0;
+}
+
+void key_exit(void)
+{
+	misc_deregister(&key_miscdevice);
+
+	//中断注销
+}
+
+
+module_init(key_init);
+module_exit(key_exit);
+```
+
+
+

@@ -1,0 +1,513 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini2440--part11--总线设备驱动 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="mini2440--part11--总线设备驱动">
+	<meta name="keywords" content="ARM,mini2440,总线设备驱动,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">Mini2440--part11--总线设备驱动</h2>
+		<div class="entry-content">
+			<a name="L........................"></a>
+<h1>总线设备驱动模型</h1>
+
+<a name="L......"></a>
+<h2>总线</h2>
+
+<ul>
+<li>总线结构描述
+在Linux内核中，总线由bus_type结构表示，定义在&lt;linux/device.h></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">bus_type</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//总线名称</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//驱动与设备的匹配函数</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li><p>注册总线
+bus_register(struct bus_type* bus);
+若成功，新的总线将被添加进系统，并可在/sys/bus下看到相应的目录。</p></li>
+<li><p>注销总线
+  void bus_unregister(struct bus_type* bus);</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: bus.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Sun 07 Feb 2016 10:11:28 AM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/kernel.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/device.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">ap_match</span><span class="p">(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">bus_type</span> <span class="n">bus</span><span class="o">=</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ap_bus&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">ap_match</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">bus_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">bus_register</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">bus_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">bus_unregister</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">bus_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">bus_exit</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L......"></a>
+<h2>驱动</h2>
+
+<p>(1) 结构描述
+在Linux内核中，驱动由device_driver结构表示</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">device_driver</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//驱动名称</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">bus_type</span><span class="o">*</span> <span class="n">bus</span><span class="p">;</span><span class="c1">//驱动所在总线</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//一个总线上可能挂载多个设备，如USB总线可能挂载无线鼠标，无线网卡等等，当总线匹配到该</span>
+</span><span class='line'>  <span class="c1">//驱动可以处理该设备时，调用prove函数来处理设备。所以probe由总线调用。</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(2) 注册
+int driver_register(struct device_driver* drv);
+注册成功后，driver的信息会在/sys/bus/相应的总线目录下面</p>
+
+<p>(3) 注销
+void driver_unregister(struct device_driver* drv)</p>
+
+<a name="L......"></a>
+<h2>设备</h2>
+
+<p>(1) 结构描述
+在Linux内核中，设备由struct device结构表示。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">device</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备的名字</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">bus_type</span><span class="o">*</span> <span class="n">bus</span><span class="p">;</span> <span class="c1">//设备所在总线</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(2) 注册
+int device_register(struct device* dev);</p>
+
+<p>(3) 注销
+void device_unregister(struce device* dev);</p>
+
+<p>总结：在系统中，我们首先注册总线。然后注册驱动和设备(这两者次序可以颠倒)，总线的match函数比较挂在该总线的驱动和设备是否匹配，如果匹配返回1，否则返回0。匹配成后，总线调用该驱动先前注册好的probe函数执行。</p>
+
+<a name="L........................"></a>
+<h1>平台总线驱动设计</h1>
+
+<p>平台总线(Platform bus)是linux2.6内核中加入的一种虚拟总线，其优势在于采用了总线的模型对设备与驱动进行管理，提高了程序的可移植性。关于platform bus的定义在drivers/base/Platform.c(paltform_bus_type)中。
+总线设备和驱动的匹配通过platform_match函数完成，主要依据设备id和设备名称来完成匹配工作。</p>
+
+<a name="L......"></a>
+<h2>设备</h2>
+
+<p>在Linux中，平台设备使用struct platform_device来描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">platform_device</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备名称</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span> <span class="c1">//设备编号，配合设备名使用</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">device</span> <span class="n">dev</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">u32</span> <span class="n">num_resources</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">resource</span><span class="o">*</span> <span class="n">resource</span><span class="p">;</span><span class="c1">//设备资源，基地址，中断号等</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">resource</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">resource_size_t</span> <span class="n">start</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">resource_size_t</span> <span class="n">end</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">flags</span><span class="p">;</span>    <span class="c1">//资源类型</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">resource</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="o">*</span> <span class="n">sibling</span><span class="p">,</span> <span class="o">*</span> <span class="n">child</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>注册平台设备，使用函数
+int platform_device_register(struct platform_device *pdev);</p></li>
+<li><p>注销平台设备，使用函数
+int platform_device_unregister(struct platform_device *pdev);</p></li>
+</ol>
+
+
+<a name="L......"></a>
+<h2>驱动</h2>
+
+<p>Linux中平台驱动使用struct platform_driver来描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">platform_driver</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">*</span><span class="p">);</span><span class="c1">//找到设备时调用的函数</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">remove</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">*</span><span class="p">);</span><span class="c1">//在删除设备的时候调用的函数</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">device_driver</span> <span class="n">driver</span><span class="p">;</span><span class="c1">//一般保存设备的名字等信息，用于驱动和设备匹配时使用</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>驱动注册，使用函数
+int platform_driver_register(struct platform driver*);</p></li>
+<li><p>驱动注销，使用函数
+int platform_driver_unregister(struct platform driver*);</p></li>
+</ol>
+
+
+<p>在驱动中，我们首先在模块初始化的时候向内核注册该驱动，找到与之匹配的设备，在找到设备后在probe函数中获取设备的硬件信息，初始化设备，这样可以提高驱动的可移植性。</p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/mini2440--part11--总线设备驱动" data-title="mini2440--part11--总线设备驱动" data-url="http://www.annpeter.cn/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Feb 5th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

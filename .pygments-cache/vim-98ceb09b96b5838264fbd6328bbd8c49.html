@@ -1,0 +1,5 @@
+<div class="highlight"><pre>int <span class="k">a</span> <span class="p">=</span> <span class="m">3</span>;
+char * str;
+module_param<span class="p">(</span><span class="k">a</span><span class="p">,</span> int<span class="p">,</span> S_IRUGO<span class="p">|</span>S_IWUSR<span class="p">)</span>; <span class="sr">//</span>安装的时候insmod hello.ko <span class="k">a</span><span class="p">=</span><span class="m">10</span>
+module_param<span class="p">(</span>str<span class="p">,</span> charp<span class="p">,</span> S_IRUGO<span class="p">)</span>;		<span class="sr">//</span>安装的时候insmod hello.ko str<span class="p">=</span>abcd
+</pre></div>

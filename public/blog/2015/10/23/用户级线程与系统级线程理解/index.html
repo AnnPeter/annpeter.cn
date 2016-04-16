@@ -1,0 +1,308 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>用户级线程与系统线程理解 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="用户级线程与系统线程理解">
+	<meta name="keywords" content="OS,线程,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">用户级线程与系统线程理解</h2>
+		<div class="entry-content">
+			<a name="L..............."></a>
+<h3>用户线程：</h3>
+
+<p>指不需要内核支持而在用户程序中实现的线程，其不依赖于操作系统核心，应用进程利用线程库提供创建、同步、调度和管理线程的函数来控制用户线程。不需要用户态/核心态切换，速度快，操作系统内核不知道多线程的存在，因此一个线程阻塞将使得整个进程（包括它的所有线程）阻塞。由于这里的处理器时间片分配是以进程为基本单位，所以每个线程执行的时间相对减少。</p>
+
+<a name="L..............."></a>
+<h3>内核线程：</h3>
+
+<p>由操作系统内核创建和撤销。内核维护进程及线程的上下文信息以及线程切换。一个内核线程由于I/O操作而阻塞，不会影响其它线程的运行。Windows NT和2000/XP支持内核线程。</p>
+
+<!-- more -->
+
+
+<a name="L......................................................"></a>
+<h3>以下是用户级线程和内核级线程的区别：</h3>
+
+<ol>
+<li><p>内核支持线程是OS内核可感知的，而用户级线程是OS内核不可感知的。</p></li>
+<li><p>用户级线程的创建、撤消和调度不需要OS内核的支持，是在语言（如Java）这一级处理的；而内核支持线程的创建、撤消和调度都需OS内核提供支持，而且与进程的创建、撤消和调度大体是相同的。</p></li>
+<li><p>用户级线程执行系统调用指令时将导致其所属进程被中断，而内核支持线程执行系统调用指令时，只导致该线程被中断。</p></li>
+<li><p>在只有用户级线程的系统内，CPU调度还是以进程为单位，处于运行状态的进程中的多个线程，由用户程序控制线程的轮换运行；在有内核支持线程的系统内，CPU调度则以线程为单位，由OS的线程调度程序负责线程的调度。</p></li>
+<li><p>用户级线程的程序实体是运行在用户态下的程序，而内核支持线程的程序实体则是可以运行在任何状态下的程序。</p></li>
+</ol>
+
+
+<p>用户线程运行在一个中间系统上面。目前中间系统实现的方式有两种，即运行时系统（Runtime System）和内核控制线程。“运行时系统”实质上是用于管理和控制线程的函数集合，包括创建、撤销、线程的同步和通信的函数以及调度的函数。这些函数都驻留在用户空间作为用户线程和内核之间的接口。用户线程不能使用系统调用，而是当线程需要系统资源时，将请求传送给运行时，由后者通过相应的系统调用来获取系统资源。内核控制线程：系统在分给进程几个轻型进程（LWP），LWP可以通过系统调用来获得内核提供的服务，而进程中的用户线程可通过复用来关联到LWP，从而得到内核的服务。</p>
+
+<a name="L............"></a>
+<h2>内核线程</h2>
+
+<p>优点：</p>
+
+<ol>
+<li>当有多个处理机时，一个进程的多个线程可以同时执行。</li>
+</ol>
+
+
+<p>缺点：</p>
+
+<ol>
+<li>由内核进行调度。</li>
+</ol>
+
+
+<a name="L............"></a>
+<h2>用户进程</h2>
+
+<p>优点:</p>
+
+<ol>
+<li>线程的调度不需要内核直接参与，控制简单。</li>
+<li>可以在不支持线程的操作系统中实现。</li>
+<li>创建和销毁线程、线程切换代价等线程管理的代价比内核线程少得多。</li>
+<li>允许每个进程定制自己的调度算法，线程管理比较灵活。这就是必须自己写管理程序，与内核线程的区别</li>
+<li>线程能够利用的表空间和堆栈空间比内核级线程多。</li>
+<li>同一进程中只能同时有一个线程在运行，如果有一个线程使用了系统调用而阻塞，那么整个进程都会被挂起。另外，页面失效也会产生同样的问题。</li>
+</ol>
+
+
+<p>缺点：</p>
+
+<ol>
+<li>资源调度按照进程进行，多个处理机下，同一个进程中的线程只能在同一个处理机下分时复用</li>
+</ol>
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2015/10/23/%E7%94%A8%E6%88%B7%E7%BA%A7%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%BA%A7%E7%BA%BF%E7%A8%8B%E7%90%86%E8%A7%A3/用户级线程与系统级线程理解" data-title="用户级线程与系统线程理解" data-url="http://www.annpeter.cn/blog/2015/10/23/%E7%94%A8%E6%88%B7%E7%BA%A7%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%B3%BB%E7%BB%9F%E7%BA%A7%E7%BA%BF%E7%A8%8B%E7%90%86%E8%A7%A3/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Oct 23rd, 2015</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/os/'>os</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

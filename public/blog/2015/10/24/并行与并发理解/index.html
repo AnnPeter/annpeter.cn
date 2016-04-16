@@ -1,0 +1,263 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>并行与并发理解 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="并行与并发理解">
+	<meta name="keywords" content="OS,并行,并发,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">并行与并发理解</h2>
+		<div class="entry-content">
+			<a name="L......"></a>
+<h3>并行</h3>
+
+<blockquote><p>就是两个任务同时运行，就是甲任务进行的同时，乙任务也在进行，同时进行。</p></blockquote>
+
+<a name="L......"></a>
+<h3>并发</h3>
+
+<blockquote><p>是指两个任务都请求运行，而处理器只能按受一个任务，就把这两个任务安排轮流进行，由于时间间隔较短，使人感觉两个任务都在运行，一个接一个发生。</p></blockquote>
+
+<!-- more -->
+
+
+<ul>
+<li>比如我跟两个网友聊天，左手操作一个电脑跟甲聊，同时右手用另一台电脑跟乙聊天，这就叫并行。</li>
+<li>如果用一台电脑我先给甲发个消息，然后立刻再给乙发消息，然后再跟甲聊，再跟乙聊，这就叫并发。</li>
+</ul>
+
+
+<p>并发和并行是即相似又有区别的两个概念，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。在多道程序环境下，并发性是指在一段时间内宏观上有多个程序在同时运行，但在单处理机系统中，每一时刻却仅能有一道程序执行，故微观上这些程序只能是分时地交替执行。倘若在计算机系统中有多个处理机，则这些可以并发执行的程序便可被分配到多个处理机上，实现并行执行，即利用每个处理机来处理一个可并发执行的程序，这样，多个程序便可以同时执行</p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2015/10/24/%E5%B9%B6%E8%A1%8C%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%90%86%E8%A7%A3/并行与并发理解" data-title="并行与并发理解" data-url="http://www.annpeter.cn/blog/2015/10/24/%E5%B9%B6%E8%A1%8C%E4%B8%8E%E5%B9%B6%E5%8F%91%E7%90%86%E8%A7%A3/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Oct 24th, 2015</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/os/'>os</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

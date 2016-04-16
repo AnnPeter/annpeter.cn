@@ -1,0 +1,402 @@
+---
+layout: post
+title: "Android手机安全卫士项目笔记"
+date: 2015-11-29 22:18:33 +7321
+comments: true
+categories: Android
+keywords: Android,手机安全卫士,安卓项目,博客,AnnPeter's Blog
+description: "Android手机安全卫士项目笔记"
+
+---
+
+##代码组织结构
+1. 根据业务逻辑划分
+ 	* 办公软件
+     	* 出差 com.itpeter.travel
+     	* 工资 com.itpeter.money
+     	* 会议 com.itpeter.meeting
+  	* 网盘
+     	* 上传 com.itpeter.upload
+     	* 下载 com.itpeter.download
+     	* 分享 com.itpeter.share
+
+<!-- more -->
+
+
+2. 功能模块模块划分**（Android开发推荐使用）**
+  	* Activity cn.itpeter.mobilesafe.activity
+  	* 后台服务  cn.itpeter.mobilesafe.service
+  	* 广播接收者 cn.itpeter.mobilesafe.receiver
+  	* 数据库    cn.itpeter.mobilesafe.dao
+ 	* 对象（java bean） cn.itpeter.mobilesafe.domain.bean
+  	* 工具类    cn.itpeter.mobilesafe.utils
+  	* 业务逻辑   cn.itpeter.mobilesafe.engine
+
+##项目创建
+* minimun SDK 要求最低的安装版本，安装apk前，系统会判断当前版本是否高于（包含）此版本，是的话才允许安装
+* Targest SDK 目标SDK，一般设置为开发时使用的手机版本，这样的话，系统在运行apk时，就认为在该版本做了充分的测试，系统就不会做过多兼容性的判断，从而提高运行效率
+* Compile With 编译程序使用的版本
+
+##闪屏页面（Splash）
+* 展示Logo，公司品牌
+* 项目初始化
+* 监测版本更新
+* 校验程序合法性（比如：判断是否有网络，有的话才能运行）
+
+###服务器获取最新版本信息
+1. 版本名
+2. 版本号
+3. 版本描述
+4. 下载链接
+```json
+{
+	"versionName": "2.0",
+	"versionCode": 2,
+	"description": "新增NB功能，赶紧来体验吧！！！",
+	"downloadUrl": "http://www.baidu.com"
+}
+```
+
+###签名冲突
+如果两个应用程序，包名相同，但是签名不同，就无法覆盖安装！
+
+1. 正式签名
+ 	* 有效期比较长，一般大于25年
+ 	* 需要设置密码
+ 	* 正式发布应用时，必须用正式签名来打包
+
+2. 测试签名（debug.keystore）
+	* 有效期是1年，很短
+	* 有默认的别名，密码，alias=android,password=androiddebugkey
+ 	* 在eclipse中直接运行项目时，系统默认采用此签名
+
+如果正式签名丢失怎么办？
+1. 修改报名发布，会发现有两个手机卫士，用户会比较纠结
+2. 请用户先删除原来的版本，再进行安装，用户会流失
+
+###常用快捷键（黑苹果下Ctrl是Alt键）
+```vim
+Ctrl + Shift + o		导包
+Ctrl + Shift + t		快速查找某个类
+Ctrl + 1				修改变量作用域
+先Ctrl + 2，再按l		创建变量并命名
+Ctrl + k				向下查找某字符串
+Ctrl + Shift + k		向上查找某字符串
+Ctrl + Shift + f 		代码格式整理
+Ctrl + d 				删除一行
+```
+
+##自定义控件
+1. 在layout文件夹中定义控价的基本布局
+2. 新建一个类，继承自ViewGroup或者ViewGroup的子类(RelativeLayout)，重写构造方法
+3. 添加一个初始化函数，用View.inflate()获取上面的布局文件，再在各个构造方法中调用此初始化函数
+4. 然后就可以在自己的布局文件中使用了
+
+###Style应用
+在values文件夹内的styles.xml文件(没有则手动添加)中添加style节点，并给节点命名;再在布局文件中使用style引用即可：style="@style/TitleStyle"。
+
+```xml
+<style name="TitleStyle">
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:gravity">center</item>
+    <item name="android:background">#8866ff00</item>
+    <item name="android:textSize">22sp</item>
+</style>
+```
+
+
+###自定义属性
+(1) 在values文件夹内的attrs.xml文件(没有则手动添加)中添加declare-styleable节点，并给节点命名
+```xml
+<declare-styleable name="SettingItemWithCheckboxView">
+    <attr name="title" /><!-- 因为在兼容包中已经定义了title所以在定义会报错，直接引用即可 -->
+    <attr name="desc_on" format="string" />
+    <attr name="desc_off" format="string" />
+</declare-styleable>
+```
+
+(2) 再在布局文件中声明自定义命名空间
+命名空间命名规范，将android的命名空间复制过来，将名字改为你想要的名字，再把命名空间路径最后的android的包名换成项目包名即可
+
+(3) 在代码中就可根据命名空间和属性名称获取属性的值了
+```java
+String title = attrs.getAttributeValue(NAMESPACE, "title");
+```
+
+##Root权限
+一般手机购买后，都没有root权限，厂商考虑到安全性因素，不允许用户或者第三方app删除和修改手机内部文件（当然，sdcard的内容可以随意修改，不需要root权限）
+
+1. 查看手机是否有root权限，查看是否可以访问到data/data目录
+2. cmd命令行，允许adb shell，如果显示#,表示已经root；如果显示\$,表示没有root（在真机状态下，即使root了，也显示\$，这时候可以运行su，直接获取root权限）
+
+##Md5加密
+```java
+String password = "123456";
+try{
+	MessageDigest instance = MessageDigest.getInstance("MD5");
+	byte[] digest = instance.digest(password.getBytes());
+
+	StringBuffer sb = new StringBuffer();
+	for(byte b : digest){
+		int i = b & 0xff;//获取字节的低八位
+		String hexString = Integer.toHexString(i);
+
+		if(hexString.length() < 2){
+			hexString = "0" + hexString;//如果是1位的话，补0转为两位
+		}
+		sb.append(hexString);
+	}
+
+	System.out.println("md5:"+sb.toString());//Md5都是32位16进制
+}catch(NoSuchAlgorithmException e){
+	e.printStackTrace();
+}
+```
+
+##.9.png  (9-Patch)
+通过黑色边线来描述图片的拉伸情况和文字填充文字的方式
+
+* 上边线表示图片水平拉伸，左边线表示垂直拉伸
+* 右边线表示垂直填充区域，下边线表示水平填充区域
+
+##自定义Button样式
+* 在drawable中新建一个xml文件设置状态选择器，以selector为根节点
+* 然后将选择器设置给button的background样式（只要能被点击的view就可以设置状态选择器）
+
+
+##ImageView背景
+background会根据ImageView组件给定的长宽进行拉伸，而src就存放的是原图的大小，不会进行拉伸。src是图片内容（前景），bg是背景，可以同时使用。
+此外：scaleType只对src起作用；bg可设置透明度，比如在ImageButton中就可以用android:scaleType控制图片的缩放方式
+
+##号码归属地查询
+先将数据库文件放在assets中，然后使用代码将数据库导入到**data/data/项目目录/file中**
+
+##输入框抖动效果
+在anim文件夹中添加shake.xml文件，内容为
+
+```xml
+<translate
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromXDelta="0"
+    android:toXDelta="10"
+    android:duration="1000"
+    android:interpolator="@anim/cycle_7" />
+```
+
+然后创建动画，并给所需要的控件播放动画即可
+```java
+Animation shake = AnimationUtils.loadAnimation(this, R.anim.shake);
+```
+
+##电话归属地显示
+来电监听用TelephonyManager，去电使用广播接收者
+
+##制作可以在窗口上一直展示的浮框（查看Toast的源码）
+**一定要在服务中开启，Toast才会一直绑定在窗口上，并且开启服务要使用bind方式，而不是start方式**
+
+```java
+WindowManager windowManager = null;
+private TextView view=null;
+
+private void showToast(String text) {
+	windowManager =  (WindowManager) getSystemService(WINDOW_SERVICE);
+
+	WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+	params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+	params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+	params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+    				|WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                	|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+	params.format = PixelFormat.TRANSLUCENT;
+	params.type = WindowManager.LayoutParams.TYPE_TOAST;
+	params.setTitle("Toast");
+
+	view = new TextView(this);
+	view.setText(text);
+	view.setTextColor(Color.RED);
+	windowManager.addView(view, params);
+}
+
+private void removeToast() {
+	windowManager.removeView(view);
+}
+```
+
+##手机震动
+权限**android.permission.VVIBRATE**
+
+```java
+private void vibrate(){
+	Vibrator vibrator = (Vibrator)getSystemService(VIBRATE_SERVICE);
+	vibrator.vibrate(2000);
+	//先等待1秒，再震动2秒，然后等待1秒，再震动3秒；－1表示不循环
+	vibrator.vibrate(new long[]{1000, 2000, 1000, 3000}, -1);
+}
+```
+
+##更新一个View的位置
+```java
+int left = view.getLeft() + dx;
+int right = view.getRight() + dx;
+
+int top = view.getTop() + dy;
+int b = view.getBottom() + dy;
+view.layout(left, top, right, bottom);
+```
+
+##获取系统安装的所有应用程序
+```java
+//获取到包的管理者
+PackageManager packageManager = content.getPackageManager();
+
+List<PackageInfo> installedPackages = packageManager.getInstalledPackages(0);
+for(PackageInfo installedPackage : installedPackages){
+	//获取到应用程序的图标
+	Drawable drawable = installedPackage.applicationInfo.loadIcon(packageManager);
+
+	//获取应用程序的名字
+	String apkName = installedPackage.applicationInfo.loadLabel(packageManager).toString();
+
+	//获取应用程序包名
+	String packageName = installedPackage.packageName;
+
+	//获取到apk资源路径
+	String sourceDir = installedPackage.applicationInfo.sourceDir;
+
+	File file = new File(sourceDir);
+	//apk的长度
+	long apkSize = file.length();
+}
+```
+
+##个性弹出框PopupWindow
+```java
+	View popup_view = View.inflate(SoftwareManagerActivity.this,
+							R.layout.software_manager_popup_item, null);
+
+    popupWindow = new PopupWindow(popup_view, -2, -2);
+    popupWindow.showAsDropDown(view, UnitUtils.dip2px(SoftwareManagerActivity.this, 50),
+								UnitUtils.dip2px(SoftwareManagerActivity.this, -70));
+    popupWindow.setOutsideTouchable(true);
+
+    if(position < sysAppInfoList.size()){
+        clickedAppInfo = sysAppInfoList.get(position);
+    }else{
+        clickedAppInfo = userAppInfoList.get(position - sysAppInfoList.size());
+    }
+
+    //设置卸载,运行,分享点击事件
+    View iv_uninstall = popup_view.findViewById(R.id.iv_uninstall);
+    iv_uninstall.setOnClickListener(new PopupWindowOnClickListener());
+    View iv_run = popup_view.findViewById(R.id.iv_run);
+    iv_run.setOnClickListener(new PopupWindowOnClickListener());
+    View iv_share = popup_view.findViewById(R.id.iv_share);
+    iv_share.setOnClickListener(new PopupWindowOnClickListener());
+```
+
+##窗口小部件
+* 需要在清单文件中配置原数据
+```xml
+<receiver android:name="MYAppWidgetProvider" >
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/appwidget_info" />
+</receiver>
+```
+
+* 在res/xml中创建appwidget_info.xml配置原数据
+```xml
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="200dp"
+    android:minHeight="40dp"
+    android:updatePeriodMillis="86400000"//谷歌默认半个小时更新一次，设置为0就可以自己控制时间
+    android:initialLayout="@layout/activity_main">
+</appwidget-provider>
+```
+
+
+* 需要配置一个广播接收者，继承自AppWidgetProvider
+* 实现一个桌面小部件的布局
+* 开启一个服务，在服务中开启定时器更新界面
+
+```java
+AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
+
+Timer timer = new Timer();
+
+TimerTask timerTask = new TimerTask(){
+	@Override
+	public void run(){
+		RemoteViews views = new RemoteView(getPackageName(), R.layout.process_widget);
+		view.setTextViewText(R.id.process_count, "正在运行软件1个");
+
+		Intent intent = new Intent();
+		intent.setAction("aaa.bbb.ccc");
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
+									0, intent, 0);
+
+		//当点击后触发广播来执行
+		view.setOnClickPendingIntent(R.id.button, pendingIntent);
+
+		//第一个参数表示上下文
+		//第二个参数表示当前有哪一个广播进行去处理当前的桌面小控件
+		ComponentName provider = new ComponentName(getApplicationContent(), MyAppWidget.class);
+		widgetManager.updateAppWidget(provider, view);
+	}
+};
+
+timer.schedule(timerTask, 0, 5000);
+```
+
+##获取病毒特征码
+
+```java
+PackageManager packageManager = gerPackageManager();
+List<PackageInfo> installedPackages = packageManager.getInstalledPackages(0);
+for(PackageInfo packageInfo: installedPackages){
+    String sourceDir = packageInfo.applicationInfo.sourceDir;
+
+    String md5 = getFileMd5(sourceDir);
+}
+
+private String getFileMd5(String sourceDir){
+    File file = new File(sourceDir);
+    StringBuffer sb = new StringBuffer();
+
+    try{
+        FileInputStream fis = new FileInputStream(file);
+
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        //获取到数字摘要
+        MessageDigest messagedigest = MessageDigest.getInstance("md5");
+        while((len = fis.read(buffer)) != -1){
+            messagedigest.update(buffer, 0, len);
+        }
+        byte[] digest = messagedigest.digest();
+
+        for(byte b : digest){
+            int i = b & 0xff;//获取字节的低八位
+            String hexString = Integer.toHexString(i);
+
+            if(hexString.length() < 2){
+                hexString = "0" + hexString;//如果是1位的话，补0转为两位
+            }
+            sb.append(hexString);
+        }
+    }
+    return sb.toString();
+}
+```
+
+##程序锁实现原理
+通过在服务中，启动一个看门狗（运行于子线程），看门狗去不停的查看当前任务栈中最顶端的任务是否被用户定义了程序锁，如果在，拦截即可。
+
+**如果是在服务中往Activity中跳转，需要给Intent设置flag：intent.setFlags(Intent.FLAG\_ACTIVITY\_NEW_TASK)**
+
+**输入密码界面的启动模式需要使用singleInstance**
+

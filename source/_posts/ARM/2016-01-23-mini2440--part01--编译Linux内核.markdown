@@ -1,0 +1,82 @@
+---
+layout: post
+title: "mini2440--part01--编译Linux内核"
+date: 2016-01-23 22:16:24 +3451
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,编译Linux内核,博客,AnnPeter's Blog
+description: "mini2440--part01--编译Linux内核"
+zTree: true
+
+---
+
+
+###PC平台的内核编译
+
+
+本文主要介绍嵌入式Linux内核的编译，使用平台为mini2440，其它平台需找到对应平台的内核代码，编译过程类似。
+
+<!-- more -->
+
+1. 配置
+
+	```vim
+	$ make config:基于文本模式的交互式配置
+	$ make menuconfig:基于文本模式的菜单型配置
+	```
+
+	内核配置通常在一个已有的配置文件基础上，通过修改得到新的配置文件，Linux内核提供了一系列可供参考的内核配置文件，位于arch/$cpu/configs；当然，对于PC平台,我们可以使用自己本机上的配置文件进行修改(位于/boot/config-XXX)。使用的时候将你的配置文件复制到源码根目录下并修改名字为.config
+
+
+2. 编译内核, 将配置文件配好后，我们开始编译。
+
+	```vim
+	$ make bzImage V=1 (V=1表示显示详细信息)
+	//编译好的内核位于arch/<cpu>/boot/目录下
+	```
+
+3. 编译模块，在我们使用菜单型进行配置的时候，有的模块有三种选项(1.为空，即不选；2.*，表示编译到内核中；3.M，表示编译为内核模块,编译到内核中，在进行系统加载时，即会进入内存，但编译为内核模块，可以动态加载和卸载。)
+
+	```vim
+	$ make modules //编译内核模块
+
+	//将编译好的内核模块，从内核源代码目录，复制至本机的/lib/modules下的**,为打包做好准备
+	$ make modules_install
+
+	```
+
+4. 制作init ramdisk
+
+	```vim
+	$ mkinitrd initrd-$version $version //$version可以通过查询/lib/modules下的目录得到
+	```
+
+5. 安装内核
+
+	```vim
+	$ cp arch/x86/boot/bzImage  /boot/vmlinuz-$version
+	$ cp initrd-$version /boot/
+
+	//修改/etc/grub.conf
+
+	```
+
+6. 清理
+
+	```vim
+	$ make clean  //清除内核模块编译过程中的中间文件
+	$ make distclean //可清除配置文件
+	```
+
+###ARM平台的内核编译
+1. 配置
+
+	```vim
+	$ make menuconfig ARCH=arm
+	```
+
+2. 编译内核
+
+	```vim
+	$ make uImage ARCH=arm CROSS_COMPILE=arm-linux-
+	```

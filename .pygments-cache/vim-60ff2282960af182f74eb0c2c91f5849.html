@@ -1,0 +1,89 @@
+<div class="highlight"><pre><span class="p">!</span>以<span class="p">!</span>或;开头的为注释
+<span class="p">!</span>以.开头的为汇编指示符，不会在编译时产生任何代码
+.globl begtext<span class="p">,</span> begdata<span class="p">,</span> begbss<span class="p">,</span> endtext<span class="p">,</span> enddata<span class="p">,</span> endbss
+.text	;正文段
+begtext:	;在正文段定义一个标识符
+.data
+begdata:
+.bss
+begbss:
+
+.text	<span class="p">!</span>切换至正文段
+BOOTSEG <span class="p">=</span> <span class="m">0</span>x<span class="m">07</span>C<span class="m">0</span>	<span class="p">!</span>BIOS加载bootsect代码的原始段地址
+
+<span class="p">!</span>entry是保留关键字，用于连接器ld86在生产的可执行文件中<span class="p">,</span>包括其后制定的标志
+<span class="p">!</span><span class="s1">&#39;start&#39;</span>通常在连接多个目标文件生成一个可执行文件时应该在其中一个汇编程序
+<span class="p">!</span>中用entry指定一个入口标号，以便调试
+entry <span class="k">start</span>
+<span class="k">start</span>:
+	jmpi <span class="k">go</span><span class="p">,</span> BOOTSEG	<span class="p">!</span>jmpi段间跳转指令
+						<span class="p">!</span>格式是： jmpi 段内偏移，段选择子
+						<span class="p">!</span>当BIOS把程序加载到物理内存<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>处并跳转到该处执行
+						<span class="p">!</span>此时，程序的物理地址在<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>处，而段寄存器<span class="k">cs</span>为<span class="m">0</span>
+						<span class="p">!(</span><span class="k">cs</span>:ip<span class="p">=</span><span class="m">0</span>x<span class="m">0000</span>:<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span><span class="p">)</span>，所以我们要跳转到BOOTSEG处
+						<span class="p">!</span>执行后<span class="k">cs</span>:ip<span class="p">=</span><span class="m">0</span>x<span class="m">07</span>C<span class="m">0</span>:<span class="m">0</span>x<span class="m">0005</span>
+						<span class="p">!</span>指令的物理地址<span class="k">cs</span>*<span class="m">10</span>h<span class="p">+</span>ip
+<span class="k">go</span>:
+	mov ax<span class="p">,</span> #BOOTSEG	<span class="p">!</span><span class="k">cs</span><span class="p">-&gt;</span>ax<span class="p">,</span>用来初始化数据段寄存器<span class="k">ds</span>和es，让他们都指向<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>段，
+						<span class="p">!</span>便于对程序中数据<span class="p">(</span>字符串<span class="p">)</span>进行寻址
+	mov <span class="k">ds</span><span class="p">,</span> ax
+	mov es<span class="p">,</span> ax
+<span class="p">!</span> 几种寻址方式:
+<span class="p">!</span> * 直接寄存器寻址<span class="p">(</span>跳转到bx值指定的地址处<span class="p">)</span>:
+<span class="p">!</span>       MOV bx<span class="p">,</span> ax
+<span class="p">!</span>       JMP bx
+<span class="p">!</span> * 间接寄存器寻址<span class="p">(</span>bx值指定内存位置处的内容作为跳转的地址<span class="p">)</span>:
+<span class="p">!</span>       MOV [bx]<span class="p">,</span> ax
+<span class="p">!</span>       JMP [bx]
+<span class="p">!</span> * 立即数&amp;字符串地址值保存:
+<span class="p">!</span>       MOV ax<span class="p">,</span> #<span class="m">1234</span>
+<span class="p">!</span>       MOV ax<span class="p">,</span> #msg1
+<span class="p">!</span> * 绝对寻址<span class="p">(</span>把内存地址<span class="m">1234</span>处的内容放入ax<span class="p">)</span>:
+<span class="p">!</span>       MOV ax<span class="p">,</span> <span class="m">1234</span>
+<span class="p">!</span> * 索引寻址<span class="p">(</span>把第<span class="m">2</span>个操作数所指内存处的值放入ax<span class="p">)</span>:
+<span class="p">!</span>       MOV ax<span class="p">,</span> msg1[bx]
+<span class="p">!</span>       MOV ax<span class="p">,</span> msg1[bx*<span class="m">4</span> <span class="p">+</span> <span class="k">di</span>]
+
+	mov cx<span class="p">,</span> #<span class="m">20</span>		<span class="p">!</span>cx <span class="p">=</span> 串长度
+	mov dx<span class="p">,</span> #<span class="m">0</span>x<span class="m">0101</span>
+	mov bx<span class="p">,</span> #<span class="m">0</span>x<span class="m">000</span>C	<span class="p">!</span>页号为<span class="m">0</span><span class="p">(</span><span class="nb">bh</span> <span class="p">=</span> <span class="m">0</span>x<span class="m">00</span><span class="p">)</span>黑底红字<span class="p">(</span><span class="k">bl</span> <span class="p">=</span> <span class="m">0</span>x<span class="m">0</span>C<span class="p">,</span>高亮<span class="p">)</span>
+	mov <span class="k">bp</span><span class="p">,</span> #BootMessage<span class="p">+</span><span class="m">32</span>	<span class="p">!</span>es:<span class="k">bp</span> <span class="p">=</span> 串地址，为什么要加<span class="m">32</span>
+							<span class="p">!</span>在使用qemu的调试中，这里是不需要加<span class="m">32</span>的
+							<span class="p">!</span>在使用真机进行调试时，这里需要加<span class="m">32</span>
+						    <span class="p">!</span>主要原因跟在使用as86汇编进行编译链接后，会在生
+							<span class="p">!</span>成的文件开头多出<span class="m">32</span>字节，这多出来的<span class="m">32</span>字节是MINIX
+							<span class="p">!</span>可执行 文件的头结构。
+	mov ax<span class="p">,</span> #<span class="m">0</span>x<span class="m">1301</span>	<span class="p">!</span>ah <span class="p">=</span> <span class="m">0</span>x<span class="m">13</span><span class="p">,</span> <span class="k">al</span> <span class="p">=</span> <span class="m">0</span>x<span class="m">01</span>
+	int <span class="m">0</span>x<span class="m">10</span>
+<span class="p">!</span>功能<span class="m">13</span>H
+<span class="p">!</span>功能描述：在Teletype模式下显示字符串 入口参数：AH＝<span class="m">13</span>H BH＝页码
+<span class="p">!</span>BL＝属性<span class="p">(</span>若AL<span class="p">=</span><span class="m">00</span>H或<span class="m">01</span>H<span class="p">)</span> CX＝显示字符串长度 <span class="p">(</span>DH、DL<span class="p">)</span>＝坐标<span class="p">(</span>行、列<span class="p">)</span>
+<span class="p">!</span>ES:BP＝显示字符串的地址 AL＝显示输出方式
+<span class="p">!</span><span class="m">0</span>——字符串中只含显示字符，其显示属性在BL中。显示后，光标位置不变
+<span class="p">!</span><span class="m">1</span>——字符串中只含显示字符，其显示属性在BL中。显示后，光标位置改变
+<span class="p">!</span><span class="m">2</span>——字符串中含显示字符和显示属性。显示后，光标位置不变
+<span class="p">!</span><span class="m">3</span>——字符串中含显示字符和显示属性。显示后，光标位置改变
+<span class="p">!</span>出口参数：无
+
+loop_forever:
+	jmp loop_forever	<span class="p">!</span>死循环，防止程序进入数据段
+
+BootMessage:
+	.<span class="k">ascii</span>  <span class="s2">&quot;Loading system ...&quot;</span>		<span class="p">!</span>字符串定义
+	.byte <span class="m">13</span><span class="p">,</span><span class="m">10</span>		<span class="p">!</span>回车和换行符的ASCII码定义，字符定义使用.byte
+
+<span class="p">!</span>.org定义了当前汇编的位置
+<span class="p">!</span>会把汇编器便已过程中当前的位置计数器调整为给出的值
+.org <span class="m">478</span>
+
+boot_flag:
+	.word <span class="m">0</span>xAA<span class="m">55</span>
+
+.text
+endtext:
+.data
+enddata:
+.bss
+endbss:
+<span class="p">!</span>这样写表示不区分代码段，数据段<span class="p">,</span>bss段<span class="p">(</span>未初始化的变量<span class="p">)</span>;只有一个段
+</pre></div>

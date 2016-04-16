@@ -1,0 +1,63 @@
+<div class="highlight"><pre>/*************************************************************************
+    <span class="p">&gt;</span> File Name: student.<span class="k">c</span>
+    <span class="p">&gt;</span> Author: AnnPeter
+    <span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span>
+    <span class="p">&gt;</span> Created Time: Mon <span class="m">01</span> Feb <span class="m">2016</span> <span class="m">11</span>:<span class="m">44</span>:<span class="m">59</span> PM CST
+ ************************************************************************/
+
+
+#<span class="nb">include</span> <span class="p">&lt;</span>linux/module.<span class="k">h</span><span class="p">&gt;</span>
+#<span class="nb">include</span> <span class="p">&lt;</span>linux/init.<span class="k">h</span><span class="p">&gt;</span>
+#<span class="nb">include</span> <span class="p">&lt;</span>linux/<span class="nb">list</span>.<span class="k">h</span><span class="p">&gt;</span>
+
+struct stu
+{
+	int <span class="k">num</span>;
+	int eng;
+	int math;
+	struct list_head <span class="nb">list</span>;
+};
+
+struct list_head stu_head;
+struct stu stu1<span class="p">,</span> stu2<span class="p">,</span> stu3;
+struct list_head* pos;
+struct stu* tmp;
+
+int mylist_init<span class="p">()</span>
+{
+	INIT_LIST_HEAD<span class="p">(</span>&amp;stu_head<span class="p">)</span>;
+
+	stu1.<span class="k">num</span> <span class="p">=</span> <span class="m">1</span>;
+	stu1.eng <span class="p">=</span> <span class="m">90</span>;
+	stu1.math <span class="p">=</span> <span class="m">90</span>;
+	list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu1.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+
+	stu2.<span class="k">num</span> <span class="p">=</span> <span class="m">2</span>;
+	stu2.eng <span class="p">=</span> <span class="m">91</span>;
+	stu2.math <span class="p">=</span> <span class="m">91</span>;
+	list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu2.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+	
+	stu3.<span class="k">num</span> <span class="p">=</span> <span class="m">3</span>;
+	stu3.eng <span class="p">=</span> <span class="m">92</span>;
+	stu3.math <span class="p">=</span> <span class="m">92</span>;
+	list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu3.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+
+
+	list_for_each<span class="p">(</span>pos<span class="p">,</span> &amp;stu_head<span class="p">)</span>
+	{
+		tmp <span class="p">=</span> list_entry<span class="p">(</span>pos<span class="p">,</span> struct stu<span class="p">,</span> <span class="nb">list</span><span class="p">)</span>;
+		printk<span class="p">(</span><span class="s2">&quot;num is %d.\n&quot;</span><span class="p">,</span> tmp<span class="p">-&gt;</span><span class="k">num</span><span class="p">)</span>;
+	}
+
+	<span class="k">return</span> <span class="m">0</span>;
+}
+
+void mylist_exit<span class="p">()</span>
+{
+	list_del<span class="p">(</span>&amp;<span class="p">(</span>stu1.<span class="nb">list</span><span class="p">))</span>;
+
+}
+
+module_init<span class="p">(</span>mylist_init<span class="p">)</span>;
+module_exit<span class="p">(</span>mylist_exit<span class="p">)</span>;
+</pre></div>

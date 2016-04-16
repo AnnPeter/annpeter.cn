@@ -1,0 +1,26 @@
+<div class="highlight"><pre><span class="c1">//打印Log日志</span>
+<span class="cp">#include &lt;android/log.h&gt;</span>
+<span class="cp">#incluce LOG_TAG &quot;System.out&quot;</span>
+<span class="cp">#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__) </span><span class="c1">//打印debug信息</span>
+<span class="cp">#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)  </span><span class="c1">//打印info信息</span>
+<span class="c1">//在Android.mk中添加LOCAL_LDLIBS += -llog</span>
+
+
+<span class="c1">//Java反射</span>
+<span class="c1">//首先定义一个Dialog类，类中有一个show方法，参数为string类型</span>
+<span class="c1">//1.拿到类的字节码</span>
+<span class="n">Class</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">Demo</span><span class="p">.</span><span class="n">class</span><span class="p">.</span><span class="n">getClassLoader</span><span class="p">(</span><span class="s">&quot;Dialog&quot;</span><span class="p">);</span>
+<span class="c1">//2.拿到方法</span>
+<span class="n">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="n">clazz</span><span class="p">.</span><span class="n">getDeclaredMethod</span><span class="p">(</span><span class="s">&quot;show&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">.</span><span class="n">class</span><span class="p">);</span>
+<span class="c1">//3.调用方法</span>
+<span class="n">method</span><span class="p">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">clazz</span><span class="p">.</span><span class="n">newInstance</span><span class="p">(),</span> <span class="s">&quot;这里是实参&quot;</span><span class="p">);</span>
+
+
+<span class="c1">//C调用Java的反射</span>
+<span class="n">jclass</span> <span class="n">clazz</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">FindClass</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&quot;com/example/ccalljava/MainActivity&quot;</span><span class="p">);</span>
+<span class="n">jmethodID</span> <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">GetMethodID</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">clazz</span><span class="p">,</span> <span class="s">&quot;方法名&quot;</span><span class="p">,</span> <span class="s">&quot;方法签名&quot;</span><span class="p">);</span> <span class="c1">//使用javap获取方法签名</span>
+<span class="c1">//获取签名做法，到项目的classes目录中，使用(javap -s 包名.类名)即可获取签名</span>
+
+<span class="c1">//这里参数使用了中文，注意将.c文件保存为utf-8编码格式保存，否则程序会崩溃</span>
+<span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">CallVoidMethod</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&quot;这里是实参&quot;</span><span class="p">));</span>
+</pre></div>

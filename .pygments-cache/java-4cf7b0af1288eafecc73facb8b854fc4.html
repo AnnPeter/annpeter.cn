@@ -1,0 +1,39 @@
+<div class="highlight"><pre><span class="c1">//显示跳转，直接指定目标Activity的类名</span>
+<span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">();</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setClass</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">SecondActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+<span class="c1">//隐式跳转</span>
+<span class="c1">//Intent.ACTION_CALL 打电话应用</span>
+<span class="c1">//Intent.ACTION_VIEW 浏览器</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">ACTION_CALL</span><span class="o">);</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">&quot;tel:110&quot;</span><span class="o">));</span>
+
+<span class="c1">//显示跳转</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setClass</span><span class="o">(</span><span class="s">&quot;com.android.dialer&quot;</span><span class="o">,</span> <span class="s">&quot;com.android.dialer.DialtactsActivity&quot;</span><span class="o">);</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">arg1</span><span class="o">,</span> <span class="n">arg2</span><span class="o">);</span>	<span class="c1">//传递参数</span>
+<span class="c1">//传递数据还可以把所有数据封装至一个Bundle对象中</span>
+<span class="n">Bundle</span> <span class="n">bundle</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Bundle</span><span class="o">();</span>
+<span class="n">bundle</span><span class="o">.</span><span class="na">putString</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;AnnPeter&quot;</span><span class="o">);</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">putExtras</span><span class="o">(</span><span class="n">bundle</span><span class="o">);</span>
+
+
+<span class="c1">//隐式跳转</span>
+<span class="c1">//指定一个activity可以隐式跳转，需要在AndroidManifest.xml，activity子节点下添加属性</span>
+<span class="c1">//有动作的activity才可以跳转</span>
+	<span class="o">&lt;</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&gt;</span>
+		<span class="o">&lt;</span><span class="n">action</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.Activity&quot;</span><span class="o">/&gt;</span> <span class="c1">//name随便写,即设置的是intent.setAction()</span>
+		<span class="o">&lt;</span><span class="n">category</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;android.intent.category.DEFAULT&quot;</span><span class="o">/&gt;</span>
+		<span class="c1">//&lt;data android:scheme=&quot;AnnPeter&quot; android:mimeType=&quot;text/username&quot;/&gt;</span>
+	<span class="o">&lt;/</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&gt;</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="s">&quot;cn.annpeter.Activity&quot;</span><span class="o">);</span>
+<span class="c1">//Intent.CATEGORY_DEFAULT 等价于 &quot;android.intent.category.DEFAULT&quot;</span>
+<span class="c1">//而且系统会默认添加category，所以当category设置为&quot;android.intent.category.DEFAULT&quot;时，下面一行代码可以不用写</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">addCategory</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">CATEGORY_DEFAULT</span><span class="o">);</span>
+<span class="c1">//如果要传输data，AndroidManifest.xml文件中本activity的intent-filter必须有一个&lt;data /&gt;子节点</span>
+<span class="c1">//当data类型为scheme时AnnPeter必须是匹配的才行</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">&quot;AnnPeter:要传输的内容&quot;</span><span class="o">));</span>
+
+<span class="c1">//接收方接收Intent和参数</span>
+<span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">getIntent</span><span class="o">();</span>
+<span class="n">Uri</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">intent</span><span class="o">.</span><span class="na">getData</span><span class="o">();</span>	<span class="c1">//获取参数</span>
+</pre></div>

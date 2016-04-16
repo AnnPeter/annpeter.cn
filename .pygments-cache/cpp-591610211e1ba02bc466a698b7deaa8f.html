@@ -1,0 +1,48 @@
+<div class="highlight"><pre><span class="cm">/*************************************************************************</span>
+<span class="cm">    &gt; File Name: queue.c</span>
+<span class="cm">    &gt; Author: AnnPeter</span>
+<span class="cm">    &gt; Mail: 864587669@qq.com</span>
+<span class="cm">    &gt; Created Time: Sat 06 Feb 2016 05:05:59 AM CST</span>
+<span class="cm"> ************************************************************************/</span>
+
+
+<span class="cp">#include &lt;linux/init.h&gt;</span>
+<span class="cp">#include &lt;linux/module.h&gt;</span>
+
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>	<span class="c1">//工作队列必须遵守GPL协议</span>
+
+<span class="k">struct</span> <span class="n">workqueue_struct</span><span class="o">*</span> <span class="n">ap_workqueue</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">work_struct</span><span class="o">*</span> <span class="n">work1</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">work1_func</span><span class="p">(</span><span class="k">struct</span> <span class="n">work_struct</span><span class="o">*</span> <span class="n">work</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="s">&quot;this is work1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">que_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">//1.创建工作队列</span>
+	<span class="c1">//在多数情况下，驱动程序并不需要自己创建工作队列，只需要定义工作，提交到</span>
+	<span class="c1">//内核默认的工作队列keventd_wq即可,在提交工作时，使用schedule_work函数</span>
+	<span class="c1">//简化操作int schedule_work(struct work_struct *work)；</span>
+	<span class="n">ap_workqueue</span> <span class="o">=</span> <span class="n">create_workqueue</span><span class="p">(</span><span class="s">&quot;ap_workqueue&quot;</span><span class="p">);</span>
+
+	<span class="n">work1</span> <span class="o">=</span> <span class="n">kmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">work_struct</span><span class="p">),</span> <span class="n">GFP_KERNEL</span><span class="p">);</span>
+	<span class="c1">//2.创建工作</span>
+	<span class="n">INIT_WORK</span><span class="p">(</span><span class="n">work1</span><span class="p">,</span> <span class="n">work1_func</span><span class="p">);</span>	
+
+	<span class="c1">//3.提交工作到工作队列</span>
+	<span class="n">queue_work</span><span class="p">(</span><span class="n">ap_workqueue</span><span class="p">,</span> <span class="n">work1</span><span class="p">);</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">que_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">que_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">que_exit</span><span class="p">)</span>
+</pre></div>

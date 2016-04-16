@@ -1,0 +1,4 @@
+<div class="highlight"><pre>mysql<span class="p">&gt;</span> GRANT ALL PRIVILEGES ON *.* TO <span class="s1">&#39;root&#39;</span>@<span class="s1">&#39;%&#39;</span> IDENTIFIED BY <span class="s1">&#39;123456&#39;</span> WITH GRANT OPTION;
+mysql<span class="p">&gt;</span> FLUSH PRIVILEGES;
+修改<span class="sr">/etc/</span>mysql/my.<span class="k">cnf</span>  将bind<span class="p">-</span>address<span class="p">=</span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>注释掉
+</pre></div>

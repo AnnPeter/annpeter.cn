@@ -1,0 +1,45 @@
+<div class="highlight"><pre><span class="cm">/*************************************************************************</span>
+<span class="cm">    &gt; File Name: led_test.c</span>
+<span class="cm">    &gt; Author: AnnPeter</span>
+<span class="cm">    &gt; Mail: 864587669@qq.com</span>
+<span class="cm">    &gt; Created Time: Thu 04 Feb 2016 02:16:07 AM CST</span>
+<span class="cm"> ************************************************************************/</span>
+
+<span class="cp">#include &quot;ap_io.h&quot;</span>
+<span class="cp">#include &quot;./led_module.h&quot;</span>
+<span class="cp">#include &lt;sys/types.h&gt;</span>
+<span class="cp">#include &lt;fcntl.h&gt;</span>
+<span class="cp">#include &lt;sys/stat.h&gt;</span>
+<span class="cp">#include &lt;sys/ioctl.h&gt;</span>
+<span class="cp">#include &lt;stdio.h&gt;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+	<span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;/dev/ap_led&quot;</span><span class="p">,</span> <span class="n">O_RDWR</span><span class="p">);</span>
+
+	<span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">print_error</span><span class="p">(</span><span class="s">&quot;error args</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+		<span class="n">print_info</span><span class="p">(</span><span class="s">&quot;please use:./led_test 1 to open the led</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+		<span class="n">print_info</span><span class="p">(</span><span class="s">&quot;           ./led_test 0 to close the led</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span><span class="p">(</span><span class="n">fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">print_error</span><span class="p">(</span><span class="s">&quot;dev open err</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="kt">int</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">cmd</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">LED_ON</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+		<span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">LED_OFF</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

@@ -1,0 +1,82 @@
+---
+layout: post
+title: "mini2440--part12--串口驱动设计"
+date: 2016-02-06 14:33:24 +8012
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,串口驱动设计,博客,AnnPeter's Blog
+description: "mini2440--part12--串口驱动设计"
+zTree: true
+
+---
+
+
+##TTY驱动架构
+在Linux中，终端是一类字符型设备，它包括多种类型，通常使用tty来简称各种类型的终端设备。
+
+* 串口终端(/dev/ttyS*)
+串口终端是使用计算机串口连接的终端设备。Linux把每个串行端口都看作是一个字符设备。这些串行端口所对应的设备名称是/dev/ttySAC0、/dev/ttySAC1。
+
+* 控制台终端(/dev/console)
+在Linux中，计算机的输出设备通常被称为控制台的终端(Console),这里特指printk信息输出到的设备。/dev/console是一个虚拟设备，它需要映射到一个真正的tty上，比如通过内核启动参数“console=ttySAC0”就把console映射到了串口0上。
+
+* 虚拟终端(/dev/tty*,如tty1，tty2...)
+当用户登录时，使用的是虚拟终端。使用ctcl+alt+[F1-F6]组合键，我们就可以切换到tty1-tty6上，它们被称为虚拟终端，而tty0则是当前所使用虚拟终端的一个别名。
+
+<!-- more -->
+
+
+Linux tty子系统包含:tty核心,tty线路规程和tty驱动。tty核心是对整个tty设备的抽象,对用户提供统一的接口,tty线路规程是对传输数据的格式化,tty驱动则是面向tty设备的硬件驱动。
+
+![tty架构分析](/upload/2016/FEB/08/imgs/1454928983.png)
+
+串口调用例程回溯，在Linux中串口底层调用位于(/drivers/serial/samsung.c 中的 s3c24xx_serial_start_tx)，我们在此函数中添加dump_stark()。然后重新编译我们的内核，重启开发板，我们就能清除的看到调用的堆栈回溯。
+```vim
+[<c0035270>] (dump_backtrace+0x0/0x10c) from [<c033a868>] (dump_stack+0x18/0x1c)
+ r7:00000000 r6:c3901800 r5:c3901c02 r4:c046e0bc                                
+[<c033a850>] (dump_stack+0x0/0x1c) from [<c01830a0>] (s3c24xx_serial_start_tx+0)
+[<c018308c>] (s3c24xx_serial_start_tx+0x0/0x64) from [<c017f2ac>] (uart_start+0)
+ r5:c3901c02 r4:a0000013                                                        
+[<c017f244>] (uart_start+0x0/0x6c) from [<c017f504>] (uart_flush_chars+0x10/0x1)
+ r5:c3901c02 r4:00000002                                                        
+[<c017f4f4>] (uart_flush_chars+0x0/0x14) from [<c016bde8>] (n_tty_write+0x230/0)
+[<c016bbb8>] (n_tty_write+0x0/0x448) from [<c01693e0>] (tty_write+0x14c/0x244)  
+[<c0169294>] (tty_write+0x0/0x244) from [<c0169560>] (redirected_tty_write+0x88)
+[<c01694d8>] (redirected_tty_write+0x0/0x98) from [<c009e044>] (vfs_write+0xb4/)
+ r9:c39a0000 r8:c00310c8 r7:00000004 r6:c39a1f78 r5:40000000                    
+r4:c3939380                                                                     
+[<c009df90>] (vfs_write+0x0/0xe8) from [<c009e15c>] (sys_write+0x4c/0x84)       
+ r7:00000004 r6:c3939380 r5:00000000 r4:00000000                                
+[<c009e110>] (sys_write+0x0/0x84) from [<c0030f20>] (ret_fast_syscall+0x0/0x28) 
+ r6:001d27f8 r5:40000000 r4:00000002
+```
+
+##串口驱动
+
+UART驱动中的数据结构：
+
+* UART驱动程序结构：**struct uart_driver**
+* UART端口结构：**struct uart_port**
+* UART相关操作函数结构：**struct uart_ops**
+* UART状态结构：struct uart_stat
+* UART信息结构：struct uart_info
+
+![uart驱动常用的数据结构](/upload/2016/FEB/08/imgs/1454946151.jpg)
+
+串口的初始化工作：
+在linux中，串口的初始化工作主要在(drivers/serial/samsung.c 和 s3c2440.c中)
+1. 注册串口驱动程序，使用函数 int uart_register_driver(struct uart_driver *drv);
+2. 初始化(在平台设备中注册设备，当设备与驱动匹配时，调用probe进行初始化)
+
+* 取出相应的uart_port
+* 初始化uart_port
+	* 获取虚拟基地址
+	* 获取中断号
+	* 复位FIFO
+* 添加uart_port，使用函数int uart_add_one_port(struct uart_driver *drv, struct uart_port *uport);
+* 创建属性文件，使用函数int device_create_file(struct device *dev, struct device_attribute *attr);
+* 初始化动态频率调节
+
+串口发送数据：
+
+串口接收数据：

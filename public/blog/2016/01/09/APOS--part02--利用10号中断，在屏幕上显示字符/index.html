@@ -1,0 +1,469 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>APOS--part02--利用10号中断，在屏幕上显示字符 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="APOS--part02--利用10号中断，在屏幕上显示字符">
+	<meta name="keywords" content="OS,APOS,'利用10号中断，在屏幕上显示字符',AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">APOS--part02--利用10号中断，在屏幕上显示字符</h2>
+		<div class="entry-content">
+			<p>本文在裸机下，实现利用BIOS中段在屏幕上显示字符。</p>
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="p">!</span>以<span class="p">!</span>或;开头的为注释
+</span><span class='line'><span class="p">!</span>以.开头的为汇编指示符，不会在编译时产生任何代码
+</span><span class='line'>.globl begtext<span class="p">,</span> begdata<span class="p">,</span> begbss<span class="p">,</span> endtext<span class="p">,</span> enddata<span class="p">,</span> endbss
+</span><span class='line'>.text ;正文段
+</span><span class='line'>begtext:  ;在正文段定义一个标识符
+</span><span class='line'>.data
+</span><span class='line'>begdata:
+</span><span class='line'>.bss
+</span><span class='line'>begbss:
+</span><span class='line'>
+</span><span class='line'>.text <span class="p">!</span>切换至正文段
+</span><span class='line'>BOOTSEG <span class="p">=</span> <span class="m">0</span>x<span class="m">07</span>C<span class="m">0</span>  <span class="p">!</span>BIOS加载bootsect代码的原始段地址
+</span><span class='line'>
+</span><span class='line'><span class="p">!</span>entry是保留关键字，用于连接器ld86在生产的可执行文件中<span class="p">,</span>包括其后制定的标志
+</span><span class='line'><span class="p">!</span><span class="s1">&#39;start&#39;</span>通常在连接多个目标文件生成一个可执行文件时应该在其中一个汇编程序
+</span><span class='line'><span class="p">!</span>中用entry指定一个入口标号，以便调试
+</span><span class='line'>entry <span class="k">start</span>
+</span><span class='line'><span class="k">start</span>:
+</span><span class='line'>  jmpi <span class="k">go</span><span class="p">,</span> BOOTSEG  <span class="p">!</span>jmpi段间跳转指令
+</span><span class='line'>                      <span class="p">!</span>格式是： jmpi 段内偏移，段选择子
+</span><span class='line'>                      <span class="p">!</span>当BIOS把程序加载到物理内存<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>处并跳转到该处执行
+</span><span class='line'>                      <span class="p">!</span>此时，程序的物理地址在<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>处，而段寄存器<span class="k">cs</span>为<span class="m">0</span>
+</span><span class='line'>                      <span class="p">!(</span><span class="k">cs</span>:ip<span class="p">=</span><span class="m">0</span>x<span class="m">0000</span>:<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span><span class="p">)</span>，所以我们要跳转到BOOTSEG处
+</span><span class='line'>                      <span class="p">!</span>执行后<span class="k">cs</span>:ip<span class="p">=</span><span class="m">0</span>x<span class="m">07</span>C<span class="m">0</span>:<span class="m">0</span>x<span class="m">0005</span>
+</span><span class='line'>                      <span class="p">!</span>指令的物理地址<span class="k">cs</span>*<span class="m">10</span>h<span class="p">+</span>ip
+</span><span class='line'><span class="k">go</span>:
+</span><span class='line'>  mov ax<span class="p">,</span> #BOOTSEG <span class="p">!</span><span class="k">cs</span><span class="p">-&gt;</span>ax<span class="p">,</span>用来初始化数据段寄存器<span class="k">ds</span>和es，让他们都指向<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>段，
+</span><span class='line'>                      <span class="p">!</span>便于对程序中数据<span class="p">(</span>字符串<span class="p">)</span>进行寻址
+</span><span class='line'>  mov <span class="k">ds</span><span class="p">,</span> ax
+</span><span class='line'>  mov es<span class="p">,</span> ax
+</span><span class='line'><span class="p">!</span> 几种寻址方式:
+</span><span class='line'><span class="p">!</span> * 直接寄存器寻址<span class="p">(</span>跳转到bx值指定的地址处<span class="p">)</span>:
+</span><span class='line'><span class="p">!</span>       MOV bx<span class="p">,</span> ax
+</span><span class='line'><span class="p">!</span>       JMP bx
+</span><span class='line'><span class="p">!</span> * 间接寄存器寻址<span class="p">(</span>bx值指定内存位置处的内容作为跳转的地址<span class="p">)</span>:
+</span><span class='line'><span class="p">!</span>       MOV [bx]<span class="p">,</span> ax
+</span><span class='line'><span class="p">!</span>       JMP [bx]
+</span><span class='line'><span class="p">!</span> * 立即数&amp;字符串地址值保存:
+</span><span class='line'><span class="p">!</span>       MOV ax<span class="p">,</span> #<span class="m">1234</span>
+</span><span class='line'><span class="p">!</span>       MOV ax<span class="p">,</span> #msg1
+</span><span class='line'><span class="p">!</span> * 绝对寻址<span class="p">(</span>把内存地址<span class="m">1234</span>处的内容放入ax<span class="p">)</span>:
+</span><span class='line'><span class="p">!</span>       MOV ax<span class="p">,</span> <span class="m">1234</span>
+</span><span class='line'><span class="p">!</span> * 索引寻址<span class="p">(</span>把第<span class="m">2</span>个操作数所指内存处的值放入ax<span class="p">)</span>:
+</span><span class='line'><span class="p">!</span>       MOV ax<span class="p">,</span> msg1[bx]
+</span><span class='line'><span class="p">!</span>       MOV ax<span class="p">,</span> msg1[bx*<span class="m">4</span> <span class="p">+</span> <span class="k">di</span>]
+</span><span class='line'>
+</span><span class='line'>  mov cx<span class="p">,</span> #<span class="m">20</span>       <span class="p">!</span>cx <span class="p">=</span> 串长度
+</span><span class='line'>  mov dx<span class="p">,</span> #<span class="m">0</span>x<span class="m">0101</span>
+</span><span class='line'>  mov bx<span class="p">,</span> #<span class="m">0</span>x<span class="m">000</span>C    <span class="p">!</span>页号为<span class="m">0</span><span class="p">(</span><span class="nb">bh</span> <span class="p">=</span> <span class="m">0</span>x<span class="m">00</span><span class="p">)</span>黑底红字<span class="p">(</span><span class="k">bl</span> <span class="p">=</span> <span class="m">0</span>x<span class="m">0</span>C<span class="p">,</span>高亮<span class="p">)</span>
+</span><span class='line'>  mov <span class="k">bp</span><span class="p">,</span> #BootMessage<span class="p">+</span><span class="m">32</span> <span class="p">!</span>es:<span class="k">bp</span> <span class="p">=</span> 串地址，为什么要加<span class="m">32</span>
+</span><span class='line'>                          <span class="p">!</span>在使用qemu的调试中，这里是不需要加<span class="m">32</span>的
+</span><span class='line'>                          <span class="p">!</span>在使用真机进行调试时，这里需要加<span class="m">32</span>
+</span><span class='line'>                          <span class="p">!</span>主要原因跟在使用as86汇编进行编译链接后，会在生
+</span><span class='line'>                          <span class="p">!</span>成的文件开头多出<span class="m">32</span>字节，这多出来的<span class="m">32</span>字节是MINIX
+</span><span class='line'>                          <span class="p">!</span>可执行 文件的头结构。
+</span><span class='line'>  mov ax<span class="p">,</span> #<span class="m">0</span>x<span class="m">1301</span>    <span class="p">!</span>ah <span class="p">=</span> <span class="m">0</span>x<span class="m">13</span><span class="p">,</span> <span class="k">al</span> <span class="p">=</span> <span class="m">0</span>x<span class="m">01</span>
+</span><span class='line'>  int <span class="m">0</span>x<span class="m">10</span>
+</span><span class='line'><span class="p">!</span>功能<span class="m">13</span>H
+</span><span class='line'><span class="p">!</span>功能描述：在Teletype模式下显示字符串 入口参数：AH＝<span class="m">13</span>H BH＝页码
+</span><span class='line'><span class="p">!</span>BL＝属性<span class="p">(</span>若AL<span class="p">=</span><span class="m">00</span>H或<span class="m">01</span>H<span class="p">)</span> CX＝显示字符串长度 <span class="p">(</span>DH、DL<span class="p">)</span>＝坐标<span class="p">(</span>行、列<span class="p">)</span>
+</span><span class='line'><span class="p">!</span>ES:BP＝显示字符串的地址 AL＝显示输出方式
+</span><span class='line'><span class="p">!</span><span class="m">0</span>——字符串中只含显示字符，其显示属性在BL中。显示后，光标位置不变
+</span><span class='line'><span class="p">!</span><span class="m">1</span>——字符串中只含显示字符，其显示属性在BL中。显示后，光标位置改变
+</span><span class='line'><span class="p">!</span><span class="m">2</span>——字符串中含显示字符和显示属性。显示后，光标位置不变
+</span><span class='line'><span class="p">!</span><span class="m">3</span>——字符串中含显示字符和显示属性。显示后，光标位置改变
+</span><span class='line'><span class="p">!</span>出口参数：无
+</span><span class='line'>
+</span><span class='line'>loop_forever:
+</span><span class='line'>  jmp loop_forever    <span class="p">!</span>死循环，防止程序进入数据段
+</span><span class='line'>
+</span><span class='line'>BootMessage:
+</span><span class='line'>  .<span class="k">ascii</span>  <span class="s2">&quot;Loading system ...&quot;</span>       <span class="p">!</span>字符串定义
+</span><span class='line'>  .byte <span class="m">13</span><span class="p">,</span><span class="m">10</span>        <span class="p">!</span>回车和换行符的ASCII码定义，字符定义使用.byte
+</span><span class='line'>
+</span><span class='line'><span class="p">!</span>.org定义了当前汇编的位置
+</span><span class='line'><span class="p">!</span>会把汇编器便已过程中当前的位置计数器调整为给出的值
+</span><span class='line'>.org <span class="m">478</span>
+</span><span class='line'>
+</span><span class='line'>boot_flag:
+</span><span class='line'>  .word <span class="m">0</span>xAA<span class="m">55</span>
+</span><span class='line'>
+</span><span class='line'>.text
+</span><span class='line'>endtext:
+</span><span class='line'>.data
+</span><span class='line'>enddata:
+</span><span class='line'>.bss
+</span><span class='line'>endbss:
+</span><span class='line'><span class="p">!</span>这样写表示不区分代码段，数据段<span class="p">,</span>bss段<span class="p">(</span>未初始化的变量<span class="p">)</span>;只有一个段
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L......:"></a>
+<h4>编译:</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>$ as86 <span class="m">-0</span> <span class="p">-</span><span class="k">a</span> <span class="p">-</span><span class="k">o</span> bootsect.<span class="k">o</span> bootsect.<span class="k">s</span>     ; 生成与<span class="k">as</span>部分兼容的目标文件<span class="p">(-</span><span class="k">a</span><span class="p">)</span>
+</span><span class='line'>$ ld86 <span class="m">-0</span> <span class="p">-</span><span class="k">s</span> <span class="p">-</span><span class="k">o</span> bootsect bootsect.<span class="k">o</span>       ; 链接<span class="p">,</span> 去掉符号信息<span class="p">(-</span><span class="k">s</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span>上面给出的版本是真机调试的版本，在使用qemu调试的版本中，使用<span class="k">ll</span>命令查看bootsect<span class="p">,</span>最后生成的bootsect为<span class="m">544</span>字节<span class="p">,</span>
+</span><span class='line'><span class="sr">//</span>并非<span class="m">512</span><span class="p">,</span> 多出来的<span class="m">32</span>字节是MINIX可执行文件的头结构<span class="p">,</span> 为了使这个程序能引导启动机器<span class="p">,</span>需要人工去掉这<span class="m">32</span>字节
+</span><span class='line'>
+</span><span class='line'>$dd <span class="nb">bs</span><span class="p">=</span><span class="m">32</span> <span class="k">if</span><span class="p">=</span>bootsect of<span class="p">=</span>boot skip<span class="p">=</span><span class="m">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L............"></a>
+<h4>测试结果</h4>
+
+<ol>
+<li><p>这是QEMU下的测试结果</p>
+
+<p><img src="http://localhost/upload/2016/JAN/23/imgs/1453569831.png" alt="QEMU下的测试结果" /></p></li>
+<li><p>这是真机下的测试结果</p>
+
+<p><img src="http://localhost/upload/2016/JAN/23/imgs/1453570778.png" alt="真机下的测试结果" /></p></li>
+</ol>
+
+
+<p></br></p>
+
+<hr />
+
+<p>BIOS 中断详细参数参见:<br>
+1. <a href="http://wenku.baidu.com/link?url=b33px-tPBF8TKPpmacQ4-yI2Fe6GkZ7m6zVXa4G8-lBFoXFHYg4CYn4bRJaV4T3AVbGC3BD2AHDg-Rzx8JiiGJObqV7X_wQzZoh2mu3RWYy">百度文库Int 10的详细参数</a><br>
+2. <a href="http://www.ctyme.com/intr/int.htm">所有中断的参数</a><br></p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/01/09/APOS--part02--%E5%88%A9%E7%94%A810%E5%8F%B7%E4%B8%AD%E6%96%AD%EF%BC%8C%E5%9C%A8%E5%B1%8F%E5%B9%95%E4%B8%8A%E6%98%BE%E7%A4%BA%E5%AD%97%E7%AC%A6/APOS--part02--利用10号中断，在屏幕上显示字符" data-title="APOS--part02--利用10号中断，在屏幕上显示字符" data-url="http://www.annpeter.cn/blog/2016/01/09/APOS--part02--%E5%88%A9%E7%94%A810%E5%8F%B7%E4%B8%AD%E6%96%AD%EF%BC%8C%E5%9C%A8%E5%B1%8F%E5%B9%95%E4%B8%8A%E6%98%BE%E7%A4%BA%E5%AD%97%E7%AC%A6/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Jan 9th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/apos/'>apos</a>, <a class='category' href='/blog/categories/os/'>os</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

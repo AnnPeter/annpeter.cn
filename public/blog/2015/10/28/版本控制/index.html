@@ -1,0 +1,340 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>版本控制 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="版本控制">
+	<meta name="keywords" content="Server,版本控制,SVN,git,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">版本控制</h2>
+		<div class="entry-content">
+			<a name="SVN.................."></a>
+<h3>SVN标准目录结构</h3>
+
+<ul>
+<li>Trunk这是SVN目录的主分支，表示日常开发的项目，任何时候Trunk目录里包含的都是最新的开发代码。Trunk应该只被用来开发将会成为你的下一个总要的版本的代码。</li>
+<li>Branches</li>
+<li>Experimental branches：有时候你想将某个新技术引入项目。这很好，但是你当然不想堵上你的整个项目。</li>
+<li>Bug fix branches：分支也可以用于处理trunk或者release branches里发现的严重Bug。</li>
+<li>Tags一般情况下，tag是用来做一个milestone的，不管是不是relese，都是一个可用的版本。Tags一般是只读的。</li>
+</ul>
+
+
+<!-- more -->
+
+
+<a name="L............"></a>
+<h3>服务器端</h3>
+
+<ol>
+<li>创建代码仓库
+
+<blockquote><p>$ svnadmin create ~/Documents/SVNRepertory/SVNTest</p></blockquote></li>
+</ol>
+
+
+<a name="L......svn.................................conf...........................svnserver.conf...passwd...authz..."></a>
+<h4>配置svn的用户权限，主要是修改conf目录下的三个文件（svnserver.conf、passwd、authz）</h4>
+
+<ol>
+<li><p>打开svnserver.conf，将下列配置前面的<strong>#</strong>和<strong>空格</strong>全都去掉</p>
+
+<blockquote><p># anon-access = read<br>
+# auth-access = write<br>
+# password-db = passwd<br>
+# authz-db = authz<br></p></blockquote></li>
+<li><p>打开passwd,在[users]下面添加帐号和密码</p>
+
+<blockquote><p>AnnPeter = annpeter<br>
+Ann = ann<br>
+Peter = peter<br></p></blockquote></li>
+<li><p>打开authz，配置用户组和权限</p>
+
+<blockquote><p>[groups]<br>
+#表明AnnPeter,Ann都属于topgroup这个组<br>
+topgroup = AnnPeter,Ann<br>
+<br>
+[/] #代表svn服务器中所有的资源库<br>
+#下面的配置说明topgroup这个组中所有用户对所有资源库都具有读写权限,Peter只有只读权限<br>
+#组名前面要用@；如果是用户名，前面不用加@<br>
+* = r<br>
+@topgroup = rw<br>
+Peter = r<br>
+[annpeter.cn:/trunk]#设置annpeter.cn版本库中trunk目录的权限<br>
+Visitor=rw<br></p></blockquote></li>
+<li><p>启动svn服务器</p>
+
+<blockquote><p>$ svnserve -d -r ~/Documents/SVNRepertory/SVNTest      <br>
+//&ndash;listen-port 指定端口，可开启多个版本库                    <br>
+//如果没有任何提示就是说明启动成功了                      <br></p></blockquote></li>
+</ol>
+
+
+<a name="L........."></a>
+<h3>客户端</h3>
+
+<ol>
+<li><p>从本地导入代码到服务器（第一次初始化导入）</p>
+
+<blockquote><p>$ svn import ../Nots  svn://localhost/SVNTest &ndash;username=AnnPeter &ndash;password=annpeter -m &ldquo;初始化导入&rdquo;</p></blockquote></li>
+<li><p>从服务器端下载代码到客户端本地</p>
+
+<blockquote><p>$ svn checkout svn://localhost/SVNTest &ndash;username=Peter &ndash;password=peter ./</p></blockquote></li>
+<li><p>提交已经更改过的代码到服务器</p>
+
+<blockquote><p>$ svm commite -m &ldquo;修改了main.cpp文件&rdquo;</p></blockquote></li>
+<li><p>更新服务器端代码到客户端
+在终端中，进入客户端代码目录后，如上面的~/Documents/SVNRepertory/SVNTest目录，然后输入指令：</p>
+
+<blockquote><p>$ svn update</p></blockquote></li>
+<li><p>创建分支</p>
+
+<blockquote><p>$ svn mkdir svn://localhost/SVNTest/ &ndash;username=AnnPeter &ndash;password=annpeter -m &ldquo;创建目录&rdquo;<br>
+$ svn mkdir svn://localhost/SVNTest/Android &ndash;username=AnnPeter &ndash;password=annpeter -m &ldquo;创建目录&rdquo;<br>
+$ svn mkdir svn://localhost/SVNTest/Android/trunk &ndash;username=AnnPeter &ndash;password=annpeter -m &ldquo;创建目录&rdquo;<br>
+$ svn mkdir svn://localhost/SVNTest/Android/branches &ndash;username=AnnPeter &ndash;password=annpeter -m &ldquo;创建目录&rdquo;<br>
+$ svn mkdir svn://localhost/SVNTest/Android/tags &ndash;username=AnnPeter &ndash;password=annpeter -m &ldquo;创建目录&rdquo;<br></p></blockquote></li>
+<li><p>查看log信息
+如果出现<strong>svn: E220001: Item is not readable</strong>错误，请在authz文件中 <strong>[/]</strong> 栏目下添加 <strong>* = r</strong></p>
+
+<blockquote><p>$ svn log svn://localhost/Android/sns/trunk/main.cpp &ndash;username=AnnPeter &ndash;password=annpeter<br>
+$ svn log main.cpp<br>
+$ svn log &ndash;stop-on-copy<br></p></blockquote></li>
+<li><p>分支拷贝</p>
+
+<blockquote><p>$ svn copy svn://localhost/Android/sns/trunk svn://localhost/Android/sns/tags/v1.0 -m &ldquo;1.0 released&rdquo;<br></p></blockquote></li>
+</ol>
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2015/10/28/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/版本控制" data-title="版本控制" data-url="http://www.annpeter.cn/blog/2015/10/28/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Oct 28th, 2015</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+---
+layout: post
+title: "Nginx源码编译安装"
+date: 2015-11-01 18:53:31 +1753
+comments: true
+categories: Server
+keywords: Server,Nginx,博客,AnnPeter's Blog
+description: "Nginx源码编译安装"
+
+---
+
+###下载组件
+>1. pcre<br>
+> http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz<br>
+>2. zlib<br>
+> http://zlib.net/zlib-1.2.8.tar.gz<br>
+>3. openssl<br>
+> http://www.openssl.org/source/openssl-1.0.0s.tar.gz<br>
+>4. fancyindex(可选，用于美化目录)<br>
+> https://github.com/aperezdc/ngx-fancyindex/archive/master.zip<br>
+
+<!-- more -->
+
+将上面四个文件下载完成后，解压放在与nginx同一个目录中，无需编译安装，nginx在编译时能引用即可。
+
+###下载编译nginx
+>http://nginx.org/download/nginx-1.8.0.tar.gz<br>
+><br>
+>将上面的组建全部解压，无需安装；然后解压nginx源码，cd到源码目录配置编译安装<br>
+>./configure	--prefix=/usr/local/nginx	--with-pcre=../pcre-8.37	--with-openssl=../openssl-1.0.0s	--with-zlib=../zlib-1.2.8	--with-http_stub_status_module	--with-http_gzip_static_module	--with-ipv6		--add-module=../ngx-fancyindex-master<br>
+
+<br>
+<br>
+Tips:可以在/etc/profile中加入环境变量方便访问
+>\#在/etc/profile文件最后添加代码<br>
+>export PATH="$PATH:/usr/local/nginx/sbin"<br>
+>
+>如果在sudo的时候找不到环境变量，可以给nginx做一个软链接，链接至/usr/local/sbin<br>
+>可以在/etc/sudoers中查看sudo的环境变量路径。<br>
+

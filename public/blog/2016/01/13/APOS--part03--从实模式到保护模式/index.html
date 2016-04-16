@@ -1,0 +1,322 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>APOS--part03--从实模式到保护模式 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="APOS--part03--从实模式到保护模式">
+	<meta name="keywords" content="OS,APOS,从实模式到保护模式,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">APOS--part03--从实模式到保护模式</h2>
+		<div class="entry-content">
+			<a name="L........."></a>
+<h2>实模式</h2>
+
+<p>计算机加电的时候其实就是按照8086的寻址方式来寻址（Intel8086是16位的CPU，有16位的寄存器、16位的数据总线以及20位的地址总线），3段地址和偏移地址两部分组成，物理地址计算公式：</p>
+
+<p>物理地址 = 段地址 × 16 + 偏移地址</p>
+
+<p>即段地址左移4位，加上偏移地址，其中，段地址和偏移地址都是16位的</p>
+
+<!-- more -->
+
+
+<a name="L...........................1MB..................1MB..........................."></a>
+<h4>在实模式下只能访问1MB内存，此时这1MB内存中内容分布如图</h4>
+
+<p><img src="/upload/2016/JAN/23/imgs/1453558510.png" alt="实模式1M内存分布" />
+很显然我们在实模式下有一部分内存是不可动的，我们能改变的只是自由内存区和引导程序加载区，比如你如果动了中断向量表区，那么调用BIOS中断将会出错</p>
+
+<p>从80386开始，Intel家族CPU进入32位时代。80386开始有32位地址线，寻址空间达到了4G。所以使用16位的寄存器已经不够了，这时候我们需要采用新的方法提高寻址能力。</p>
+
+<p>在实模式下，段地址可以看做是地址的一部分：假设说段地址为XXXXh，表示是以XXXX0h开始的一段内存，再由偏移地址指出具体地址。</p>
+
+<p>而在保护模式下，虽然段地址仍然由原来的16位的cs，ds等寄存器表示，但此时它仅仅变成了一个索引，这个索引指向一个数据结构的一个表项，表项中详细定义了段的起始地址、界限以及其它属性等。这个数据结构我们称之为GDT（Global Descriptor Table 全局描述符表）</p>
+
+<p><img src="/upload/2016/JAN/24/imgs/1453573298.png" alt="GDT原理示意图" /></p>
+
+<a name="L...........................GDTR...Global.Descriptor.Table.Register..."></a>
+<h5>首先我们来介绍一下GDTR（Global Descriptor Table Register）</h5>
+
+<p>在Intel的计算机中是使用一个寄存器来保存GDT的首地址：GDTR是一个48位（6字节）寄存器，低16位用于存储段的索引长度，即全局描述符表长度，称为表限，以1字节为一单位（后面说到其实就是全局描述符的个数）。高32位用来存储描述符表的基址。具体如下：</p>
+
+<p><img src="/upload/2016/JAN/24/imgs/1453574049.jpg" alt="GDTR功能描述" />
+这里，首先告诉你全局描述符表里面的每个项，即每个全局描述符长为8字节。</p>
+
+<p></br></p>
+
+<a name="L........................"></a>
+<h5>再介绍段选择子：</h5>
+
+<p>段选择子也是一个寄存器，共16位，用来存储使用第几个段和这个段的部分属性</p>
+
+<p><img src="/upload/2016/JAN/24/imgs/1453574068.jpg" alt="段选择子功能描述" />
+这里的索引值就是指的第几个段，占这个16位寄存器的高13位，共可寻址2<sup>13</sup>=8192个段，多了就寻址不到了，前面说过，每个描述符8个字节，那么可以知道，这个全局描述符表最大可以有8192*8=64KB</p>
+
+<p>TI是个标志，TI=0时表示此选择子是个全局描述符的选择子，为1时表示这是个局部描述符的选择子，此处可以知道，全局描述符的选择子和局部描述符的选择子其实是同一个寄存器。</p>
+
+<p>RPL为特权级，共有四个特权级，最高特权级为00，表示最底层的操作。</p>
+
+<a name="L...................................."></a>
+<h5>最后介绍一下全局描述符表</h5>
+
+<p>全局描述符表是由一个一个的全局描述符组成的，每个描述符8字节，共64位，这64位的作用和分布如下</p>
+
+<p><img src="/upload/2016/JAN/24/imgs/1453574993.jpg" alt="GDT每一项的作用" /></p>
+
+<ol>
+<li><p>段限：顾名思义就是段的长度限制，也就是本描述符所描述的段最大可以有多长，从图上可以看出来，段限分为两部分，共20位，而段的长度的单位是由G标志来控制的，G=0表示长度的单位为1字节，G=1表示长度的单位为4KB。比如G=0而段限为100，那么，此段的大小为1B×100=100B，而如果G=1而段限为100，那么此段大小为4KB×100+4KB=404KB（注意，这里的段限是指向头的，需要加4KB）。</p>
+
+<p> 这里还可以看出来，段基址也被分为两部分，共32位基址，段的基址就是这个段在内存中的开始地址，这里需要指出的是，段的基址为此段可访问的开始地址，加上段限就是此段可访问的地址，那么如果段限为0的话此段还是可以访问开始地址的，这里不深究。</p></li>
+<li><p>TYPE：表明此段的类型
+ 4位中的最高位被清 0 的时候表是它是数据段，相应的余下的三位，从左到右依次为 E、W、A，即数据段的 TYPE 为：0EWA。其中 E 表示向下增长位，置 1 时表示向下增长（这主要是在大小需要动态改变的堆栈段中使用，如果是向下增长的段，动态的改变段的大小限制，会让堆栈空间加到堆栈的底部。如果堆栈的大小不需要改变，那么这个段既可以是向下增长的段，也可以是非向下增长的段） ；W 表示可写位，置 1表示可写；A表示被访问位（如果 CPU访问了它，此位将会被置 1） 。</p>
+
+<p> 4 位中的最高位被置 1 时表示它是代码段，相应的余下的三位，从左到右依次为 C、Ｒ、Ａ，即代码段的 TYPE 为：1CRA。其中 C 是表明此代码段是否是一致代码段，如果 C 被置1，表明此是一致代码段。一致代码段主要是用于特权级访问控制，这在以后的实验报告中会详细论述；R 表明此段是否可读，置 1 表示可读；A表示被访问位，这与前述一样。</p></li>
+<li><p>S：为 1 时表示这是一个代码段或数据段描述符，为 0 时表示这是一个系统段描述符。
+ 系统段描述符又称为特殊段描述符， 包括： 局部描述符表 （LDT） 描述符， 任务状态段 （TSS）描述符，调用门描述符，中断门描述符，陷阱门及任务门描述符等。</p></li>
+<li><p>DPL：表示特权级，从 00~11，共 0，1，2，3 四个特权级</p></li>
+<li><p>P：为 0 是表示此描述符无效，不能被使用</p></li>
+<li><p>AVL：留给程序员随便用的</p></li>
+<li><p>D/B：为 0 的时候表示它是一个 16 位的段，为 1时表示它是一个 32 位的段</p></li>
+</ol>
+
+
+<p>[Tip]：设置这些寄存器什么的在汇编里面都有特定的伪指令对应</p>
+
+<a name="L.................."></a>
+<h2>进入保护模式</h2>
+
+<p>在由实模式到保护模式的最大的问题就是内存访问的问题了，现在内存访问问题解决了，那么怎么进入实模式呢？
+很明显要设置GDTR，还有打开A20地址线，一般还要初始化8259A中断控制器，最后一步就是设置CR0控制寄存器，你可能不知道我在说什么，没关系，我一个个介绍。</p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/01/13/APOS--part03--%E4%BB%8E%E5%AE%9E%E6%A8%A1%E5%BC%8F%E5%88%B0%E4%BF%9D%E6%8A%A4%E6%A8%A1%E5%BC%8F/APOS--part03--从实模式到保护模式" data-title="APOS--part03--从实模式到保护模式" data-url="http://www.annpeter.cn/blog/2016/01/13/APOS--part03--%E4%BB%8E%E5%AE%9E%E6%A8%A1%E5%BC%8F%E5%88%B0%E4%BF%9D%E6%8A%A4%E6%A8%A1%E5%BC%8F/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Jan 13th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/apos/'>apos</a>, <a class='category' href='/blog/categories/os/'>os</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

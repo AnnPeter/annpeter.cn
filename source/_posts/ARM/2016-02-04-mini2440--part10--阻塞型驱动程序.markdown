@@ -1,0 +1,46 @@
+---
+layout: post
+title: "mini2440--part10--阻塞型驱动程序"
+date: 2016-02-04 18:19:55 +9901
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,阻塞型驱动程序,博客,AnnPeter's Blog
+description: "mini2440--part10--阻塞型驱动程序"
+zTree: true
+
+---
+
+
+当一个设备无法立刻满足用户的读写请求时，驱动程序应当(缺省地)阻塞进程，使他进入等待(睡眠)状态，直到请求可以得到满足。
+
+<!-- more -->
+
+####内核等待队列
+将需要阻塞的进程放入内核等待队列中，当条件得到满足，等待队列中的线程会被执行。
+
+1. 定义等待队列
+	wait_queue_head_t my_queue;
+
+2. 初始化等待队列
+	init_waitqueue_head(&my_queue);
+
+3. 定义加初始化等待队列
+	DECLARE_AWIT_QUEUE_HEAD(my_queue);
+
+4. 进入等待队列，睡眠
+	* wait_event(queue, condition);
+    当condition(布尔表达式)为真时，立刻返回(即表示现在有数据，不用等待)；否则让进程进入TASK_UNINTERRUPTIBLE模式的睡眠，并挂在queue参数所指定的等待队列上。
+
+	* wait_event_interruptible(queue, condition);
+    当condition(布尔表达式)为真时，立刻返回(即表示现在有数据，不用等待)；否则让进程进入TASK_INTERRUPTIBLE模式的睡眠，并挂在queue参数所指定的等待队列上。
+
+	* wait_event_killable(queue, conditiion);
+	当condition(布尔表达式)为真时，立即返回(即表示现在有数据，不用等待)；否则让进程进入TASK_KILLABLE的睡眠，并挂在queue参数所指定的等待队列上。
+
+5. 从等待队列中唤醒进程
+	* wake_up(wait_queue_t* q);
+	从等待队列q中唤醒状态为TASK_UNINTERRUPTIBLE、TASK_INTERRUPTIBLE、TASK_KILLABLE的所有进程。
+
+    * wake_up_interruptible(wait_queue_t* q);
+    从等待队列q中唤醒状态为TASK_INTERRUPTIABLE的进程。
+

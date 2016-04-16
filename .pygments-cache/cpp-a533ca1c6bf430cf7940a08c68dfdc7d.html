@@ -1,0 +1,9 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">file_operations</span> <span class="n">dev_fops</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="p">.</span><span class="n">llseek</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">,</span>
+	<span class="p">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">dev_read</span><span class="p">,</span>
+	<span class="p">.</span><span class="n">write</span> <span class="o">=</span> <span class="n">dev_write</span><span class="p">,</span>
+	<span class="p">.</span><span class="n">ioctl</span> <span class="o">=</span> <span class="n">dev_ioctl</span><span class="p">,</span>
+	<span class="p">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">dev_open</span><span class="p">,</span>
+	<span class="p">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">dev_release</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>

@@ -1,0 +1,464 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini2440--part08--Linux中断处理过程 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="mini2440--part08--Linux中断处理过程">
+	<meta name="keywords" content="ARM,mini2440,Linux中断处理过程,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">mini2440--part08--Linux中断处理过程</h2>
+		<div class="entry-content">
+			<p>Linux中断处理过程，不同平台在中断入口时的处理可能有所不同。
+1. 在entry-armv.S中定义了中断统一的入口__irq_svc。
+2. 然后执行entry-armv.S中的irq_handler，获取中断号
+3. 调用irq.c中的asm_do_IRQ
+4. 调用irq.c中的generic_handle_irq，在这个过程中取得irq_desc
+5. 调用irq.c中的generic_handle_irq_desc
+6. 最后根据irq_desc中action中的用户事先设置好的handler，调用处理例程。</p>
+
+<!-- more -->
+
+
+<a name="L............"></a>
+<h3>中断注册</h3>
+
+<p>Linux使用request_irq函数注册中断。</p>
+
+<blockquote><p>int request_irq(unsigned int irq, void (<em>handler)(int, void</em>, struct pt_regs<em>), unsigned long flags, const char</em> devname, void* dev_id);<br>
+参数:<br>
+irq：中断号<br>
+handler：中断处理函数<br>
+flags：与中断管理有关的选项<br>
+devname：设备名<br>
+dev_id：共享中断时使用<br></p></blockquote>
+
+<p>在flag参数中，可以选择一些与中断管理有关的选项，如：
+* IRQF_DISABLED(SA_INTERRUPT)：如果设置该位，表示这是一个“快速”中断处理程序；如果没有设置这位，那么是一个“慢速”中断处理程序。
+* IRQF_SHARED(SA_SHIRQ)：该位表明该中断号是多个设备共享的。</p>
+
+<a name="L.............................."></a>
+<h4>中断处理函数的流程：</h4>
+
+<ol>
+<li>检查设备是否产生了中断</li>
+<li>清除中断产生标志</li>
+<li>相应的硬件操作</li>
+</ol>
+
+
+<p>快速中断和慢速中断的主要区别在于：快速中断保证中断处理的原子性(不被打断)，而慢速中断则不保证。也就是“开启中断”标志位(处理器IF)在运行快速中断处理程序时是关闭的，因次在服务该中断时，不会被其它类型的中断打断；而调用慢速中断处理时，其它类型中断仍然可以得到服务。</p>
+
+<p>中断处理程序的特别之处是在中断上下文中运行的，它的行为受到某些限制：</p>
+
+<ol>
+<li>不能使用可能引起阻塞的函数</li>
+<li>不能使用可能引起调度的函数</li>
+</ol>
+
+
+<a name="L............"></a>
+<h3>中断注销</h3>
+
+<p>当设备不再需要使用中断时(通常在驱动卸载时), 应当把它们注销, 使用函数:void free_irq(unsigned int irq, void *dev_id)，dev_id用于共享中断时使用。</p>
+
+<a name="L.................."></a>
+<h2>中断分层处理</h2>
+
+<p>在Linux中断中，当中断类型为慢速中断时，同类设备中断不能嵌套；当中断类型为快速中断时，当一个中断例程在执行时，其它中断都会被忽略。</p>
+
+<p>中断分层技术主要是减少中断处理的时间。中断分层主要分为和硬件相关的操作(上半部，中断处理程序，即：中断上下文中执行)、检测和处理(下半部，内核中执行)。</p>
+
+<ul>
+<li>上半部:当中断发生时,它进行相应地硬件读写,并“登记”该中断。通常由中断处理程序充当上半部。</li>
+<li>下半部:在系统空闲的时候对上半部“登记”的中断进行后续处理。</li>
+</ul>
+
+
+<a name="L.........................................."></a>
+<h4>中断分层技术主要有三种方式：</h4>
+
+<ol>
+<li>中断嵌套</li>
+<li>中断分层方式</li>
+<li>工作队列</li>
+</ol>
+
+
+<p>工作队列是一种将任务推后执行的形式,他把推后的任务交由一个内核线程去执行。这样下半部会在进程上下文执行,它允许重新调度甚至睡眠。 每个被推后的任务叫做“工作”,由这些工作组成的队列称为工作队列。</p>
+
+<p><img src="/upload/2016/FEB/06/imgs/1454705882.png" alt="工作队列工作流程图" />
+<img src="/upload/2016/FEB/06/imgs/1454705885.png" alt="工作队列流程数据结构" /></p>
+
+<p>Linux内核使用struct workqueue_struct来描述一个工作队列,使用struct work_struct来描述一个工作项。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">workqueue_struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">cpu_workqueue_struct</span> <span class="o">*</span><span class="n">cpu_wq</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="cm">/*workqueue name*/</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">singlethread</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">freezeable</span><span class="p">;</span> <span class="cm">/* Freeze threads during suspend */</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rt</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">work_struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">atomic_long_t</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">entry</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">work_func_t</span> <span class="n">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="kt">work_func_t</span><span class="p">)(</span><span class="k">struct</span> <span class="n">work_struct</span> <span class="o">*</span><span class="n">work</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>创建工作队列 create_workqueue</li>
+<li>创建工作 INIT_WORK</li>
+<li>提交工作 queue_work</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: queue.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Sat 06 Feb 2016 05:05:59 AM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>  <span class="c1">//工作队列必须遵守GPL协议</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">workqueue_struct</span><span class="o">*</span> <span class="n">ap_workqueue</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">work_struct</span><span class="o">*</span> <span class="n">work1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">work1_func</span><span class="p">(</span><span class="k">struct</span> <span class="n">work_struct</span><span class="o">*</span> <span class="n">work</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">printk</span><span class="p">(</span><span class="s">&quot;this is work1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">que_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">//1.创建工作队列</span>
+</span><span class='line'>  <span class="c1">//在多数情况下，驱动程序并不需要自己创建工作队列，只需要定义工作，提交到</span>
+</span><span class='line'>  <span class="c1">//内核默认的工作队列keventd_wq即可,在提交工作时，使用schedule_work函数</span>
+</span><span class='line'>  <span class="c1">//简化操作int schedule_work(struct work_struct *work)；</span>
+</span><span class='line'>  <span class="n">ap_workqueue</span> <span class="o">=</span> <span class="n">create_workqueue</span><span class="p">(</span><span class="s">&quot;ap_workqueue&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">work1</span> <span class="o">=</span> <span class="n">kmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">work_struct</span><span class="p">),</span> <span class="n">GFP_KERNEL</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">//2.创建工作</span>
+</span><span class='line'>  <span class="n">INIT_WORK</span><span class="p">(</span><span class="n">work1</span><span class="p">,</span> <span class="n">work1_func</span><span class="p">);</span> 
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//3.提交工作到工作队列</span>
+</span><span class='line'>  <span class="n">queue_work</span><span class="p">(</span><span class="n">ap_workqueue</span><span class="p">,</span> <span class="n">work1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">que_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">que_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">que_exit</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/mini2440--part08--Linux中断处理过程" data-title="mini2440--part08--Linux中断处理过程" data-url="http://www.annpeter.cn/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Feb 2nd, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

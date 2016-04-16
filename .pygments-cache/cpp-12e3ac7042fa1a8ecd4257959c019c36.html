@@ -1,0 +1,16 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">workqueue_struct</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">cpu_workqueue_struct</span> <span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">cpu_wq</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">name</span><span class="p">;</span> <span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">workqueue</span> <span class="n">name</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+    <span class="kt">int</span> <span class="n">singlethread</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">freezeable</span><span class="p">;</span> <span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">Freeze</span> <span class="n">threads</span> <span class="n">during</span> <span class="n">suspend</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+    <span class="kt">int</span> <span class="n">rt</span><span class="p">;</span>
+<span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">struct</span> <span class="n">work_struct</span> <span class="p">{</span>
+    <span class="kt">atomic_long_t</span> <span class="n">data</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">entry</span><span class="p">;</span>
+    <span class="kt">work_func_t</span> <span class="n">func</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="kt">work_func_t</span><span class="p">)(</span><span class="k">struct</span> <span class="n">work_struct</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">work</span><span class="p">);</span>
+</pre></div>

@@ -1,0 +1,14 @@
+<div class="highlight"><pre>允许<span class="m">22</span>、<span class="m">80</span>、<span class="m">3306</span>端口的数据
+$ sudo iptables <span class="p">-</span>A INPUT <span class="p">-</span><span class="k">p</span> tcp <span class="p">--</span>dport <span class="m">22</span> <span class="p">-</span><span class="k">j</span> ACCEPT
+$ sudo iptables <span class="p">-</span>A INPUT <span class="p">-</span><span class="k">p</span> tcp <span class="p">--</span>dport <span class="m">80</span> <span class="p">-</span><span class="k">j</span> ACCEPT
+$ sudo iptables <span class="p">-</span>A INPUT <span class="p">-</span><span class="k">p</span> tcp <span class="p">--</span>dport <span class="m">3306</span> <span class="p">-</span><span class="k">j</span> ACCEPT
+
+允许loopback数据
+$ sudo iptables <span class="p">-</span>I INPUT <span class="m">1</span> <span class="p">-</span><span class="k">i</span> <span class="k">lo</span> <span class="p">-</span><span class="k">j</span> ACCEPT
+
+阻止其它数据
+$ sudo iptables <span class="p">-</span><span class="k">P</span> INPUT DROP
+
+查看设置好的规则
+$ sudo iptables <span class="p">-</span>L <span class="p">--</span>line<span class="p">-</span>numbers
+</pre></div>

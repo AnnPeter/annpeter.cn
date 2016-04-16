@@ -1,0 +1,19 @@
+<div class="highlight"><pre>方法一:
+<span class="p">(</span>适用于管理员或者有全局权限的用户重设其它用户的密码<span class="p">)</span>
+进入命令行模式
+$ mysql <span class="p">-</span><span class="k">u</span> root <span class="p">-</span><span class="k">p</span>
+
+mysql<span class="p">&gt;</span>use mysql;
+mysql<span class="p">&gt;</span> UPDATE user SET password<span class="p">=</span>PASSWORD<span class="p">(</span><span class="s2">&quot;new password&quot;</span><span class="p">)</span> WHERE user<span class="p">=</span><span class="s1">&#39;username&#39;</span>;
+mysql<span class="p">&gt;</span> FLUSH PRIVILEGES;
+mysql<span class="p">&gt;</span> quit;
+
+方法二:
+$ mysql <span class="p">-</span><span class="k">u</span> root <span class="p">-</span><span class="k">p</span>
+mysql<span class="p">&gt;</span>use mysql;
+mysql<span class="p">&gt;</span> SET PASSWORD FOR   username<span class="p">=</span>PASSWORD<span class="p">(</span><span class="s1">&#39;new password&#39;</span><span class="p">)</span>;
+mysql<span class="p">&gt;</span> QUIT
+
+方法三:
+$ mysqladmin <span class="p">-</span><span class="k">u</span> root <span class="s2">&quot;old password&quot;</span> <span class="s2">&quot;new password&quot;</span>
+</pre></div>

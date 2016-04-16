@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="cm">/*************************************************************************</span>
+<span class="cm">    &gt; File Name: hello_module.c</span>
+<span class="cm">    &gt; Author: AnnPeter</span>
+<span class="cm">    &gt; Mail: 864587669@qq.com</span>
+<span class="cm">    &gt; Created Time: Sun 31 Jan 2016 05:44:56 PM CST</span>
+<span class="cm"> ************************************************************************/</span>
+
+
+<span class="cp">#include &lt;linux/init.h&gt;</span>
+<span class="cp">#include &lt;linux/module.h&gt;</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="nf">hello_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">print</span><span class="p">(</span><span class="n">KERN_WARNING</span><span class="s">&quot;hello,world!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">hello_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span><span class="s">&quot;Goodbye,word!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">hello_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">hello_exit</span><span class="p">);</span>
+</pre></div>

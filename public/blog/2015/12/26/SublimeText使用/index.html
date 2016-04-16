@@ -1,0 +1,464 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>SublimeText使用 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="SublimeText使用">
+	<meta name="keywords" content="SublimeText,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">SublimeText使用</h2>
+		<div class="entry-content">
+			<a name="L.................."></a>
+<h2>插件安装准备</h2>
+
+<a name="L1......Ctrl........console"></a>
+<h5>1、按Ctrl+`调出console</h5>
+
+<a name="L2..................................................."></a>
+<h5>2、粘贴以下代码到底部命令行并回车：</h5>
+
+<blockquote><p>import urllib2,os;pf=&lsquo;Package Control.sublime-package&rsquo;;ipp=sublime.installed_packages_path();os.makedirs(ipp) if not os.path.exists(ipp) else None;open(os.path.join(ipp,pf),&lsquo;wb&rsquo;).write(urllib2.urlopen(&lsquo;http://sublime.wbond.net/&rsquo;+pf.replace(&lsquo; &rsquo;,&lsquo;%20&rsquo;)).read())</p></blockquote>
+
+<!-- more -->
+
+
+<a name="L3.........Sublime.Text.2..."></a>
+<h5>3、重启Sublime Text 2。</h5>
+
+<a name="L4............Perferences-.package.settings.........package.control.............................."></a>
+<h5>4、如果在Perferences->package settings中看到package control这一项，则安装成功。</h5>
+
+<a name="L......Markdown........."></a>
+<h3>编辑Markdown小技巧</h3>
+
+<blockquote><p>选中多行，按下Command+Shift+L  &mdash;&mdash;&mdash;-   可以同时编辑这些行<br>
+然后使用Command+左右键 &mdash;&mdash;&mdash;-   移动光标至行首，行尾<br>
+然后进行多行编辑编辑<br></p></blockquote>
+
+<a name="L......"></a>
+<h2>插件</h2>
+
+<a name="autofilename"></a>
+<h3>autofilename</h3>
+
+<ul>
+<li>功能：快捷输入文件名</li>
+<li>输入" / &ldquo;即可看到相对于本项目文件夹的其它文件</li>
+</ul>
+
+
+<a name="Convert...To...UTF8"></a>
+<h3>Convert​To​UTF8</h3>
+
+<ul>
+<li>功能：解决JBK编码文件自动转换为utf-8格式，解决乱码问题</li>
+</ul>
+
+
+<a name="SublimeLinter"></a>
+<h3>SublimeLinter</h3>
+
+<ul>
+<li>代码校验插件，支持多种语言</li>
+</ul>
+
+
+<a name="Colorcoder"></a>
+<h3>Colorcoder</h3>
+
+<ul>
+<li>高亮所有变量，因此可以极大的简化代码定位。尤其是对那些有阅读障碍的程序员非常有帮助。</li>
+</ul>
+
+
+<a name="Emmet"></a>
+<h3>Emmet</h3>
+
+<ul>
+<li>功能：html标签快捷输入</li>
+<li><p>语法</p>
+
+<pre><code class="``css">  后代：&gt;
+  缩写：nav&gt;ul&gt;li
+  &lt;nav&gt;
+      &lt;ul&gt;
+          &lt;li&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+  &lt;/nav&gt;
+</code></pre>
+
+<pre><code class="``css">  兄弟：+
+  缩写：div+p+bq
+  &lt;div&gt;&lt;/div&gt;
+  &lt;p&gt;&lt;/p&gt;
+  &lt;blockquote&gt;&lt;/blockquote&gt;
+</code></pre>
+
+<pre><code class="``css">  上级：^
+  缩写：div+div&gt;p&gt;span+em^bq
+  &lt;div&gt;&lt;/div&gt;
+  &lt;div&gt;
+      &lt;p&gt;&lt;span&gt;&lt;/span&gt;&lt;em&gt;&lt;/em&gt;&lt;/p&gt;
+      &lt;blockquote&gt;&lt;/blockquote&gt;
+  &lt;/div&gt;
+</code></pre>
+
+<pre><code class="``css">  分组：(   )
+  缩写：div&gt;(header&gt;ul&gt;li*2&gt;a)+footer&gt;p
+  &lt;div&gt;
+      &lt;header&gt;
+          &lt;ul&gt;
+              &lt;li&gt;&lt;a href=""&gt;&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href=""&gt;&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+      &lt;/header&gt;
+      &lt;footer&gt;
+          &lt;p&gt;&lt;/p&gt;
+      &lt;/footer&gt;
+  &lt;/div&gt;
+
+
+  缩写：(div&gt;dl&gt;(dt+dd)*3)+footer&gt;p
+  &lt;div&gt;
+      &lt;dl&gt;
+          &lt;dt&gt;&lt;/dt&gt;
+          &lt;dd&gt;&lt;/dd&gt;
+          &lt;dt&gt;&lt;/dt&gt;
+          &lt;dd&gt;&lt;/dd&gt;
+          &lt;dt&gt;&lt;/dt&gt;
+          &lt;dd&gt;&lt;/dd&gt;
+      &lt;/dl&gt;
+  &lt;/div&gt;
+  &lt;footer&gt;
+      &lt;p&gt;&lt;/p&gt;
+  &lt;/footer&gt;
+</code></pre>
+
+<pre><code class="``css">  乘法：*
+  缩写：ul&gt;li*5
+  &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+</code></pre>
+
+<pre><code class="``css">  自增符号：$
+  缩写：ul&gt;li.item$*5
+  &lt;ul&gt;
+      &lt;li class="item1"&gt;&lt;/li&gt;
+      &lt;li class="item2"&gt;&lt;/li&gt;
+      &lt;li class="item3"&gt;&lt;/li&gt;
+      &lt;li class="item4"&gt;&lt;/li&gt;
+      &lt;li class="item5"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  缩写：ul&gt;li.item$$$*5
+  &lt;ul&gt;
+      &lt;li class="item001"&gt;&lt;/li&gt;
+      &lt;li class="item002"&gt;&lt;/li&gt;
+      &lt;li class="item003"&gt;&lt;/li&gt;
+      &lt;li class="item004"&gt;&lt;/li&gt;
+      &lt;li class="item005"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  缩写：ul&gt;li.item$@-*5
+  &lt;ul&gt;
+      &lt;li class="item5"&gt;&lt;/li&gt;
+      &lt;li class="item4"&gt;&lt;/li&gt;
+      &lt;li class="item3"&gt;&lt;/li&gt;
+      &lt;li class="item2"&gt;&lt;/li&gt;
+      &lt;li class="item1"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  缩写：ul&gt;li.item$@3*5
+  &lt;ul&gt;
+      &lt;li class="item3"&gt;&lt;/li&gt;
+      &lt;li class="item4"&gt;&lt;/li&gt;
+      &lt;li class="item5"&gt;&lt;/li&gt;
+      &lt;li class="item6"&gt;&lt;/li&gt;
+      &lt;li class="item7"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+</code></pre>
+
+<pre><code class="``css">  id和class属性
+  缩写：form#search.wide
+  &lt;form id="search" class="wide"&gt;&lt;/form&gt;
+
+  缩写：p.class1.class2.class3
+  &lt;p class="class1 class2 class3"&gt;&lt;/p&gt;
+
+  自定义属性
+  缩写：[a='value1' b="value2"]
+  &lt;div a="value1" b="value2"&gt;&lt;/div&gt;
+</code></pre>
+
+<pre><code class="``css">  缩写：option[value=$]*12&gt;{$月份}
+
+  &lt;option value="1"&gt;1月份&lt;/option&gt;
+  &lt;option value="2"&gt;2月份&lt;/option&gt;
+  &lt;option value="3"&gt;3月份&lt;/option&gt;
+  &lt;option value="4"&gt;4月份&lt;/option&gt;
+  &lt;option value="5"&gt;5月份&lt;/option&gt;
+  &lt;option value="6"&gt;6月份&lt;/option&gt;
+  &lt;option value="7"&gt;7月份&lt;/option&gt;
+  &lt;option value="8"&gt;8月份&lt;/option&gt;
+  &lt;option value="9"&gt;9月份&lt;/option&gt;
+  &lt;option value="10"&gt;10月份&lt;/option&gt;
+  &lt;option value="11"&gt;11月份&lt;/option&gt;
+  &lt;option value="12"&gt;12月份&lt;/option&gt;
+</code></pre>
+
+<pre><code class="``css">  文本：{}
+  缩写：a{Click me}
+  &lt;a href=""&gt;Click me&lt;/a&gt;
+
+  缩写：p&gt;{Click }+a{here}+{ to continue}
+  &lt;p&gt;Click &lt;a href=""&gt;here&lt;/a&gt; to continue&lt;/p&gt;
+</code></pre>
+
+<pre><code class="``css">  缩写：script:src
+  &lt;script src=""&gt;&lt;/script&gt;
+</code></pre></li>
+</ul>
+
+
+<a name="L......Emmet......"></a>
+<h3>更多Emmet语法</h3>
+
+<p><img src="/upload/2015/OCT/12/imgs/1444639540.png" alt="更多Emmet语法" /></p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2015/12/26/SublimeText%E4%BD%BF%E7%94%A8/SublimeText使用" data-title="SublimeText使用" data-url="http://www.annpeter.cn/blog/2015/12/26/SublimeText%E4%BD%BF%E7%94%A8/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Dec 26th, 2015</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/others/'>others</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

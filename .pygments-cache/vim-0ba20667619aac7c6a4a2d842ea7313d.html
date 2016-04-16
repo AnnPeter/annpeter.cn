@@ -1,0 +1,11 @@
+<div class="highlight"><pre>$ <span class="k">make</span> modules <span class="sr">//</span>编译内核模块<span class="p">&lt;</span><span class="sr">/p&gt;&lt;/</span>li<span class="p">&gt;</span>
+<span class="p">&lt;</span>/<span class="k">ol</span><span class="p">&gt;</span>
+
+
+<span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="sr">//</span>将编译好的内核模块，从内核源代码目录，复制至本机的<span class="sr">/lib/</span>modules下的**<span class="p">,</span>为打包做好准备
+$ <span class="k">make</span> modules_install
+<span class="p">&lt;</span>code<span class="p">&gt;</span>
+<span class="m">4</span>. 制作init ramdisk
+<span class="p">&lt;</span>/code<span class="p">&gt;</span><span class="k">vim</span>
+$ mkinitrd initrd<span class="p">-</span>$<span class="k">version</span> $<span class="k">version</span> <span class="sr">//</span>$<span class="k">version</span>可以通过查询<span class="sr">/lib/</span>modules下的目录得到
+</pre></div>

@@ -1,0 +1,13 @@
+<div class="highlight"><pre><span class="c1">//方法一：</span>
+<span class="n">view</span><span class="o">.</span><span class="na">measure</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+<span class="n">view</span><span class="o">.</span><span class="na">getMeasuredHeight</span><span class="o">();</span>
+
+<span class="c1">//方法二：</span>
+<span class="n">view</span><span class="o">.</span><span class="na">getViewTreeObserver</span><span class="o">().</span><span class="na">addOnGlobalLayoutListener</span><span class="o">(</span><span class="k">new</span> <span class="nf">OnGlobalLayoutListener</span><span class="o">()</span> <span class="o">{</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onGlobalLayout</span><span class="o">()</span> <span class="o">{</span>
+		<span class="n">view</span><span class="o">.</span><span class="na">getViewTreeObserver</span><span class="o">().</span><span class="na">removeOnGlobalLayoutListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span> <span class="c1">//获取到height的值后，及时删除监听</span>
+		<span class="n">view</span><span class="o">.</span><span class="na">getHeigh</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">});</span>
+</pre></div>

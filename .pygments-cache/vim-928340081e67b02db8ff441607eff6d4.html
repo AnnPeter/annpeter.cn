@@ -1,0 +1,8 @@
+<div class="highlight"><pre>使用dd命令，将我们写入U盘的前<span class="m">512</span>个字节取出来，放入<span class="k">u</span>.log中
+#obs表示每个输出缓冲区大小，ibs表示每个输入缓冲区大小，<span class="k">count</span>表示拷贝个数，单位为输入缓冲区的大小可用<span class="nb">bs</span>代替
+#obs和ibs
+$ sudo dd <span class="k">if</span><span class="p">=</span><span class="sr">/dev/</span>sdd of<span class="p">=</span><span class="k">u</span>.log <span class="nb">bs</span><span class="p">=</span><span class="m">512</span> <span class="k">count</span><span class="p">=</span><span class="m">1</span>
+
+使用二进制查看命令打开<span class="k">u</span>.log
+$ xxd <span class="k">u</span>.log
+</pre></div>

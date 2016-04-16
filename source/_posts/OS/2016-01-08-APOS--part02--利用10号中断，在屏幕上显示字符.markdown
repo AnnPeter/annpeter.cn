@@ -1,0 +1,132 @@
+---
+layout: post
+title: "APOS--part02--利用10号中断，在屏幕上显示字符"
+date: 2016-01-08 23:15:15 +4672
+comments: true
+categories: OS APOS
+keywords: OS,APOS,'利用10号中断，在屏幕上显示字符',AnnPeter's Blog
+description: "APOS--part02--利用10号中断，在屏幕上显示字符"
+zTree: true
+
+---
+本文在裸机下，实现利用BIOS中段在屏幕上显示字符。
+<!-- more -->
+
+```vim
+!以!或;开头的为注释
+!以.开头的为汇编指示符，不会在编译时产生任何代码
+.globl begtext, begdata, begbss, endtext, enddata, endbss
+.text	;正文段
+begtext:	;在正文段定义一个标识符
+.data
+begdata:
+.bss
+begbss:
+
+.text	!切换至正文段
+BOOTSEG = 0x07C0	!BIOS加载bootsect代码的原始段地址
+
+!entry是保留关键字，用于连接器ld86在生产的可执行文件中,包括其后制定的标志
+!'start'通常在连接多个目标文件生成一个可执行文件时应该在其中一个汇编程序
+!中用entry指定一个入口标号，以便调试
+entry start
+start:
+	jmpi go, BOOTSEG	!jmpi段间跳转指令
+						!格式是： jmpi 段内偏移，段选择子
+						!当BIOS把程序加载到物理内存0x7C00处并跳转到该处执行
+						!此时，程序的物理地址在0x7C00处，而段寄存器cs为0
+						!(cs:ip=0x0000:0x7C00)，所以我们要跳转到BOOTSEG处
+						!执行后cs:ip=0x07C0:0x0005
+						!指令的物理地址cs*10h+ip
+go:
+	mov ax, #BOOTSEG	!cs->ax,用来初始化数据段寄存器ds和es，让他们都指向0x7C00段，
+						!便于对程序中数据(字符串)进行寻址
+	mov ds, ax
+	mov es, ax
+! 几种寻址方式:
+! * 直接寄存器寻址(跳转到bx值指定的地址处):
+!       MOV bx, ax
+!       JMP bx
+! * 间接寄存器寻址(bx值指定内存位置处的内容作为跳转的地址):
+!       MOV [bx], ax
+!       JMP [bx]
+! * 立即数&字符串地址值保存:
+!       MOV ax, #1234
+!       MOV ax, #msg1
+! * 绝对寻址(把内存地址1234处的内容放入ax):
+!       MOV ax, 1234
+! * 索引寻址(把第2个操作数所指内存处的值放入ax):
+!       MOV ax, msg1[bx]
+!       MOV ax, msg1[bx*4 + di]
+
+	mov cx, #20		!cx = 串长度
+	mov dx, #0x0101
+	mov bx, #0x000C	!页号为0(bh = 0x00)黑底红字(bl = 0x0C,高亮)
+	mov bp, #BootMessage+32	!es:bp = 串地址，为什么要加32
+							!在使用qemu的调试中，这里是不需要加32的
+							!在使用真机进行调试时，这里需要加32
+						    !主要原因跟在使用as86汇编进行编译链接后，会在生
+							!成的文件开头多出32字节，这多出来的32字节是MINIX
+							!可执行 文件的头结构。
+	mov ax, #0x1301	!ah = 0x13, al = 0x01
+	int 0x10
+!功能13H
+!功能描述：在Teletype模式下显示字符串 入口参数：AH＝13H BH＝页码
+!BL＝属性(若AL=00H或01H) CX＝显示字符串长度 (DH、DL)＝坐标(行、列)
+!ES:BP＝显示字符串的地址 AL＝显示输出方式
+!0——字符串中只含显示字符，其显示属性在BL中。显示后，光标位置不变
+!1——字符串中只含显示字符，其显示属性在BL中。显示后，光标位置改变
+!2——字符串中含显示字符和显示属性。显示后，光标位置不变
+!3——字符串中含显示字符和显示属性。显示后，光标位置改变
+!出口参数：无
+
+loop_forever:
+	jmp loop_forever	!死循环，防止程序进入数据段
+
+BootMessage:
+	.ascii  "Loading system ..."		!字符串定义
+	.byte 13,10		!回车和换行符的ASCII码定义，字符定义使用.byte
+
+!.org定义了当前汇编的位置
+!会把汇编器便已过程中当前的位置计数器调整为给出的值
+.org 478
+
+boot_flag:
+	.word 0xAA55
+
+.text
+endtext:
+.data
+enddata:
+.bss
+endbss:
+!这样写表示不区分代码段，数据段,bss段(未初始化的变量);只有一个段
+```
+
+####编译:
+```vim
+$ as86 -0 -a -o bootsect.o bootsect.s     ; 生成与as部分兼容的目标文件(-a)
+$ ld86 -0 -s -o bootsect bootsect.o       ; 链接, 去掉符号信息(-s)
+
+//上面给出的版本是真机调试的版本，在使用qemu调试的版本中，使用ll命令查看bootsect,最后生成的bootsect为544字节,
+//并非512, 多出来的32字节是MINIX可执行文件的头结构, 为了使这个程序能引导启动机器,需要人工去掉这32字节
+
+$dd bs=32 if=bootsect of=boot skip=1
+
+```
+
+
+####测试结果
+ 1. 这是QEMU下的测试结果
+
+	![QEMU下的测试结果](http://localhost/upload/2016/JAN/23/imgs/1453569831.png)
+ 2. 这是真机下的测试结果
+
+ 	![真机下的测试结果](http://localhost/upload/2016/JAN/23/imgs/1453570778.png)
+
+</br>
+___
+
+BIOS 中断详细参数参见:<br>
+1. [百度文库Int 10的详细参数](http://wenku.baidu.com/link?url=b33px-tPBF8TKPpmacQ4-yI2Fe6GkZ7m6zVXa4G8-lBFoXFHYg4CYn4bRJaV4T3AVbGC3BD2AHDg-Rzx8JiiGJObqV7X_wQzZoh2mu3RWYy)<br>
+2. [所有中断的参数](http://www.ctyme.com/intr/int.htm)<br>

@@ -1,0 +1,26 @@
+<div class="highlight"><pre>为SFTP访问创建用户组，便于管理权限
+groupadd sftp<span class="p">-</span>users
+
+创建SFTP用户，并配置相应权限；
+这里第二行的意思是将alice从所有其他用户组中移除并加入到sftp<span class="p">-</span>users组，并且关闭其Shell访问。
+adduser alice
+usermod <span class="p">-</span>G sftp<span class="p">-</span>users <span class="p">-</span><span class="k">s</span> <span class="sr">/bin/</span>false alice
+
+创建SSH用户组，并把管理员加到该组（注意usermod中的<span class="p">-</span><span class="k">a</span>参数的意思是不从其他用户组中移除）
+groupadd ssh<span class="p">-</span>users
+<span class="k">mkdir</span> /sftp_root
+chown root:sftp_users /sftp_root
+chmod <span class="m">770</span> /sftp_root
+
+修改SSH配置文件
+<span class="k">vim</span> <span class="sr">/etc/</span>ssh/sshd_config
+修改
+#Subsystem      sftp    <span class="sr">/usr/</span>libexec<span class="sr">/openssh/</span>sftp<span class="p">-</span>server
+Subsystem sftp internal<span class="p">-</span>sftp
+
+在ssh_config文件最后添加一下内容：
+Match Group sftp<span class="p">-</span>users
+ChrootDirectory <span class="sr">/sftp_root/</span>www
+ForceCommand internal<span class="p">-</span>sftp
+AllowTcpForwarding no
+</pre></div>

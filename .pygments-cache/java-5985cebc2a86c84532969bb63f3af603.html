@@ -1,0 +1,38 @@
+<div class="highlight"><pre><span class="c1">//定义外部访问接口 RInterface.aidl</span>
+<span class="kd">interface</span> <span class="nc">RInterface</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">play</span><span class="o">();</span>
+    <span class="kt">void</span> <span class="nf">stop</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="c1">//定义远程服务 RService.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RService</span> <span class="kd">extends</span> <span class="n">Service</span> <span class="o">{</span>
+
+    <span class="c1">//Stub继承了Binder并实现了RInterface中的接口函数</span>
+    <span class="kd">class</span> <span class="nc">RControl</span> <span class="kd">extends</span> <span class="n">Stub</span><span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span> <span class="o">{</span>
+            <span class="n">RService</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">play</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span> <span class="o">{</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">IBinder</span> <span class="nf">onBind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">RControl</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;AnnPeter&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">//清单文件中注册Service</span>
+<span class="o">&lt;</span><span class="n">service</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;.RService&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span> <span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">action</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;com.example.fun.RService&quot;</span><span class="o">&gt;&lt;/</span><span class="n">action</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">service</span><span class="o">&gt;</span>
+</pre></div>

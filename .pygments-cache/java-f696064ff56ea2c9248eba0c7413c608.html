@@ -1,0 +1,119 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+
+	<span class="n">MyView</span> <span class="n">bar</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+	<span class="kd">static</span><span class="o">{</span>
+		<span class="n">System</span><span class="o">.</span><span class="na">loadLibrary</span><span class="o">(</span><span class="s">&quot;fill&quot;</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+		<span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+
+		<span class="n">bar</span> <span class="o">=</span> <span class="o">(</span><span class="n">MyView</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">myView</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">Thread</span> <span class="n">thread</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Thread</span><span class="o">(){</span>
+			<span class="nd">@Override</span>
+			<span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+				<span class="kd">super</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+				<span class="n">startFill</span><span class="o">();</span>
+			<span class="o">}</span>
+		<span class="o">};</span>
+		<span class="n">thread</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">stopFill</span><span class="o">();</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">show</span><span class="o">(</span><span class="kt">int</span> <span class="n">p</span><span class="o">){</span>
+		<span class="n">bar</span><span class="o">.</span><span class="na">setCurr</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">startFill</span><span class="o">();</span>
+	<span class="kd">public</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">stopFill</span><span class="o">();</span>
+<span class="o">}</span>
+
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyView</span> <span class="kd">extends</span> <span class="n">View</span> <span class="o">{</span>
+
+	<span class="kt">int</span> <span class="n">max</span><span class="o">;</span>
+	<span class="kt">int</span> <span class="n">curr</span><span class="o">;</span>
+
+	<span class="kd">public</span> <span class="nf">MyView</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">AttributeSet</span> <span class="n">attrs</span><span class="o">,</span> <span class="kt">int</span> <span class="n">defStyleAttr</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">attrs</span><span class="o">,</span> <span class="n">defStyleAttr</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="nf">MyView</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">AttributeSet</span> <span class="n">attrs</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">attrs</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="nf">MyView</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onDraw</span><span class="o">(</span><span class="n">Canvas</span> <span class="n">canvas</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">.</span><span class="na">onDraw</span><span class="o">(</span><span class="n">canvas</span><span class="o">);</span>
+
+		<span class="n">max</span> <span class="o">=</span> <span class="mi">100</span><span class="o">;</span>
+
+		<span class="n">Paint</span> <span class="n">paint</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Paint</span><span class="o">();</span>
+		<span class="k">if</span><span class="o">(</span><span class="n">curr</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="o">){</span>
+			<span class="n">paint</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="k">new</span> <span class="nf">Color</span><span class="o">().</span><span class="na">GREEN</span><span class="o">);</span>
+		<span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">curr</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="o">){</span>
+			<span class="n">paint</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="k">new</span> <span class="nf">Color</span><span class="o">().</span><span class="na">YELLOW</span><span class="o">);</span>
+		<span class="o">}</span><span class="k">else</span> <span class="o">{</span>
+			<span class="n">paint</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="k">new</span> <span class="nf">Color</span><span class="o">().</span><span class="na">RED</span><span class="o">);</span>
+		<span class="o">}</span>
+
+		<span class="n">canvas</span><span class="o">.</span><span class="na">drawRect</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="n">max</span><span class="o">-</span><span class="n">curr</span><span class="o">+</span><span class="mi">10</span><span class="o">,</span> <span class="mi">20</span><span class="o">,</span> <span class="n">max</span><span class="o">+</span><span class="mi">10</span><span class="o">,</span> <span class="n">paint</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCurr</span><span class="o">(</span><span class="kt">int</span> <span class="n">curr</span><span class="o">){</span>
+		<span class="k">this</span><span class="o">.</span><span class="na">curr</span> <span class="o">=</span> <span class="n">curr</span><span class="o">;</span>
+		<span class="n">postInvalidate</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+
+
+<span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">jni</span><span class="o">.</span><span class="na">h</span><span class="o">&gt;</span>
+<span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">time</span><span class="o">.</span><span class="na">h</span><span class="o">&gt;</span>
+<span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">stdio</span><span class="o">.</span><span class="na">h</span><span class="o">&gt;</span>
+<span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">stdlib</span><span class="o">.</span><span class="na">h</span><span class="o">&gt;</span>
+<span class="cm">/*</span>
+<span class="cm"> * Class:     com_example_fill_MainActivity</span>
+<span class="cm"> * Method:    startFill</span>
+<span class="cm"> * Signature: ()V</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">isRun</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+<span class="n">JNIEXPORT</span> <span class="kt">void</span> <span class="n">JNICALL</span> <span class="nf">Java_com_example_fill_MainActivity_startFill</span>
+  <span class="o">(</span><span class="n">JNIEnv</span> <span class="o">*</span> <span class="n">env</span><span class="o">,</span> <span class="n">jobject</span> <span class="n">obj</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">srand</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+	<span class="k">while</span><span class="o">(</span><span class="n">isRun</span><span class="o">)</span>
+	<span class="o">{</span>
+		<span class="n">jclass</span> <span class="n">clazz</span> <span class="o">=</span> <span class="o">(*</span><span class="n">env</span><span class="o">)-&gt;</span><span class="n">FindClass</span><span class="o">(</span><span class="n">env</span><span class="o">,</span> <span class="s">&quot;com/example/fill/MainActivity&quot;</span><span class="o">);</span>
+		<span class="n">jmethodID</span> <span class="n">mid</span> <span class="o">=</span> <span class="o">(*</span><span class="n">env</span><span class="o">)-&gt;</span><span class="n">GetMethodID</span><span class="o">(</span><span class="n">env</span><span class="o">,</span> <span class="n">clazz</span><span class="o">,</span> <span class="s">&quot;show&quot;</span><span class="o">,</span> <span class="s">&quot;(I)V&quot;</span><span class="o">);</span>
+		<span class="o">(*</span><span class="n">env</span><span class="o">)-&gt;</span><span class="n">CallVoidMethod</span><span class="o">(</span><span class="n">env</span><span class="o">,</span> <span class="n">obj</span><span class="o">,</span> <span class="n">mid</span><span class="o">,</span> <span class="n">i</span><span class="o">++);</span>
+		<span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">==</span><span class="mi">100</span><span class="o">?</span> <span class="mi">0</span><span class="o">:</span><span class="n">i</span><span class="o">;</span>
+		<span class="n">sleep</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+	<span class="o">}</span>
+
+<span class="o">}</span>
+<span class="cm">/*</span>
+<span class="cm"> * Class:     com_example_fill_MainActivity</span>
+<span class="cm"> * Method:    stopFill</span>
+<span class="cm"> * Signature: ()V</span>
+<span class="cm"> */</span>
+<span class="n">JNIEXPORT</span> <span class="kt">void</span> <span class="n">JNICALL</span> <span class="nf">Java_com_example_fill_MainActivity_stopFill</span>
+<span class="o">(</span><span class="n">JNIEnv</span> <span class="o">*</span> <span class="n">env</span><span class="o">,</span> <span class="n">jobject</span> <span class="n">obj</span><span class="o">)</span>
+<span class="o">{</span>
+	<span class="n">isRun</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>

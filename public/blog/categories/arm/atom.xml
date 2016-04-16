@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: arm | AnnPeter's Blog]]></title>
+  <link href="http://www.annpeter.cn/blog/categories/arm/atom.xml" rel="self"/>
+  <link href="http://www.annpeter.cn/"/>
+  <updated>2016-04-16T11:13:25+08:00</updated>
+  <id>http://www.annpeter.cn/</id>
+  <author>
+    <name><![CDATA[AnnPeter]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part12--串口驱动设计]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/index.html"/>
+    <updated>2016-02-06T22:33:24+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/mini2440--part12--串口驱动设计</id>
+    <content type="html"><![CDATA[<a name="TTY............"></a>
+<h2>TTY驱动架构</h2>
+
+<p>在Linux中，终端是一类字符型设备，它包括多种类型，通常使用tty来简称各种类型的终端设备。</p>
+
+<ul>
+<li><p>串口终端(/dev/ttyS*)
+串口终端是使用计算机串口连接的终端设备。Linux把每个串行端口都看作是一个字符设备。这些串行端口所对应的设备名称是/dev/ttySAC0、/dev/ttySAC1。</p></li>
+<li><p>控制台终端(/dev/console)
+在Linux中，计算机的输出设备通常被称为控制台的终端(Console),这里特指printk信息输出到的设备。/dev/console是一个虚拟设备，它需要映射到一个真正的tty上，比如通过内核启动参数“console=ttySAC0”就把console映射到了串口0上。</p></li>
+<li><p>虚拟终端(/dev/tty*,如tty1，tty2&hellip;)
+当用户登录时，使用的是虚拟终端。使用ctcl+alt+[F1-F6]组合键，我们就可以切换到tty1-tty6上，它们被称为虚拟终端，而tty0则是当前所使用虚拟终端的一个别名。</p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Linux tty子系统包含:tty核心,tty线路规程和tty驱动。tty核心是对整个tty设备的抽象,对用户提供统一的接口,tty线路规程是对传输数据的格式化,tty驱动则是面向tty设备的硬件驱动。</p>
+
+<p><img src="/upload/2016/FEB/08/imgs/1454928983.png" alt="tty架构分析" /></p>
+
+<p>串口调用例程回溯，在Linux中串口底层调用位于(/drivers/serial/samsung.c 中的 s3c24xx_serial_start_tx)，我们在此函数中添加dump_stark()。然后重新编译我们的内核，重启开发板，我们就能清除的看到调用的堆栈回溯。
+<code>vim
+[&lt;c0035270&gt;] (dump_backtrace+0x0/0x10c) from [&lt;c033a868&gt;] (dump_stack+0x18/0x1c)
+ r7:00000000 r6:c3901800 r5:c3901c02 r4:c046e0bc                                
+[&lt;c033a850&gt;] (dump_stack+0x0/0x1c) from [&lt;c01830a0&gt;] (s3c24xx_serial_start_tx+0)
+[&lt;c018308c&gt;] (s3c24xx_serial_start_tx+0x0/0x64) from [&lt;c017f2ac&gt;] (uart_start+0)
+ r5:c3901c02 r4:a0000013                                                        
+[&lt;c017f244&gt;] (uart_start+0x0/0x6c) from [&lt;c017f504&gt;] (uart_flush_chars+0x10/0x1)
+ r5:c3901c02 r4:00000002                                                        
+[&lt;c017f4f4&gt;] (uart_flush_chars+0x0/0x14) from [&lt;c016bde8&gt;] (n_tty_write+0x230/0)
+[&lt;c016bbb8&gt;] (n_tty_write+0x0/0x448) from [&lt;c01693e0&gt;] (tty_write+0x14c/0x244)  
+[&lt;c0169294&gt;] (tty_write+0x0/0x244) from [&lt;c0169560&gt;] (redirected_tty_write+0x88)
+[&lt;c01694d8&gt;] (redirected_tty_write+0x0/0x98) from [&lt;c009e044&gt;] (vfs_write+0xb4/)
+ r9:c39a0000 r8:c00310c8 r7:00000004 r6:c39a1f78 r5:40000000                    
+r4:c3939380                                                                     
+[&lt;c009df90&gt;] (vfs_write+0x0/0xe8) from [&lt;c009e15c&gt;] (sys_write+0x4c/0x84)       
+ r7:00000004 r6:c3939380 r5:00000000 r4:00000000                                
+[&lt;c009e110&gt;] (sys_write+0x0/0x84) from [&lt;c0030f20&gt;] (ret_fast_syscall+0x0/0x28)
+ r6:001d27f8 r5:40000000 r4:00000002
+</code></p>
+
+<a name="L............"></a>
+<h2>串口驱动</h2>
+
+<p>UART驱动中的数据结构：</p>
+
+<ul>
+<li>UART驱动程序结构：<strong>struct uart_driver</strong></li>
+<li>UART端口结构：<strong>struct uart_port</strong></li>
+<li>UART相关操作函数结构：<strong>struct uart_ops</strong></li>
+<li>UART状态结构：struct uart_stat</li>
+<li>UART信息结构：struct uart_info</li>
+</ul>
+
+
+<p><img src="/upload/2016/FEB/08/imgs/1454946151.jpg" alt="uart驱动常用的数据结构" /></p>
+
+<p>串口的初始化工作：
+在linux中，串口的初始化工作主要在(drivers/serial/samsung.c 和 s3c2440.c中)
+1. 注册串口驱动程序，使用函数 int uart_register_driver(struct uart_driver *drv);
+2. 初始化(在平台设备中注册设备，当设备与驱动匹配时，调用probe进行初始化)</p>
+
+<ul>
+<li>取出相应的uart_port</li>
+<li>初始化uart_port
+
+<ul>
+<li>获取虚拟基地址</li>
+<li>获取中断号</li>
+<li>复位FIFO</li>
+</ul>
+</li>
+<li>添加uart_port，使用函数int uart_add_one_port(struct uart_driver <em>drv, struct uart_port </em>uport);</li>
+<li>创建属性文件，使用函数int device_create_file(struct device <em>dev, struct device_attribute </em>attr);</li>
+<li>初始化动态频率调节</li>
+</ul>
+
+
+<p>串口发送数据：</p>
+
+<p>串口接收数据：</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part11--总线设备驱动]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/index.html"/>
+    <updated>2016-02-05T22:33:24+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/mini2440--part11--总线设备驱动</id>
+    <content type="html"><![CDATA[<a name="L........................"></a>
+<h1>总线设备驱动模型</h1>
+
+<a name="L......"></a>
+<h2>总线</h2>
+
+<ul>
+<li><p>总线结构描述
+在Linux内核中，总线由bus_type结构表示，定义在&lt;linux/device.h>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">bus_type</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//总线名称&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="c1">//驱动与设备的匹配函数</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">match</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<ul>
+<li><p>注册总线
+bus_register(struct bus_type* bus);
+若成功，新的总线将被添加进系统，并可在/sys/bus下看到相应的目录。</p></li>
+<li><p>注销总线
+  void bus_unregister(struct bus_type* bus);</p></li>
+</ul>
+
+
+<pre><code class="cpp">/*************************************************************************
+    &gt; File Name: bus.c
+    &gt; Author: AnnPeter
+    &gt; Mail: 864587669@qq.com
+    &gt; Created Time: Sun 07 Feb 2016 10:11:28 AM CST
+ ************************************************************************/
+
+
+#include &lt;linux/init.h&gt;
+#include &lt;linux/module.h&gt;
+#include &lt;linux/kernel.h&gt;
+#include &lt;linux/device.h&gt;
+
+MODULE_LICENSE("GPL");
+
+int ap_match(struct device* dev, struct device_driver* drv)
+{
+
+    return 0;
+}
+
+struct bus_type bus=
+{
+    .name = "ap_bus",
+    .match = ap_match,
+};
+
+int bus_init(void)
+{
+    bus_register(&amp;bus);
+
+    return 0;
+}
+
+void bus_exit(void)
+{
+    bus_unregister(&amp;bus);
+}
+
+module_init(bus_init);
+module_exit(bus_exit);
+</code></pre>
+
+<a name="L......"></a>
+<h2>驱动</h2>
+
+<p>(1) 结构描述
+在Linux内核中，驱动由device_driver结构表示</p>
+
+<pre><code class="cpp">struct device_driver{
+    const char* name;//驱动名称
+    struct bus_type* bus;//驱动所在总线
+
+    //一个总线上可能挂载多个设备，如USB总线可能挂载无线鼠标，无线网卡等等，当总线匹配到该
+    //驱动可以处理该设备时，调用prove函数来处理设备。所以probe由总线调用。
+    int (*probe)(struct device* dev);
+}
+</code></pre>
+
+<p>(2) 注册
+int driver_register(struct device_driver* drv);
+注册成功后，driver的信息会在/sys/bus/相应的总线目录下面</p>
+
+<p>(3) 注销
+void driver_unregister(struct device_driver* drv)</p>
+
+<a name="L......"></a>
+<h2>设备</h2>
+
+<p>(1) 结构描述
+在Linux内核中，设备由struct device结构表示。
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">device</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备的名字</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">bus_type</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">bus</span><span class="p">;</span> <span class="c1">//设备所在总线&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="p">...</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>(2) 注册
+int device_register(struct device* dev);</p>
+
+<p>(3) 注销
+void device_unregister(struce device* dev);</p>
+
+<p>总结：在系统中，我们首先注册总线。然后注册驱动和设备(这两者次序可以颠倒)，总线的match函数比较挂在该总线的驱动和设备是否匹配，如果匹配返回1，否则返回0。匹配成后，总线调用该驱动先前注册好的probe函数执行。</p>
+
+<a name="L........................"></a>
+<h1>平台总线驱动设计</h1>
+
+<p>平台总线(Platform bus)是linux2.6内核中加入的一种虚拟总线，其优势在于采用了总线的模型对设备与驱动进行管理，提高了程序的可移植性。关于platform bus的定义在drivers/base/Platform.c(paltform_bus_type)中。
+总线设备和驱动的匹配通过platform_match函数完成，主要依据设备id和设备名称来完成匹配工作。</p>
+
+<a name="L......"></a>
+<h2>设备</h2>
+
+<p>在Linux中，平台设备使用struct platform_device来描述
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">platform_device</span><span class="p">{</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备名称</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span> <span class="c1">//设备编号，配合设备名使用</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">device</span> <span class="n">dev</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">u32</span> <span class="n">num_resources</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">resource</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">resource</span><span class="p">;</span><span class="c1">//设备资源，基地址，中断号等</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">struct</span> <span class="n">resource</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">resource_size_t</span> <span class="n">start</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">resource_size_t</span> <span class="n">end</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">name</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">flags</span><span class="p">;</span>    <span class="c1">//资源类型</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">resource</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">parent</span><span class="p">,</span> <span class="o">*</span> <span class="n">sibling</span><span class="p">,</span> <span class="o">*</span> <span class="n">child</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+1. 注册平台设备，使用函数
+int platform_device_register(struct platform_device *pdev);</p>
+
+<ol>
+<li>注销平台设备，使用函数
+int platform_device_unregister(struct platform_device *pdev);</li>
+</ol>
+
+
+<a name="L......"></a>
+<h2>驱动</h2>
+
+<p>Linux中平台驱动使用struct platform_driver来描述
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">platform_driver</span><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="p">);</span><span class="c1">//找到设备时调用的函数</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">remove</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="p">);</span><span class="c1">//在删除设备的时候调用的函数</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">device_driver</span> <span class="n">driver</span><span class="p">;</span><span class="c1">//一般保存设备的名字等信息，用于驱动和设备匹配时使用&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="p">...</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<ol>
+<li><p>驱动注册，使用函数
+int platform_driver_register(struct platform driver*);</p></li>
+<li><p>驱动注销，使用函数
+int platform_driver_unregister(struct platform driver*);</p></li>
+</ol>
+
+
+<p>在驱动中，我们首先在模块初始化的时候向内核注册该驱动，找到与之匹配的设备，在找到设备后在probe函数中获取设备的硬件信息，初始化设备，这样可以提高驱动的可移植性。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part10--阻塞型驱动程序]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/05/mini2440--part10--%E9%98%BB%E5%A1%9E%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/index.html"/>
+    <updated>2016-02-05T02:19:55+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/05/mini2440--part10--%E9%98%BB%E5%A1%9E%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/mini2440--part10--阻塞型驱动程序</id>
+    <content type="html"><![CDATA[<p>当一个设备无法立刻满足用户的读写请求时，驱动程序应当(缺省地)阻塞进程，使他进入等待(睡眠)状态，直到请求可以得到满足。</p>
+
+<!-- more -->
+
+
+<a name="L.................."></a>
+<h4>内核等待队列</h4>
+
+<p>将需要阻塞的进程放入内核等待队列中，当条件得到满足，等待队列中的线程会被执行。</p>
+
+<ol>
+<li><p>定义等待队列
+ wait_queue_head_t my_queue;</p></li>
+<li><p>初始化等待队列
+ init_waitqueue_head(&amp;my_queue);</p></li>
+<li><p>定义加初始化等待队列
+ DECLARE_AWIT_QUEUE_HEAD(my_queue);</p></li>
+<li><p>进入等待队列，睡眠</p>
+
+<ul>
+<li><p>wait_event(queue, condition);
+当condition(布尔表达式)为真时，立刻返回(即表示现在有数据，不用等待)；否则让进程进入TASK_UNINTERRUPTIBLE模式的睡眠，并挂在queue参数所指定的等待队列上。</p></li>
+<li><p>wait_event_interruptible(queue, condition);
+当condition(布尔表达式)为真时，立刻返回(即表示现在有数据，不用等待)；否则让进程进入TASK_INTERRUPTIBLE模式的睡眠，并挂在queue参数所指定的等待队列上。</p></li>
+<li><p>wait_event_killable(queue, conditiion);
+当condition(布尔表达式)为真时，立即返回(即表示现在有数据，不用等待)；否则让进程进入TASK_KILLABLE的睡眠，并挂在queue参数所指定的等待队列上。</p></li>
+</ul>
+</li>
+<li><p>从等待队列中唤醒进程</p>
+
+<ul>
+<li><p>wake_up(wait_queue_t* q);
+从等待队列q中唤醒状态为TASK_UNINTERRUPTIBLE、TASK_INTERRUPTIBLE、TASK_KILLABLE的所有进程。</p></li>
+<li><p>wake_up_interruptible(wait_queue_t* q);
+从等待队列q中唤醒状态为TASK_INTERRUPTIABLE的进程。</p></li>
+</ul>
+</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part09--混杂设备驱动--按键驱动]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/03/mini2440--part09--%E6%B7%B7%E6%9D%82%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8--%E6%8C%89%E9%94%AE%E9%A9%B1%E5%8A%A8/index.html"/>
+    <updated>2016-02-03T16:43:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/03/mini2440--part09--%E6%B7%B7%E6%9D%82%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8--%E6%8C%89%E9%94%AE%E9%A9%B1%E5%8A%A8/mini2440--part09--混杂设备驱动--按键驱动</id>
+    <content type="html"><![CDATA[<p>在Linux系统中,存在一类字符设备,它们拥有相同的主设备号(10),但次设备号不同,我们称这类设备为混杂设备(miscdevice)。所有的混杂设备形成一个链表,对设备访问时内核根据次设备号查找到相应的混杂设备。</p>
+
+<!-- more -->
+
+
+<p>Linux中使用struct miscdevice来描述一个混杂设备，在这个结构中，共有6个成员，我们需要初始化前三个成员，链表成员由Linux内核管理。
+<code>cpp
+struct miscdevice {
+    int minor;
+    /* 次设备号*/
+    const char *name; /* 设备名*/
+    const struct file_operations *fops; /*文件操作*/
+    struct list_head list;
+    struct device *parent;
+    struct device *this_device;
+};
+</code></p>
+
+<ol>
+<li><p>首先，我们需要初始化miscdevice这个结构</p></li>
+<li><p>然后使用misc_register函数来注册一个混杂设备驱动。int misc_register(struct miscdevice* misc)；</p></li>
+<li><p>最后使用misc_deregister(struct miscdevice* misc);</p></li>
+</ol>
+
+
+<a name="L............"></a>
+<h2>按键去抖</h2>
+
+<p>按键所用开关为机械弹性开关,当机械触点断开、闭合时,由于机械触点的弹性作用,开关不会马上稳定地接通或断开。因而在闭合及断开的瞬间总是伴随有一连串的抖动,当我们按下开关,可以发现有多次中断被触发。</p>
+
+<p>按键去抖动的方法主要有二种,一种是硬件电路去抖动;另一种就是软件延时去抖。而延时又一般分为二种,一种是for循环等待,另一种是定时器延时。在操作系统中,由于效率方面的原因,一般不允许使用for循环来等待,只能使用定时器。</p>
+
+<p>Linux内核使用struct timer_list来描述一个定时器:
+<code>cpp
+struct timer_list {
+    struct list_head entry;
+    unsigned long expires;  //超时时间
+    void (*function)(unsigned long);    //操作函数
+    unsigned long data;
+    struct tvec_base *base;
+};
+</code></p>
+
+<p>去抖步骤：</p>
+
+<ol>
+<li>定义定时器变量</li>
+<li>初始化定时器，使用init_timer初始化，设置超时函数</li>
+<li>add_timer注册定时器</li>
+<li>mod_timer启动定时器，设置超时时间，启动。(定时器只会超时一次，如果要实现循环，在超时函数中再次调用mod_timer即可)</li>
+</ol>
+
+
+<a name="L........................"></a>
+<h3>按键驱动混杂实现</h3>
+
+<pre><code class="cpp">/*************************************************************************
+    &gt; File Name: key.c
+    &gt; Author: AnnPeter
+    &gt; Mail: 864587669@qq.com
+    &gt; Created Time: Thu 04 Feb 2016 09:31:04 AM CST
+ ************************************************************************/
+
+
+#include &lt;linux/init.h&gt;
+#include &lt;linux/module.h&gt;
+#include &lt;linux/miscdevice.h&gt;
+#include &lt;linux/fs.h&gt;
+#include &lt;asm/io.h&gt;
+#include &lt;linux/interrupt.h&gt;
+
+struct irq_type
+{
+    int irq;
+    char* name;
+    int number;
+};
+
+static struct irq_type key_irq[6]=
+{
+    {IRQ_EINT8, "key0", 0},
+    {IRQ_EINT11, "key1", 1},
+    {IRQ_EINT13, "key2", 2},
+    {IRQ_EINT14, "key3", 3},
+    {IRQ_EINT15, "key4", 4},
+    {IRQ_EINT19, "key5", 5},
+};
+
+irqreturn_t key_int_handler(int irq, void* dev_id)
+{
+    //1. 检测是否发生按键中断
+
+    //2.清除已经产生的按键中断
+
+    //3.打印按下的按键，属于中断处理下半部，可以放在工作队列中，减少中断时间
+    struct irq_type* nirq = (struct irq_type*)(dev_id);
+    printk("the key is %d\n", nirq-&gt;number);
+    return 0;
+}
+
+#define GPGCON 0x56000060
+
+void key_hw_init()
+{
+    unsigned int data;
+    unsigned int* gpg_con;
+
+    gpg_con = ioremap(GPGCON, 4);
+
+    data = readl(gpg_con);
+    data &amp;= ~((0x3&lt;&lt;0)|(0x3&lt;&lt;6)|(0x3&lt;&lt;10)|(0x3&lt;&lt;12)|(0x3&lt;&lt;14|(0x3&lt;&lt;22)));
+    data |= ((0x2&lt;&lt;0)|(0x2&lt;&lt;6)|(0x2&lt;&lt;10)|(0x2&lt;&lt;12)|(0x2&lt;&lt;14)|(0x2&lt;&lt;22));
+
+    writel(data, gpg_con);
+}
+
+int key_open(struct inode* node, struct file* filp)
+{
+    return 0;
+}
+
+const struct file_operations key_fops=
+{
+    .open = key_open,
+};
+
+struct miscdevice key_miscdevice=
+{
+    .minor = 200,
+    .name  = "ap_key",
+    .fops  = &amp;key_fops,
+};
+
+int key_init(void)
+{
+    misc_register(&amp;key_miscdevice);
+
+    key_hw_init();
+
+    //注册中断
+    int i = 0;
+    int ret = 0;
+    for(i = 0; i &lt; 6; i++)
+    {
+        ret = request_irq(key_irq[i].irq, key_int_handler, IRQF_SHARED,
+                    key_irq[i].name, (void*)&amp;(key_irq[i]));
+    }
+
+    if(ret == 0)
+    {
+        printk("key int success\n");
+    }
+    else
+    {
+        printk("key int error, return code is %d", ret);
+    }
+
+    return 0;
+}
+
+void key_exit(void)
+{
+    misc_deregister(&amp;key_miscdevice);
+
+    //中断注销
+}
+
+
+module_init(key_init);
+module_exit(key_exit);
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part08--Linux中断处理过程]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/index.html"/>
+    <updated>2016-02-02T01:59:45+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/mini2440--part08--Linux中断处理过程</id>
+    <content type="html"><![CDATA[<p>Linux中断处理过程，不同平台在中断入口时的处理可能有所不同。
+1. 在entry-armv.S中定义了中断统一的入口__irq_svc。
+2. 然后执行entry-armv.S中的irq_handler，获取中断号
+3. 调用irq.c中的asm_do_IRQ
+4. 调用irq.c中的generic_handle_irq，在这个过程中取得irq_desc
+5. 调用irq.c中的generic_handle_irq_desc
+6. 最后根据irq_desc中action中的用户事先设置好的handler，调用处理例程。</p>
+
+<!-- more -->
+
+
+<a name="L............"></a>
+<h3>中断注册</h3>
+
+<p>Linux使用request_irq函数注册中断。</p>
+
+<blockquote><p>int request_irq(unsigned int irq, void (<em>handler)(int, void</em>, struct pt_regs<em>), unsigned long flags, const char</em> devname, void* dev_id);<br>
+参数:<br>
+irq：中断号<br>
+handler：中断处理函数<br>
+flags：与中断管理有关的选项<br>
+devname：设备名<br>
+dev_id：共享中断时使用<br></p></blockquote>
+
+<p>在flag参数中，可以选择一些与中断管理有关的选项，如：
+* IRQF_DISABLED(SA_INTERRUPT)：如果设置该位，表示这是一个“快速”中断处理程序；如果没有设置这位，那么是一个“慢速”中断处理程序。
+* IRQF_SHARED(SA_SHIRQ)：该位表明该中断号是多个设备共享的。</p>
+
+<a name="L.............................."></a>
+<h4>中断处理函数的流程：</h4>
+
+<ol>
+<li>检查设备是否产生了中断</li>
+<li>清除中断产生标志</li>
+<li>相应的硬件操作</li>
+</ol>
+
+
+<p>快速中断和慢速中断的主要区别在于：快速中断保证中断处理的原子性(不被打断)，而慢速中断则不保证。也就是“开启中断”标志位(处理器IF)在运行快速中断处理程序时是关闭的，因次在服务该中断时，不会被其它类型的中断打断；而调用慢速中断处理时，其它类型中断仍然可以得到服务。</p>
+
+<p>中断处理程序的特别之处是在中断上下文中运行的，它的行为受到某些限制：</p>
+
+<ol>
+<li>不能使用可能引起阻塞的函数</li>
+<li>不能使用可能引起调度的函数</li>
+</ol>
+
+
+<a name="L............"></a>
+<h3>中断注销</h3>
+
+<p>当设备不再需要使用中断时(通常在驱动卸载时), 应当把它们注销, 使用函数:void free_irq(unsigned int irq, void *dev_id)，dev_id用于共享中断时使用。</p>
+
+<a name="L.................."></a>
+<h2>中断分层处理</h2>
+
+<p>在Linux中断中，当中断类型为慢速中断时，同类设备中断不能嵌套；当中断类型为快速中断时，当一个中断例程在执行时，其它中断都会被忽略。</p>
+
+<p>中断分层技术主要是减少中断处理的时间。中断分层主要分为和硬件相关的操作(上半部，中断处理程序，即：中断上下文中执行)、检测和处理(下半部，内核中执行)。</p>
+
+<ul>
+<li>上半部:当中断发生时,它进行相应地硬件读写,并“登记”该中断。通常由中断处理程序充当上半部。</li>
+<li>下半部:在系统空闲的时候对上半部“登记”的中断进行后续处理。</li>
+</ul>
+
+
+<a name="L.........................................."></a>
+<h4>中断分层技术主要有三种方式：</h4>
+
+<ol>
+<li>中断嵌套</li>
+<li>中断分层方式</li>
+<li>工作队列</li>
+</ol>
+
+
+<p>工作队列是一种将任务推后执行的形式,他把推后的任务交由一个内核线程去执行。这样下半部会在进程上下文执行,它允许重新调度甚至睡眠。 每个被推后的任务叫做“工作”,由这些工作组成的队列称为工作队列。</p>
+
+<p><img src="/upload/2016/FEB/06/imgs/1454705882.png" alt="工作队列工作流程图" />
+<img src="/upload/2016/FEB/06/imgs/1454705885.png" alt="工作队列流程数据结构" /></p>
+
+<p>Linux内核使用struct workqueue_struct来描述一个工作队列,使用struct work_struct来描述一个工作项。
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">workqueue_struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">cpu_workqueue_struct</span> <span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">cpu_wq</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">name</span><span class="p">;</span> <span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">workqueue</span> <span class="n">name</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">singlethread</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">freezeable</span><span class="p">;</span> <span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">Freeze</span> <span class="n">threads</span> <span class="n">during</span> <span class="n">suspend</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rt</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">struct</span> <span class="n">work_struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">atomic_long_t</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">entry</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">work_func_t</span> <span class="n">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="kt">work_func_t</span><span class="p">)(</span><span class="k">struct</span> <span class="n">work_struct</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="n">work</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<ol>
+<li>创建工作队列 create_workqueue</li>
+<li>创建工作 INIT_WORK</li>
+<li>提交工作 queue_work</li>
+</ol>
+
+
+<pre><code class="cpp">/*************************************************************************
+    &gt; File Name: queue.c
+    &gt; Author: AnnPeter
+    &gt; Mail: 864587669@qq.com
+    &gt; Created Time: Sat 06 Feb 2016 05:05:59 AM CST
+ ************************************************************************/
+
+
+#include &lt;linux/init.h&gt;
+#include &lt;linux/module.h&gt;
+
+MODULE_LICENSE("GPL");  //工作队列必须遵守GPL协议
+
+struct workqueue_struct* ap_workqueue;
+
+struct work_struct* work1;
+
+void work1_func(struct work_struct* work)
+{
+    printk("this is work1\n");
+}
+
+int que_init(void)
+{
+    //1.创建工作队列
+    //在多数情况下，驱动程序并不需要自己创建工作队列，只需要定义工作，提交到
+    //内核默认的工作队列keventd_wq即可,在提交工作时，使用schedule_work函数
+    //简化操作int schedule_work(struct work_struct *work)；
+    ap_workqueue = create_workqueue("ap_workqueue");
+
+    work1 = kmalloc(sizeof(struct work_struct), GFP_KERNEL);
+    //2.创建工作
+    INIT_WORK(work1, work1_func);   
+
+    //3.提交工作到工作队列
+    queue_work(ap_workqueue, work1);
+
+    return 0;
+}
+
+void que_exit(void)
+{
+
+}
+
+module_init(que_init);
+module_exit(que_exit)
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

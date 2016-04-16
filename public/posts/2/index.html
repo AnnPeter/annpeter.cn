@@ -1,0 +1,524 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="在Linux系统中,存在一类字符设备,它们拥有相同的主设备号(10),但次设备号不同,我们称这类设备为混杂设备(miscdevice)。所有的混杂设备形成一个链表,对设备访问时内核根据次设备号查找到相应的混杂设备。 Read on &rarr; Feb 3rd, 2016 arm, &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner">
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/02/03/mini2440--part09--%E6%B7%B7%E6%9D%82%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8--%E6%8C%89%E9%94%AE%E9%A9%B1%E5%8A%A8/index.html">
+        
+            Mini2440--part09--混杂设备驱动--按键驱动</a>
+    </h2>
+    <div class="entry-content">
+        <p>在Linux系统中,存在一类字符设备,它们拥有相同的主设备号(10),但次设备号不同,我们称这类设备为混杂设备(miscdevice)。所有的混杂设备形成一个链表,对设备访问时内核根据次设备号查找到相应的混杂设备。</p>
+
+
+        
+        <a href="/blog/2016/02/03/mini2440--part09--%E6%B7%B7%E6%9D%82%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8--%E6%8C%89%E9%94%AE%E9%A9%B1%E5%8A%A8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Feb 3rd, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/index.html">
+        
+            mini2440--part08--Linux中断处理过程</a>
+    </h2>
+    <div class="entry-content">
+        <p>Linux中断处理过程，不同平台在中断入口时的处理可能有所不同。
+1. 在entry-armv.S中定义了中断统一的入口__irq_svc。
+2. 然后执行entry-armv.S中的irq_handler，获取中断号
+3. 调用irq.c中的asm_do_IRQ
+4. 调用irq.c中的generic_handle_irq，在这个过程中取得irq_desc
+5. 调用irq.c中的generic_handle_irq_desc
+6. 最后根据irq_desc中action中的用户事先设置好的handler，调用处理例程。</p>
+
+
+        
+        <a href="/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Feb 2nd, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/28/mini2440--part07--Mini2440LED%E9%A9%B1%E5%8A%A8/index.html">
+        
+            mini2440--part07--Mini2440LED驱动</a>
+    </h2>
+    <div class="entry-content">
+        <p>本文主要实现了，在Linux中驱动mini2440的LED。</p>
+
+
+        
+        <a href="/blog/2016/01/28/mini2440--part07--Mini2440LED%E9%A9%B1%E5%8A%A8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 28th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/27/mini2440--part06--Linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/index.html">
+        
+            mini2440--part06--Linux内核模块介绍</a>
+    </h2>
+    <div class="entry-content">
+        <p>内核模块特点：</p>
+
+<ol>
+<li>模块本身不被编译进内核文件(zImage或者bzImage)</li>
+<li>可以根据需求，在内核运行期间动态的安装或者卸载。</li>
+</ol>
+
+
+
+        
+        <a href="/blog/2016/01/27/mini2440--part06--Linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 27th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/26/mini2440--part05--%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E6%A6%82%E8%BF%B0/index.html">
+        
+            Mini2440--part05--驱动开发概述</a>
+    </h2>
+    <div class="entry-content">
+        <a name="L..............."></a>
+<h3>驱动分类：</h3>
+
+<ul>
+<li>常规分类：字符设备、块设备、网络设备</li>
+<li><p>总线分类法：USB设备、PCI设备、平台总线设备</p></li>
+<li><p>字符设备：是一种按字节来访问的设备,字符驱动则负责驱动字符设备,这样的驱动通常实现 open, close, read和write 系统调用。例:串口,LED,按键。</p></li>
+<li><p>块设备：在大部分的Unix系统中, 块设备定义为:以块(通常是512字节)为最小传输单位的设备,块设备不能按字节处理数据。而Linux则允许块设备传送任意数目的字节。因此,块和字符设备的区别仅仅是驱动的与内核的接口不同。常见的块设备包括硬盘,flash,SD卡&hellip;</p></li>
+<li><p>网络接口：可以是一个硬件设备,如网卡; 但也可以是一个纯粹的软件设备, 比如回环接口(lo).一个网络接口负责发送和接收数据报文。</p></li>
+</ul>
+
+
+
+        
+        <a href="/blog/2016/01/26/mini2440--part05--%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E6%A6%82%E8%BF%B0/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 26th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/25/mini2440--part04--Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/index.html">
+        
+            mini2440--part04--Linux系统调用</a>
+    </h2>
+    <div class="entry-content">
+        <p>一般进程是不能访问内核的。它不能访问内核所占内存空间也不能调用内核函数。CPU硬件决定了这些（这就是为什么它被称作"保护模式"）。为了和用户空间上运行的进程进行交互，内核提供了一组接口。透过该接口，应用程序可以访问硬件设备和其他操作系统资源。在Linux中，系统调用是用户空间访问内核的惟一手段；除异常和中断外，它们是内核惟一的合法入口。</p>
+
+
+        
+        <a href="/blog/2016/01/25/mini2440--part04--Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 25th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/24/SourceInsight%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
+        
+            SourceInsight的使用</a>
+    </h2>
+    <div class="entry-content">
+        <p>本文主要介绍SourceInsight的简单使用，主要用于查看项目。</p>
+
+
+        
+        <a href="/blog/2016/01/24/SourceInsight%E7%9A%84%E4%BD%BF%E7%94%A8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 24th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/others/'>others</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/24/mini2440--part03--Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%88%B6%E4%BD%9C/index.html">
+        
+            mini2440--part03--Linux文件系统制作</a>
+    </h2>
+    <div class="entry-content">
+        <p>本文主要介绍嵌入式Linux文件系统的制作，主要包括initramfs和NFS。</p>
+
+
+        
+        <a href="/blog/2016/01/24/mini2440--part03--Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%88%B6%E4%BD%9C/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 24th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/24/mini2440--part02--Uboot%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
+        
+            mini2440--part02--Uboot的使用</a>
+    </h2>
+    <div class="entry-content">
+        <a name="Uboot............"></a>
+<h3>Uboot命令使用</h3>
+
+<ol>
+<li>printenv:查看环境变量，可查看到ipaddr，ethaddr，serverip等信息</li>
+<li>setenv:添加、修改、删除环境变量
+ setenv name value &hellip;添加或修改环境变量
+ setenv name 删除环境变量</li>
+<li>save(或saveenv)保存所有环境变量到flash中</li>
+</ol>
+
+
+
+        
+        <a href="/blog/2016/01/24/mini2440--part02--Uboot%E7%9A%84%E4%BD%BF%E7%94%A8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 24th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/01/24/mini2440--part01--%E7%BC%96%E8%AF%91Linux%E5%86%85%E6%A0%B8/index.html">
+        
+            mini2440--part01--编译Linux内核</a>
+    </h2>
+    <div class="entry-content">
+        <a name="PC....................."></a>
+<h3>PC平台的内核编译</h3>
+
+<p>本文主要介绍嵌入式Linux内核的编译，使用平台为mini2440，其它平台需找到对应平台的内核代码，编译过程类似。</p>
+
+
+        
+        <a href="/blog/2016/01/24/mini2440--part01--%E7%BC%96%E8%AF%91Linux%E5%86%85%E6%A0%B8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Jan 24th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+<nav id="pagenavi">
+    
+        
+            <a href="/" class="prev">Prev</a>
+        
+    
+    
+        <a href="/posts/3" class="next">Next</a>
+    
+</nav>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

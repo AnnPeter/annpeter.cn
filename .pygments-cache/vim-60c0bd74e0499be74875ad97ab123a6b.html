@@ -1,0 +1,43 @@
+<div class="highlight"><pre>$ sudo apt<span class="p">-</span><span class="k">get</span> install python<span class="p">-</span>pip
+$ sudo pip install Django<span class="p">==</span><span class="m">1</span>.<span class="m">8</span>.<span class="m">5</span>
+$ sudo apt<span class="p">-</span><span class="k">get</span> install python<span class="p">-</span>mysqldb
+
+<span class="sr">//</span>Django搭建完成后，要启动供外网访问，启动方式
+$ python manage.<span class="k">py</span> runserver <span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">8800</span>
+
+
+$ pip install uwsgi	<span class="sr">//</span>安装uwsgi
+新建test.<span class="k">py</span>文件，内容如下：
+<span class="nb">def</span> application<span class="p">(</span>env<span class="p">,</span> start_response<span class="p">)</span>:
+        start_response<span class="p">(</span><span class="s1">&#39;200 OK&#39;</span><span class="p">,</span> [<span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span><span class="s1">&#39;text/html&#39;</span><span class="p">)</span>]<span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Hello World&quot;</span>
+$ apt<span class="p">-</span><span class="k">get</span> install build<span class="p">-</span>essential python<span class="p">-</span>dev
+$ uwsgi <span class="p">--</span>http :<span class="m">8001</span> <span class="p">--</span>wsgi<span class="p">-</span><span class="k">file</span> test.<span class="k">py</span>  <span class="sr">//</span>检查uwsgi是否安装成功
+
+
+编写wsgi.<span class="k">py</span><span class="p">,</span>放入Django项目根目录
+# <span class="p">-</span>*<span class="p">-</span>coding:utf<span class="m">-8</span> <span class="p">-</span>*<span class="p">-</span>
+import os<span class="p">,</span>sys
+sys.<span class="nb">path</span>.append<span class="p">(</span>os.<span class="nb">path</span>.dirname<span class="p">(</span>os.<span class="nb">path</span>.dirname<span class="p">(</span>__file__<span class="p">)))</span>
+os.environ.setdefault<span class="p">(</span><span class="s2">&quot;DJANGO_SETTINGS_MODULE&quot;</span><span class="p">,</span> <span class="s2">&quot;config.settings&quot;</span><span class="p">)</span>
+from django.core.wsgi import get_wsgi_application
+application <span class="p">=</span> get_wsgi_application<span class="p">()</span>
+
+编写uwsgi8800.xml，放入etc目录下
+<span class="p">&lt;</span>uwsgi<span class="p">&gt;</span>
+     <span class="p">&lt;</span>socket<span class="p">&gt;</span>:<span class="m">8800</span><span class="p">&lt;</span>/socket<span class="p">&gt;</span>
+     <span class="p">&lt;</span><span class="k">chdir</span><span class="p">&gt;</span><span class="sr">/www/</span>annpeter.<span class="k">cn</span><span class="p">&lt;</span>/<span class="k">chdir</span><span class="p">&gt;</span>
+     <span class="p">&lt;</span>module<span class="p">&gt;</span>wsgi<span class="p">&lt;</span>/module<span class="p">&gt;</span>
+     <span class="p">&lt;</span>processes<span class="p">&gt;</span><span class="m">4</span><span class="p">&lt;</span>/processes<span class="p">&gt;</span> <span class="p">&lt;!--</span> 进程数 <span class="p">--&gt;</span>
+     <span class="p">&lt;</span>daemonize<span class="p">&gt;</span><span class="sr">/var/</span>log<span class="sr">/uwsgi8800.log&lt;/</span>daemonize<span class="p">&gt;</span>
+<span class="p">&lt;</span>/uwsgi<span class="p">&gt;</span>
+
+运行$ uwsgi <span class="p">-</span><span class="k">x</span> <span class="sr">/etc/</span>uwsgi8800.xml启动web服务
+
+
+然后再nginx.<span class="k">conf</span>中配置转发
+location  / {
+	<span class="nb">include</span> uwsgi_params;
+	uwsgi_pass          <span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">8800</span>;
+}
+</pre></div>

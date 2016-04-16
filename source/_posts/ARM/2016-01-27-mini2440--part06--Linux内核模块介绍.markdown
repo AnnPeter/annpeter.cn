@@ -1,0 +1,159 @@
+---
+layout: post
+title: "mini2440--part06--Linux内核模块介绍"
+date: 2016-01-27 22:10:11 +2341
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,Linux内核模块介绍,博客,AnnPeter's Blog
+description: "mini2440--part06--Linux内核模块介绍"
+zTree: true
+
+---
+
+内核模块特点：
+
+1. 模块本身不被编译进内核文件(zImage或者bzImage)
+2. 可以根据需求，在内核运行期间动态的安装或者卸载。
+
+
+<!-- more -->
+
+```vim
+//安装insmod
+$ insmod ~/Desktop/dnw_usb.ko
+
+//卸载rmmod
+$ rmmod dnw_usb
+
+//查看lsmod
+$ lsmod
+```
+
+###内核模块编写
+内核模块包括
+
+1. 头文件<linux/init.h>,<linux/module.h>
+2. 加载函数module_init(void*)
+3. 卸载函数module_exit(void*)
+
+```cpp
+/*************************************************************************
+    > File Name: hello_module.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Sun 31 Jan 2016 05:44:56 PM CST
+ ************************************************************************/
+
+
+#include <linux/init.h>
+#include <linux/module.h>
+
+static int hello_init(void)
+{
+	print(KERN_WARNING"hello,world!\n");
+	return 0;
+}
+
+static void hello_exit(void)
+{
+	printk(KERN_INFO"Goodbye,word!\n")
+}
+
+module_init(hello_init);
+module_exit(hello_exit);
+```
+
+##内核可选项
+###模块声明
+1. MODULE_LICENSE("遵守的协议");		声明该模块遵守的许可证协议，如：“GPL”、“GPL v2”等。
+2. MODULE_AUTHOR("作者");		声明模块的作者
+3. MODULE_DESCRIPTION("模块的功能描述");	声明模块的功能
+4. MODULE_VERSION("V1.0");	声明模块的版本
+
+###模块参数
+通过宏module_param指定保存模块参数的变量，模块参数可用于在加载模块时传递参数给模块
+module_param(name, type, perm);
+
+* name:变量的名称
+* type:变量类型，bool:布尔型,int:整型,charp:字符串型
+* perm:访问权限。S_IRUGO:读权限，S_IWUSR:写权限
+
+```vim
+int a = 3;
+char * str;
+module_param(a, int, S_IRUGO|S_IWUSR); //安装的时候insmod hello.ko a=10
+module_param(str, charp, S_IRUGO);		//安装的时候insmod hello.ko str=abcd
+```
+
+###符号导出
+如果一个模块中的函数希望提供给其它模块使用，则这个模块不仅要实现这个函数，还要将这个函数导出<br>
+EXPORT_SYMBOL(符号名);<br>
+EXPORT_SYMBOL_GPL(符号名);<br>
+说明：其中EXPORT_SYMBOL_GPL只能用于导出包含GPL许可证的模块。<br>
+
+
+##内核链表
+```vim
+/*************************************************************************
+    > File Name: student.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Mon 01 Feb 2016 11:44:59 PM CST
+ ************************************************************************/
+
+
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/list.h>
+
+struct stu
+{
+	int num;
+	int eng;
+	int math;
+	struct list_head list;
+};
+
+struct list_head stu_head;
+struct stu stu1, stu2, stu3;
+struct list_head* pos;
+struct stu* tmp;
+
+int mylist_init()
+{
+	INIT_LIST_HEAD(&stu_head);
+
+	stu1.num = 1;
+	stu1.eng = 90;
+	stu1.math = 90;
+	list_add_tail(&(stu1.list), &stu_head);
+
+	stu2.num = 2;
+	stu2.eng = 91;
+	stu2.math = 91;
+	list_add_tail(&(stu2.list), &stu_head);
+	
+	stu3.num = 3;
+	stu3.eng = 92;
+	stu3.math = 92;
+	list_add_tail(&(stu3.list), &stu_head);
+
+
+	list_for_each(pos, &stu_head)
+	{
+		tmp = list_entry(pos, struct stu, list);
+		printk("num is %d.\n", tmp->num);
+	}
+
+	return 0;
+}
+
+void mylist_exit()
+{
+	list_del(&(stu1.list));
+
+}
+
+module_init(mylist_init);
+module_exit(mylist_exit);
+```

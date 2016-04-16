@@ -1,0 +1,22 @@
+<div class="highlight"><pre>/*************************************************************************
+	<span class="p">&gt;</span> File Name: test.<span class="k">c</span>
+	<span class="p">&gt;</span> Author: AnnPeter
+	<span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span>
+	<span class="p">&gt;</span> Created Time: Tue <span class="m">02</span> Feb <span class="m">2016</span> <span class="m">05</span>:<span class="m">04</span>:<span class="m">40</span> PM CST
+ ************************************************************************/
+
+void ap_pk<span class="p">()</span>
+{
+	__asm__<span class="p">(</span>
+<span class="c">	&quot;ldr r7, =365 \n&quot;</span>
+<span class="c">	&quot;swi \n&quot;</span>
+	:
+	:
+	:<span class="s2">&quot;memory&quot;</span><span class="p">)</span>;
+}
+
+void <span class="k">main</span><span class="p">()</span>
+{
+	ap_pk<span class="p">()</span>;
+}
+</pre></div>

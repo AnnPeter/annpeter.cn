@@ -1,0 +1,49 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+
+	<span class="kd">private</span> <span class="n">ComponentName</span> <span class="n">componentName</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="n">DevicePolicyManager</span> <span class="n">devicePolicyManager</span><span class="o">;</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+		<span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">active</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="c1">//激活设备管理器</span>
+		<span class="n">Intent</span> <span class="n">intent_dev</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">(</span><span class="n">DevicePolicyManager</span><span class="o">.</span><span class="na">ACTION_ADD_DEVICE_ADMIN</span><span class="o">);</span>
+
+		<span class="n">componentName</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ComponentName</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">AdminReceiver</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+		<span class="n">intent_dev</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">DevicePolicyManager</span><span class="o">.</span><span class="na">EXTRA_DEVICE_ADMIN</span><span class="o">,</span> <span class="n">componentName</span><span class="o">);</span>
+		<span class="n">intent_dev</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">DevicePolicyManager</span><span class="o">.</span><span class="na">EXTRA_ADD_EXPLANATION</span><span class="o">,</span> <span class="s">&quot;激活手机安全卫士管理器，全面为您的手机保驾护航&quot;</span><span class="o">);</span>
+		<span class="n">startActivity</span><span class="o">(</span><span class="n">intent_dev</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">lock</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">devicePolicyManager</span> <span class="o">=</span> <span class="o">(</span><span class="n">DevicePolicyManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">DEVICE_POLICY_SERVICE</span><span class="o">);</span>
+		<span class="k">if</span><span class="o">(</span><span class="n">devicePolicyManager</span><span class="o">.</span><span class="na">isAdminActive</span><span class="o">(</span><span class="n">componentName</span><span class="o">)){</span>
+			<span class="n">devicePolicyManager</span><span class="o">.</span><span class="na">lockNow</span><span class="o">();</span>
+
+			<span class="c1">//重置密码</span>
+			<span class="n">devicePolicyManager</span><span class="o">.</span><span class="na">resetPassword</span><span class="o">(</span><span class="s">&quot;123456&quot;</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span><span class="c1">//flag表示禁止其它设备管理器再重置密码</span>
+		<span class="o">}</span><span class="k">else</span><span class="o">{</span>
+			<span class="n">Log</span><span class="o">.</span><span class="na">i</span><span class="o">(</span><span class="s">&quot;log&quot;</span><span class="o">,</span> <span class="s">&quot;设备管理器未激活&quot;</span><span class="o">);</span>
+		<span class="o">}</span>
+
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">uninstall</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="c1">//取消激活，如果未取消激活，该应用将在用户手机上显示为不可卸载</span>
+		<span class="n">devicePolicyManager</span><span class="o">.</span><span class="na">removeActiveAdmin</span><span class="o">(</span><span class="n">componentName</span><span class="o">);</span>
+
+		<span class="c1">//卸载程序</span>
+		<span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">ACTION_UNINSTALL_PACKAGE</span><span class="o">);</span>
+		<span class="n">intent</span><span class="o">.</span><span class="na">addCategory</span><span class="o">(</span><span class="n">intent</span><span class="o">.</span><span class="na">CATEGORY_DEFAULT</span><span class="o">);</span>
+		<span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">&quot;package:&quot;</span><span class="o">+</span><span class="n">getPackageName</span><span class="o">()));</span>
+		<span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+
+	<span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>

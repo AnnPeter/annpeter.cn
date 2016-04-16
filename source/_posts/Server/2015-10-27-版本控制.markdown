@@ -1,0 +1,85 @@
+---
+layout: post
+title: "版本控制"
+date: 2015-10-27 17:30:33 +0130
+comments: true
+categories: Server
+keywords: Server,版本控制,SVN,git,博客,AnnPeter's Blog
+description: "版本控制"
+
+---
+
+###SVN标准目录结构
+* Trunk这是SVN目录的主分支，表示日常开发的项目，任何时候Trunk目录里包含的都是最新的开发代码。Trunk应该只被用来开发将会成为你的下一个总要的版本的代码。
+* Branches
+ * Experimental branches：有时候你想将某个新技术引入项目。这很好，但是你当然不想堵上你的整个项目。
+ * Bug fix branches：分支也可以用于处理trunk或者release branches里发现的严重Bug。
+* Tags一般情况下，tag是用来做一个milestone的，不管是不是relese，都是一个可用的版本。Tags一般是只读的。
+
+<!-- more -->
+
+###服务器端
+1. 创建代码仓库
+>$ svnadmin create ~/Documents/SVNRepertory/SVNTest
+
+####配置svn的用户权限，主要是修改conf目录下的三个文件（svnserver.conf、passwd、authz）
+1. 打开svnserver.conf，将下列配置前面的**#**和**空格**全都去掉
+>\# anon-access = read<br>
+>\# auth-access = write<br>
+>\# password-db = passwd<br>
+>\# authz-db = authz<br>
+
+2. 打开passwd,在[users]下面添加帐号和密码
+> AnnPeter = annpeter<br>
+> Ann = ann<br>
+> Peter = peter<br>
+
+3. 打开authz，配置用户组和权限
+>[groups]<br>
+>\#表明AnnPeter,Ann都属于topgroup这个组<br>
+>topgroup = AnnPeter,Ann<br>
+><br>
+>[/] \#代表svn服务器中所有的资源库<br>
+>\#下面的配置说明topgroup这个组中所有用户对所有资源库都具有读写权限,Peter只有只读权限<br>
+>\#组名前面要用@；如果是用户名，前面不用加@<br>
+>\* = r<br>
+>@topgroup = rw<br>
+>Peter = r<br>
+>[annpeter.cn:/trunk]\#设置annpeter.cn版本库中trunk目录的权限<br>
+>Visitor=rw<br>
+
+
+4. 启动svn服务器
+>$ svnserve -d -r ~/Documents/SVNRepertory/SVNTest		<br>
+>//--listen-port 指定端口，可开启多个版本库					<br>
+>//如果没有任何提示就是说明启动成功了						<br>
+
+###客户端
+1. 从本地导入代码到服务器（第一次初始化导入）
+>$ svn import ../Nots  svn://localhost/SVNTest --username=AnnPeter --password=annpeter -m "初始化导入"
+
+2. 从服务器端下载代码到客户端本地
+>$ svn checkout svn://localhost/SVNTest --username=Peter --password=peter ./
+
+3. 提交已经更改过的代码到服务器
+>$ svm commite -m "修改了main.cpp文件"
+
+4. 更新服务器端代码到客户端
+在终端中，进入客户端代码目录后，如上面的~/Documents/SVNRepertory/SVNTest目录，然后输入指令：
+>$ svn update
+
+5. 创建分支
+>$ svn mkdir svn://localhost/SVNTest/ --username=AnnPeter --password=annpeter -m "创建目录"<br>
+>$ svn mkdir svn://localhost/SVNTest/Android --username=AnnPeter --password=annpeter -m "创建目录"<br>
+>$ svn mkdir svn://localhost/SVNTest/Android/trunk --username=AnnPeter --password=annpeter -m "创建目录"<br>
+>$ svn mkdir svn://localhost/SVNTest/Android/branches --username=AnnPeter --password=annpeter -m "创建目录"<br>
+>$ svn mkdir svn://localhost/SVNTest/Android/tags --username=AnnPeter --password=annpeter -m "创建目录"<br>
+
+5. 查看log信息
+如果出现**svn: E220001: Item is not readable**错误，请在authz文件中 **[/]** 栏目下添加 **\* = r**
+>$ svn log svn://localhost/Android/sns/trunk/main.cpp --username=AnnPeter --password=annpeter<br>
+>$ svn log main.cpp<br>
+>$ svn log --stop-on-copy<br>
+
+6. 分支拷贝
+>$ svn copy svn://localhost/Android/sns/trunk svn://localhost/Android/sns/tags/v1.0 -m "1.0 released"<br>

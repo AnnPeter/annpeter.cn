@@ -1,0 +1,416 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Linux常用命令 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="Linux常用命令">
+	<meta name="keywords" content="Server,Linux命令,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">Linux常用命令</h2>
+		<div class="entry-content">
+			<a name="L..............."></a>
+<h2>软、硬链接</h2>
+
+<ul>
+<li>软链接(soft link)：A是B的软链接（A和B都是文件名），A的目录项中的inode节点号与B的目录项中的inode节点号不相同，A和B指向的是两个不同的inode，继而指向两块不同的数据块。但是A的数据块中存放的只是B的路径名（可以根据这个找到B的目录项）。A和B之间是“主从”关系，如果B被删除了，A仍然存在（因为两个是不同的文件），但指向的是一个无效的链接。</li>
+<li>软链接可以 跨文件系统 ，硬链接不可以</li>
+<li>软链接可以对一个不存在的文件名进行链接</li>
+<li>软链接可以对目录进行链接</li>
+</ul>
+
+
+<!-- more -->
+
+
+<ul>
+<li>硬链接(hard link)：A是B的硬链接（A和B都是文件名），则A的目录项中的inode节点号与B的目录项中的inode节点号相同，即一个inode节点对应两个不同的文件名，两个文件名指向同一个文件，A和B对文件系统来说是完全平等的。如果删除了其中一个，对另外一个没有影响。每增加一个文件名，inode节点上的链接数增加一，每删除一个对应的文件名，inode节点上的链接数减一，直到为0，inode节点和对应的数据块被回收。注：文件和文件名是不同的东西，rm A删除的只是A这个文件名，而A对应的数据块（文件）只有在inode节点链接数减少为0的时候才会被系统回收。</li>
+<li>硬链接只有在同一个文件系统中才能创建。</li>
+<li>不允许给目录创建硬链接。</li>
+</ul>
+
+
+<blockquote><p>硬：ln 源文件 链接名<br>
+软：ln -s 源文件 链接名<br></p></blockquote>
+
+<hr />
+
+<a name="scp.................."></a>
+<h2>scp远程文件拷贝</h2>
+
+<blockquote><ol>
+<li>拷贝远程主机文件至本机<br>
+$ scp -r root@www.itpeter.cn:/www  ~/Desktop<br></li>
+<li>拷贝本机文件至远程主机<br>
+$ scp -r ~/Desktop root@www.itpeter.cn:/www<br></li>
+</ol>
+</blockquote>
+
+<a name="MySql......"></a>
+<h2>MySql操作</h2>
+
+<a name="L............"></a>
+<h4>创建用户</h4>
+
+<blockquote><p>mysql> CREATE USER &lsquo;peter&rsquo;@&lsquo;%&rsquo; IDENTIFIED BY &lsquo;peter&rsquo;;<br>
+mysql> GRANT ALL ON <em>microengine</em>.* TO &lsquo;peter&rsquo;@&lsquo;%&rsquo;;<br></p></blockquote>
+
+<a name="L............"></a>
+<h4>修改密码</h4>
+
+<blockquote><p>方法一:<br>
+(适用于管理员或者有全局权限的用户重设其它用户的密码)<br>
+进入命令行模式<br>
+$ mysql -u root -p<br>
+<br>
+mysql>use mysql;<br>
+mysql> UPDATE user SET password=PASSWORD(&ldquo;new password&rdquo;) WHERE user=&lsquo;username&rsquo;;<br>
+mysql> FLUSH PRIVILEGES;<br>
+mysql> quit;<br>
+<br>
+方法二:<br>
+$ mysql -u root -p<br>
+mysql>use mysql;<br>
+mysql> SET PASSWORD FOR   username=PASSWORD(&lsquo;new password&rsquo;);<br>
+mysql> QUIT<br>
+<br>
+方法三:<br>
+$ mysqladmin -u root &ldquo;old password&rdquo; &ldquo;new password&rdquo;<br></p></blockquote>
+
+<a name="L......root............"></a>
+<h4>允许root远程登录</h4>
+
+<blockquote><p>mysql> GRANT ALL PRIVILEGES ON <em>.</em> TO &lsquo;root&rsquo;@&lsquo;%&rsquo; IDENTIFIED BY &lsquo;123456&rsquo; WITH GRANT OPTION;<br>
+mysql> FLUSH PRIVILEGES;<br>
+修改/etc/mysql/my.cnf  将bind-address=127.0.0.1注释掉<br></p></blockquote>
+
+<a name="htpasswd................................."></a>
+<h2>htpasswd使用，用于生成密码文件</h2>
+
+<blockquote><p>$ htpasswd -c dev_htpasswd AnnPeter    新建dev_htpasswd，并添加用户<br>
+$ htpasswd dev_htpasswd Peter          添加用户<br></p></blockquote>
+
+<a name="L........................"></a>
+<h2>查看端口占用情况</h2>
+
+<blockquote><p>$ netstat -lpnt</p></blockquote>
+
+<a name="L..............."></a>
+<h2>可视化路由</h2>
+
+<blockquote><p>$ traceroute www.itpeter.cn</p></blockquote>
+
+<a name="L.................."></a>
+<h2>后台运行软件</h2>
+
+<p>在命令后面加上 <strong>&amp;</strong> 即可</p>
+
+<a name="L...............web........."></a>
+<h2>命令行访问web服务器</h2>
+
+<blockquote><p>$ curl <a href="http://www.baidu.com">http://www.baidu.com</a></p></blockquote>
+
+<a name="Ubuntu.................."></a>
+<h2>Ubuntu添加开机自启</h2>
+
+<blockquote><p>如果要添加为开机启动执行的脚本文件，<br>
+可先将脚本复制或者软连接到/etc/init.d/目录下，<br>
+修改文件权限为755<br>
+然后用：<br>
+$ cd /etc/init.d<br>
+$ sudo update-rc.d test defaults NN命令(NN为启动顺序)，<br>
+将脚本添加到初始化执行的队列中去。<br>
+注意如果脚本需要用到网络，则NN需设置一个比较大的数字，如99。<br>
+<br>
+卸载命令为：<br>
+$ sudo update-rc.d -f test remove<br></p></blockquote>
+
+<a name="Nginx............................................."></a>
+<h2>Nginx在安装完成后，需要添加新模块时</h2>
+
+<blockquote><p>$ nginx -V //查看一起的编译选项<br>
+$ 然后联合要添加的模块和以前的模块一起config<br>
+$ 然后make（不要make install，会覆盖）<br>
+$ 备份以前的nginx可执行文件<br>
+$ 将编译好的nginx拷贝过去<br></p></blockquote>
+
+<a name="L............"></a>
+<h2>压缩解压</h2>
+
+<blockquote><a name="tar.......br."></a>
+<h3>tar命令<br></h3>
+
+<ul>
+<li>打包tar.gz<br>
+$ tar zcvf XX.tar.gz  XX<br></li>
+<li>查看包内内容<br>
+$ tar tvf XX.tar.gz<br></li>
+</ul>
+
+
+<p><br></p>
+
+<a name="rar.......br."></a>
+<h3>rar解压<br></h3>
+
+<p>$ rar e XX.rar<br></p></blockquote>
+
+<a name="ftp......"></a>
+<h2>ftp连接</h2>
+
+<blockquote><p>$ ftp ip or 域名
+$ Name:
+$ Password:</p></blockquote>
+
+<a name="find"></a>
+<h2>find</h2>
+
+<blockquote><p>$ find . -name &ldquo;*.xml&rdquo; |xargs grep &ldquo;hello world&rdquo; 递归查找所有文件内容中包含hello world的xml文件</p></blockquote>
+
+<a name="stat"></a>
+<h2>stat</h2>
+
+<blockquote><p>$ stat example.txt //查看文件Inode信息</p></blockquote>
+
+<a name="L............"></a>
+<h2>用户管理</h2>
+
+<blockquote><p>#添加用户<br>
+#-m 添加用户目录<br>
+#-s 指定bash脚本<br>
+useradd -m -s /bin/bash annpeter<br>
+<br>
+#添加用户到组www-data，-a表示append<br>
+$ usermod -a -G www-data annpeter<br></p></blockquote>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2015/11/12/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/Linux常用命令" data-title="Linux常用命令" data-url="http://www.annpeter.cn/blog/2015/11/12/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Nov 12th, 2015</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

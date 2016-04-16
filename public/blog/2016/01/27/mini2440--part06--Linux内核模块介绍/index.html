@@ -1,0 +1,513 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini2440--part06--Linux内核模块介绍 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="mini2440--part06--Linux内核模块介绍">
+	<meta name="keywords" content="ARM,mini2440,Linux内核模块介绍,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">mini2440--part06--Linux内核模块介绍</h2>
+		<div class="entry-content">
+			<p>内核模块特点：</p>
+
+<ol>
+<li>模块本身不被编译进内核文件(zImage或者bzImage)</li>
+<li>可以根据需求，在内核运行期间动态的安装或者卸载。</li>
+</ol>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="sr">//</span>安装insmod
+</span><span class='line'>$ insmod <span class="p">~</span><span class="sr">/Desktop/</span>dnw_usb.ko
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span>卸载rmmod
+</span><span class='line'>$ rmmod dnw_usb
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span>查看lsmod
+</span><span class='line'>$ lsmod
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L.................."></a>
+<h3>内核模块编写</h3>
+
+<p>内核模块包括</p>
+
+<ol>
+<li>头文件&lt;linux/init.h>,&lt;linux/module.h></li>
+<li>加载函数module_init(void*)</li>
+<li>卸载函数module_exit(void*)</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: hello_module.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Sun 31 Jan 2016 05:44:56 PM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">int</span> <span class="nf">hello_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">print</span><span class="p">(</span><span class="n">KERN_WARNING</span><span class="s">&quot;hello,world!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">hello_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span><span class="s">&quot;Goodbye,word!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">hello_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">hello_exit</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L..............."></a>
+<h2>内核可选项</h2>
+
+<a name="L............"></a>
+<h3>模块声明</h3>
+
+<ol>
+<li>MODULE_LICENSE(&ldquo;遵守的协议&rdquo;);       声明该模块遵守的许可证协议，如：“GPL”、“GPL v2”等。</li>
+<li>MODULE_AUTHOR(&ldquo;作者&rdquo;);     声明模块的作者</li>
+<li>MODULE_DESCRIPTION(&ldquo;模块的功能描述&rdquo;); 声明模块的功能</li>
+<li>MODULE_VERSION(&ldquo;V1.0&rdquo;);  声明模块的版本</li>
+</ol>
+
+
+<a name="L............"></a>
+<h3>模块参数</h3>
+
+<p>通过宏module_param指定保存模块参数的变量，模块参数可用于在加载模块时传递参数给模块
+module_param(name, type, perm);</p>
+
+<ul>
+<li>name:变量的名称</li>
+<li>type:变量类型，bool:布尔型,int:整型,charp:字符串型</li>
+<li>perm:访问权限。S_IRUGO:读权限，S_IWUSR:写权限</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>int <span class="k">a</span> <span class="p">=</span> <span class="m">3</span>;
+</span><span class='line'>char * str;
+</span><span class='line'>module_param<span class="p">(</span><span class="k">a</span><span class="p">,</span> int<span class="p">,</span> S_IRUGO<span class="p">|</span>S_IWUSR<span class="p">)</span>; <span class="sr">//</span>安装的时候insmod hello.ko <span class="k">a</span><span class="p">=</span><span class="m">10</span>
+</span><span class='line'>module_param<span class="p">(</span>str<span class="p">,</span> charp<span class="p">,</span> S_IRUGO<span class="p">)</span>;        <span class="sr">//</span>安装的时候insmod hello.ko str<span class="p">=</span>abcd
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L............"></a>
+<h3>符号导出</h3>
+
+<p>如果一个模块中的函数希望提供给其它模块使用，则这个模块不仅要实现这个函数，还要将这个函数导出<br>
+EXPORT_SYMBOL(符号名);<br>
+EXPORT_SYMBOL_GPL(符号名);<br>
+说明：其中EXPORT_SYMBOL_GPL只能用于导出包含GPL许可证的模块。<br></p>
+
+<a name="L............"></a>
+<h2>内核链表</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>/*************************************************************************
+</span><span class='line'>    <span class="p">&gt;</span> File Name: student.<span class="k">c</span>
+</span><span class='line'>    <span class="p">&gt;</span> Author: AnnPeter
+</span><span class='line'>    <span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span>
+</span><span class='line'>    <span class="p">&gt;</span> Created Time: Mon <span class="m">01</span> Feb <span class="m">2016</span> <span class="m">11</span>:<span class="m">44</span>:<span class="m">59</span> PM CST
+</span><span class='line'> ************************************************************************/
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>#<span class="nb">include</span> <span class="p">&lt;</span>linux/module.<span class="k">h</span><span class="p">&gt;</span>
+</span><span class='line'>#<span class="nb">include</span> <span class="p">&lt;</span>linux/init.<span class="k">h</span><span class="p">&gt;</span>
+</span><span class='line'>#<span class="nb">include</span> <span class="p">&lt;</span>linux/<span class="nb">list</span>.<span class="k">h</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>struct stu
+</span><span class='line'>{
+</span><span class='line'>  int <span class="k">num</span>;
+</span><span class='line'>  int eng;
+</span><span class='line'>  int math;
+</span><span class='line'>  struct list_head <span class="nb">list</span>;
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>struct list_head stu_head;
+</span><span class='line'>struct stu stu1<span class="p">,</span> stu2<span class="p">,</span> stu3;
+</span><span class='line'>struct list_head* pos;
+</span><span class='line'>struct stu* tmp;
+</span><span class='line'>
+</span><span class='line'>int mylist_init<span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  INIT_LIST_HEAD<span class="p">(</span>&amp;stu_head<span class="p">)</span>;
+</span><span class='line'>
+</span><span class='line'>  stu1.<span class="k">num</span> <span class="p">=</span> <span class="m">1</span>;
+</span><span class='line'>  stu1.eng <span class="p">=</span> <span class="m">90</span>;
+</span><span class='line'>  stu1.math <span class="p">=</span> <span class="m">90</span>;
+</span><span class='line'>  list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu1.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+</span><span class='line'>
+</span><span class='line'>  stu2.<span class="k">num</span> <span class="p">=</span> <span class="m">2</span>;
+</span><span class='line'>  stu2.eng <span class="p">=</span> <span class="m">91</span>;
+</span><span class='line'>  stu2.math <span class="p">=</span> <span class="m">91</span>;
+</span><span class='line'>  list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu2.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+</span><span class='line'>  
+</span><span class='line'>  stu3.<span class="k">num</span> <span class="p">=</span> <span class="m">3</span>;
+</span><span class='line'>  stu3.eng <span class="p">=</span> <span class="m">92</span>;
+</span><span class='line'>  stu3.math <span class="p">=</span> <span class="m">92</span>;
+</span><span class='line'>  list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu3.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  list_for_each<span class="p">(</span>pos<span class="p">,</span> &amp;stu_head<span class="p">)</span>
+</span><span class='line'>  {
+</span><span class='line'>      tmp <span class="p">=</span> list_entry<span class="p">(</span>pos<span class="p">,</span> struct stu<span class="p">,</span> <span class="nb">list</span><span class="p">)</span>;
+</span><span class='line'>      printk<span class="p">(</span><span class="s2">&quot;num is %d.\n&quot;</span><span class="p">,</span> tmp<span class="p">-&gt;</span><span class="k">num</span><span class="p">)</span>;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="m">0</span>;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>void mylist_exit<span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  list_del<span class="p">(</span>&amp;<span class="p">(</span>stu1.<span class="nb">list</span><span class="p">))</span>;
+</span><span class='line'>
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>module_init<span class="p">(</span>mylist_init<span class="p">)</span>;
+</span><span class='line'>module_exit<span class="p">(</span>mylist_exit<span class="p">)</span>;
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/01/27/mini2440--part06--Linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/mini2440--part06--Linux内核模块介绍" data-title="mini2440--part06--Linux内核模块介绍" data-url="http://www.annpeter.cn/blog/2016/01/27/mini2440--part06--Linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Jan 27th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

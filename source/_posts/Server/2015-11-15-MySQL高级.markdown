@@ -1,0 +1,242 @@
+---
+layout: post
+title: "MySQL高级"
+date: 2015-11-15 21:30:11 +1211
+comments: true
+categories: Server
+keywords: Server,MySQL,博客,AnnPeter's Blog
+description: "MySQL高级"
+
+---
+
+本文主要记录一些MySQL的高级用法，留作后用。
+<!-- more -->
+
+```sql
+#查看所有存储过程状态，但是无法看到存储过程语句详情
+show procedure status;
+
+#查看所有函数状态
+show FUNCTION status;
+
+
+#查看具体的存储过程，可以看到存储过程的语句内容
+select * from mysql.proc where db = 'oracle_01' and `type` = 'PROCEDURE';
+
+#查看具体的函数状态
+select * from mysql.proc where db = 'oracle_01' and `type` = 'FUNCTION';
+
+
+#删除存储过程
+drop procedure IF EXISTS P_GETSname;
+
+#删除函数
+drop function IF EXISTS F_GETSname;
+
+
+
+
+#重新定义定介符
+DELIMITER //
+
+CREATE PROCEDURE P_GETSname(in sno int)
+BEGIN
+
+SELECT `SNAME` FROM S WHERE S.`SNO` = sno;
+
+END //
+
+#将定介符再次设置为;号
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION F_GETSname(sno int)
+RETURNS VARCHAR(60)
+BEGIN
+RETURN (SELECT `SNAME` FROM S WHERE S.`SNO` = sno);
+END //
+
+DELIMITER ;
+
+
+
+#调用存储过程
+CALL F_GETSname(1);
+
+#调用自定义函数
+SELECT F_GETJname(1);
+
+
+
+#触发器
+CREATE TRIGGER update_everydayregister_info
+BEFORE INSERT ON ap_zjarea_everydayregister
+FOR EACH ROW
+BEGIN
+    DECLARE dayLastDayFull varchar(20); #最后一次签到时间，精确到毫秒
+    DECLARE thisMonthTimes INT;
+    DECLARE allTimes INT;
+    DECLARE seriesTimes INT;
+
+    SELECT all_times, last_regtime , series_times, this_month_times INTO allTimes, dayLastDayFull, seriesTimes, thisMonthTimes
+        FROM ap_zjarea_everydayregister_info WHERE uid  = NEW.uid;
+
+    SET @dayTodayFull = SUBSTRING(NEW.regtime, 1, 19); #当前时间，精确到毫秒
+    SET @dayLastDay = SUBSTRING(dayLastDayFull, 1, 10); #最后一次签到时间，精确到天
+    SET @dayToday = SUBSTRING(@dayTodayFull, 1, 10);    #当前时间，精确到天
+
+    IF ISNULL(dayLastDayFull) THEN  #用户第一次签到，插入累计信息
+
+        INSERT INTO `ap_zjarea_everydayregister_info` values(NEW.uid, @dayTodayFull, 1, 1, 1);
+
+    ELSEIF (@dayToday != @dayLastDay) THEN #用户不是第一次签到，更新累计信息
+
+        SET allTimes = allTimes + 1;
+
+        IF (SUBSTRING(@dayLastDay, 6, 2) = SUBSTRING(@dayToday , 6, 2)) THEN #如果都是这个月的，这个月累计加一
+            SET thisMonthTimes = thisMonthTimes + 1;
+        ELSE
+            SET thisMonthTimes = 1;
+        END IF;
+
+        IF (date_sub(@dayToday, interval 1 day) = @dayLastDay) THEN
+            SET seriesTimes = seriesTimes + 1;
+        ELSE
+            SET seriesTimes = 1;
+        END IF;
+
+        UPDATE ap_zjarea_everydayregister_info SET last_regtime = @dayTodayFull, this_month_times = thisMonthTimes, all_times = allTimes, series_times = seriesTimes WHERE uid  = NEW.uid;
+
+    ELSE
+        INSERT INTO `ERROR` values(1);
+    END IF;
+END
+
+
+
+#临时表的使用
+DROP PROCEDURE IF EXISTS analysis_year_register_info;
+
+DELIMITER $$
+CREATE PROCEDURE analysis_year_register_info
+(	IN _year INT)
+BEGIN
+	DROP TABLE IF EXISTS TEMPTABLE_this_year_info;
+	CREATE TEMPORARY TABLE TEMPTABLE_this_year_info SELECT * FROM ap_zjarea_everydayregister  WHERE SUBSTRING(regtime, 1, 4) = _year;
+	SELECT COUNT(*) INTO @_jan FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 01;
+	SELECT COUNT(*) INTO @_feb FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 02;
+	SELECT COUNT(*) INTO @_mar FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 03;
+	SELECT COUNT(*) INTO @_apr FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 04;
+	SELECT COUNT(*) INTO @_may FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 05;
+	SELECT COUNT(*) INTO @_jun FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 06;
+	SELECT COUNT(*) INTO @_jul FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 07;
+	SELECT COUNT(*) INTO @_aug FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 08;
+	SELECT COUNT(*) INTO @_sep FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 09;
+	SELECT COUNT(*) INTO @_oct FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 10;
+	SELECT COUNT(*) INTO @_nov FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 11;
+	SELECT COUNT(*) INTO @_dec FROM TEMPTABLE_this_year_info WHERE SUBSTRING(regtime, 6, 7) = 12;
+	DROP TABLE IF EXISTS TEMPTABLE_this_year_info;
+	SELECT @_jan, @_feb, @_mar, @_apr, @_may, @_jun, @_jul, @_aug, @_sep, @_oct, @_nov, @_dec;
+END $$
+DELIMITER ;
+
+#call analysis_year_register_info(year(now()));
+
+
+
+
+
+#通用分页技术
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_MvcCommonDataSource $$ #分隔符
+CREATE PROCEDURE sp_MvcCommonDataSource (
+    #输入参数
+    _fields VARCHAR(2000), #要查询的字段，用逗号(,)分隔
+    _tables TEXT,  #要查询的表
+    _where VARCHAR(2000),   #查询条件
+    _orderby VARCHAR(200),  #排序规则
+    _pageindex INT,  #查询页码
+    _pageSize INT,   #每页记录数
+    _sumfields VARCHAR(200),#求和字段
+    #输出参数
+    OUT _totalcount INT,  #总记录数
+    OUT _pagecount INT,    #总页数
+    OUT _sumResult VARCHAR(2000)#求和结果
+)
+BEGIN
+    #140529-xxj-分页存储过程
+    #计算起始行号
+    SET @startRow = _pageSize * (_pageIndex - 1);
+    SET @pageSize = _pageSize;
+    SET @rowindex = 0; #行号
+
+    #合并字符串
+    SET @strsql = CONCAT(
+        #'select sql_calc_found_rows  @rowindex:=@rowindex+1 as rownumber,' #记录行号
+        'select sql_calc_found_rows '
+        ,_fields
+        ,' from '
+        ,_tables
+        ,CASE IFNULL(_where, '') WHEN '' THEN '' ELSE CONCAT(' where ', _where) END
+        ,CASE IFNULL(_orderby, '') WHEN '' THEN '' ELSE CONCAT(' order by ', _orderby) END
+      ,' limit '
+        ,@startRow
+        ,','
+        ,@pageSize
+    );
+
+    PREPARE strsql FROM @strsql;#定义预处理语句
+    EXECUTE strsql;                         #执行预处理语句
+    DEALLOCATE PREPARE strsql;  #删除定义
+    #通过 sql_calc_found_rows 记录没有使用 limit 语句的记录，使用 found_rows() 获取行数
+    SET _totalcount = FOUND_ROWS();
+
+    #计算总页数
+    IF (_totalcount <= _pageSize) THEN
+        SET _pagecount = 1;
+    ELSE IF (_totalcount % _pageSize > 0) THEN
+        SET _pagecount = _totalcount / _pageSize + 1;
+    ELSE
+        SET _pagecount = _totalcount / _pageSize;
+    END IF;
+    END IF;
+
+    #计算求和字段
+    IF (IFNULL(_sumfields, '') <> '') THEN
+        #序列sum结果
+        SET @sumCols = CONCAT (
+            'CONCAT_WS(\',\','
+            ,'SUM('
+            ,REPLACE(_sumfields,',','),SUM(')
+            ,'))');
+        #拼接字符串
+        SET @sumsql = CONCAT(
+            'select '
+            ,@sumCols
+            ,' INTO @sumResult from '
+            ,_tables
+            ,CASE IFNULL(_where, '') WHEN '' THEN '' ELSE CONCAT(' where ', _where) END
+            ,';'
+        );
+        #select @sumsql;
+        PREPARE sumsql FROM @sumsql;#定义预处理语句
+        EXECUTE sumsql;
+        SET _sumResult = @sumResult;                        #执行预处理语句
+        DEALLOCATE PREPARE sumsql;  #删除定义
+
+    END IF;
+
+END $$
+DELIMITER ; #修改分隔符为分号(;)
+
+#测试分页查询
+call sp_MvcCommonDataSource('*', 'SPJ', ' ', ' ', 1, 3, ' ', @totalcount , @pagecount, @sumResult);
+SELECT @totalcount,@pagecount,@sumResult;
+
+```

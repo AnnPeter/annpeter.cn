@@ -1,0 +1,23 @@
+---
+layout: post
+title: "Ubuntu安装BCM4322驱动"
+date: 2015-12-20 17:31:45 +9723
+comments: true
+categories: Others
+keywords: Ubuntu安装BCM4322驱动,BCM4322,快捷键,博客,AnnPeter's Blog
+description: "Ubuntu安装BCM4322驱动"
+
+---
+
+本文主要介绍联想Y410(网卡已更换为BCM4322，黑果网卡)在Ubuntu15.10下的无线网卡驱动。
+<!-- more -->
+
+```vim
+系统:Ubuntu15.10
+网卡:BCM4322
+
+$ sudo apt-get install linux-headers-generic build-essential
+$ sudo apt-get install broadcom-sta-dkms
+$ sudo apt-get install bcmwl-kernel-source
+
+```

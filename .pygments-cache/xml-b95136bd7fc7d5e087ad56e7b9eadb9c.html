@@ -1,0 +1,32 @@
+<div class="highlight"><pre>* 需要配置一个广播接收者，继承自AppWidgetProvider
+* 实现一个桌面小部件的布局
+* 开启一个服务，在服务中开启定时器更新界面
+    ```java
+    AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
+
+    Timer timer = new Timer();
+
+    TimerTask timerTask = new TimerTask(){
+        @Override
+        public void run(){
+            RemoteViews views = new RemoteView(getPackageName(), R.layout.process_widget);
+    view.setTextViewText(R.id.process_count, &quot;正在运行软件1个&quot;);
+
+    Intent intent = new Intent();
+    intent.setAction(&quot;aaa.bbb.ccc&quot;);
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+    //当点击后触发广播来执行
+    view.setOnClickPendingIntent(R.id.button, pendingIntent);
+
+    //第一个参数表示上下文
+    //第二个参数表示当前有哪一个广播进行去处理当前的桌面小控件
+    ComponentName provider = new ComponentName(getApplicationContent(), MyAppWidget.class);
+    widgetManager.updateAppWidget(provider, view);
+        }
+    };
+
+    timer.schedule(timerTask, 0, 5000);
+    ```
+
+##获取病毒特征码
+</pre></div>

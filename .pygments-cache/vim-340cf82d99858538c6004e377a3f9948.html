@@ -1,0 +1,13 @@
+<div class="highlight"><pre>电脑加电后，BIOS进行自检，主要完成的工作有：
+<span class="m">1</span>.电脑加电，此时<span class="k">cs</span><span class="p">=</span><span class="m">0</span>xFFFF<span class="p">,</span>ip<span class="p">=</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span>寻址<span class="m">0</span>xFFFF<span class="m">0</span>（ROM BIOS映射区），硬件自检POST<span class="p">(</span>Power On Self Test<span class="p">)</span>
+<span class="m">2</span>.检测系统中内存和显卡等关键部件的存在和工作状态
+<span class="m">3</span>.查找并执行显卡等接口卡BIOS，进行设备初始化
+<span class="m">4</span>.执行系统BIOS，进行系统检测<span class="p">--</span>检测和配置系统中安装的即插即用设备
+<span class="m">5</span>.更新CMOS中扩展系统配置数据ESCD<span class="p">(</span>Extended System Configuration Data<span class="p">),</span>实际上就是BIOS保留的以前的设备资源分配表。
+<span class="m">6</span>.按指定启动顺序从软盘、硬盘、U盘或者光驱启动
+<span class="m">7</span>.将一个可启动的磁盘的<span class="m">0</span>磁道<span class="m">0</span>扇区读入<span class="m">0</span>x<span class="m">7</span>C<span class="m">00</span>处，并设置<span class="k">cs</span><span class="p">=</span><span class="m">0</span>x<span class="m">07</span>C<span class="m">0</span><span class="p">,</span>ip<span class="p">=</span><span class="m">0</span>x<span class="m">0000</span>
+
+TIP：因为BIOS是固化在ROM中的，作为初学者可不必太过深究内部的实现，我们要做的就是在BIOS的后面开始引导系统，当然，在后期，我们必须了解BIOS为我们提供了什么，我们才能完善我们的引导和系统。
+
+接下来，BIOS会把硬盘的头<span class="m">512</span>字节的数据复制到内存，检查这<span class="m">512</span>字节是不是以<span class="m">16</span>进制的<span class="m">55</span> AA结尾，如果是则认为这是一个启动程序，并跳转到这段程序的开头执行指令。在MBR主引导记录中，实际上启动代码只有<span class="m">446</span>字节，有<span class="m">4</span>个<span class="m">16</span>字节是硬盘分区表（这就是为什么MBR分区格式只能有<span class="m">4</span>个主分区的原因），最后两个字节为结束标志字。
+</pre></div>

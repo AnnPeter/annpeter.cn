@@ -1,0 +1,7 @@
+<div class="highlight"><pre><span class="n">jstring</span> <span class="nf">java_com_example_ndkhellloworld_helloFromC</span><span class="p">(</span><span class="n">JNIEnv</span><span class="o">*</span> <span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">thiz</span><span class="p">){</span>
+	<span class="kt">char</span><span class="o">*</span> <span class="n">arr</span> <span class="o">=</span> <span class="s">&quot;hello from c&quot;</span><span class="p">;</span>
+
+	<span class="n">jstring</span> <span class="n">jstr</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">arr</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">jstr</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

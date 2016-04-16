@@ -1,0 +1,373 @@
+<div class="highlight"><pre><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L..............................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h2</span><span class="o">&gt;</span><span class="n">服务</span><span class="err">（</span><span class="n">四大组件之一</span><span class="err">）</span><span class="o">&lt;/</span><span class="n">h2</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">运行于后台的一个组件</span><span class="err">，</span><span class="n">用来运行后台代码</span><span class="err">，</span><span class="n">服务是没有前台界面的</span><span class="err">，</span><span class="n">可以视为没有界面的Activity</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L...............&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">进程优先级</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="mi">1</span><span class="o">.</span><span class="na">Foreground</span> <span class="n">process</span> <span class="n">拥有一个正在与用户交互的Activity</span><span class="err">（</span><span class="n">onResume</span><span class="o">()</span><span class="n">方法被调用</span><span class="err">）</span><span class="n">的进程</span>
+<span class="mi">2</span><span class="o">.</span><span class="na">Visible</span> <span class="n">process</span> <span class="n">不在前台</span><span class="err">，</span><span class="n">但对用户依然可见</span><span class="err">，</span><span class="n">但是没有焦点</span><span class="err">，</span><span class="n">如Activity的onPause</span><span class="o">()</span><span class="n">方法被调用</span>
+<span class="mi">3</span><span class="o">.</span><span class="na">Service</span> <span class="n">process</span> <span class="nf">通过startService</span><span class="o">(),</span><span class="n">开启的进程</span><span class="err">，</span><span class="n">杀死后可能会被重启</span><span class="err">（</span><span class="n">内存充足</span><span class="err">）</span>
+<span class="mi">4</span><span class="o">.</span><span class="na">Background</span> <span class="n">process</span> <span class="n">不可见状态</span><span class="err">，</span><span class="n">如Activity的onStop</span><span class="o">()</span><span class="n">方法调用后</span><span class="err">，</span><span class="n">会变成background</span> <span class="n">process</span>
+<span class="mi">5</span><span class="o">.</span><span class="na">Empty</span> <span class="n">process</span><span class="err">（</span><span class="n">通常认为</span><span class="err">，</span><span class="n">没有拥有任何活动组件的</span><span class="err">）</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.....................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">创建</span><span class="err">、</span><span class="n">关闭服务</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">ol</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">需要继承自Service类</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">需要在清单文件application的子节点中声明</span><span class="o">&lt;</span><span class="n">service</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;服务类名全路径&quot;</span><span class="o">&gt;&lt;/</span><span class="n">service</span><span class="o">&gt;&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">ol</span><span class="o">&gt;</span>
+
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="c1">//首先定义一个MyService的服务类，继承自Service</span>
+
+<span class="c1">//显示启动服务</span>
+<span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">MyService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="n">startService</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+
+<span class="c1">//关闭服务</span>
+<span class="n">stopService</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.....................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">服务的生命周期</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="c1">//服务被创建过一次就不会再次创建了，但是会再次掉用onStartCommand方法</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(){</span>
+
+<span class="o">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">onStartCommand</span><span class="o">(</span> <span class="n">Intent</span> <span class="n">intent</span><span class="o">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">,</span> <span class="kt">int</span> <span class="n">startId</span><span class="o">){</span>
+
+    <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">OnStartCommand</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="n">flags</span><span class="o">,</span> <span class="n">startId</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="o">(){</span>
+
+<span class="o">}</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L...............&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">电话录音机</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">空闲状态</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">响铃状态</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">摘机状态</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="n">TelephonyManager</span> <span class="n">tm</span> <span class="o">=</span> <span class="o">(</span><span class="n">TelephonyManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">TELEPHONY_SERVICE</span><span class="o">);</span>
+
+<span class="c1">//listen可以监听很多事件，第二个参数用于指明具体是什么事件</span>
+<span class="n">tm</span><span class="o">.</span><span class="na">listen</span><span class="o">(</span><span class="k">new</span> <span class="nf">RecordLisener</span><span class="o">(),</span> <span class="n">PhoneStateListener</span><span class="o">.</span><span class="na">LISTEN_CALL_STATE</span><span class="o">);</span>
+
+<span class="kd">class</span> <span class="nc">RecordLisener</span> <span class="kd">extends</span> <span class="n">PhoneStateListener</span><span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCallStateChanged</span><span class="o">(</span><span class="kt">int</span> <span class="n">state</span><span class="o">,</span> <span class="n">String</span> <span class="n">incomingNumber</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCallStateChanged</span><span class="o">(</span><span class="n">state</span><span class="o">,</span> <span class="n">incomingNumber</span><span class="o">);</span>
+
+        <span class="k">if</span><span class="o">(</span><span class="n">state</span> <span class="o">==</span> <span class="n">TelephonyManager</span><span class="o">.</span><span class="na">CALL_STATE_OFFHOOK</span><span class="o">){</span>
+            <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;开始录音！&quot;</span><span class="o">);</span>
+        <span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">state</span> <span class="o">==</span> <span class="n">TelephonyManager</span><span class="o">.</span><span class="na">CALL_STATE_RINGING</span><span class="o">){</span>
+            <span class="n">mediaRecorder</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MediaRecorder</span><span class="o">();</span>
+            <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">setAudioSource</span><span class="o">(</span><span class="n">MediaRecorder</span><span class="o">.</span><span class="na">AudioSource</span><span class="o">.</span><span class="na">MIC</span><span class="o">);</span>
+            <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">setOutputFormat</span><span class="o">(</span><span class="n">MediaRecorder</span><span class="o">.</span><span class="na">OutputFormat</span><span class="o">.</span><span class="na">THREE_GPP</span><span class="o">);</span>
+            <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">setOutputFile</span><span class="o">(</span><span class="n">getFilesDir</span><span class="o">()+</span><span class="s">&quot;/recorder.3gp&quot;</span><span class="o">);</span>
+            <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">setAudioEncoder</span><span class="o">(</span><span class="n">MediaRecorder</span><span class="o">.</span><span class="na">AudioEncoder</span><span class="o">.</span><span class="na">AMR_NB</span><span class="o">);</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">prepare</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">Log</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;LOG_TAG&quot;</span><span class="o">,</span> <span class="s">&quot;prepare() failed&quot;</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;电话来了，已经准备好了录音&quot;</span><span class="o">);</span>
+        <span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">state</span> <span class="o">==</span> <span class="n">TelephonyManager</span><span class="o">.</span><span class="na">CALL_STATE_IDLE</span><span class="o">){</span>
+            <span class="k">if</span><span class="o">(</span><span class="n">mediaRecorder</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">){</span>
+                <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+                <span class="n">mediaRecorder</span><span class="o">.</span><span class="na">release</span><span class="o">();</span>
+                <span class="n">mediaRecorder</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;录音已经完毕&quot;</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.....................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">服务的开启方式</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">startService</span><span class="o">&amp;</span><span class="n">ndash</span><span class="o">;</span><span class="n">stopService</span>  <span class="c1">//涉及到的方法onCreate、onStartCommand、onDestroy</span>
+
+<span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">该方法启动的是服务进程</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">Activity一旦启动服务</span><span class="err">，</span><span class="n">服务就跟Activity没有关系了</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">bindService</span><span class="o">&amp;</span><span class="n">ndash</span><span class="o">;</span><span class="n">unBindService</span> <span class="c1">//涉及到的方法onBind、onUnbind</span>
+
+<span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">该方法启动的不是服务进程</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">Activity与服务建立连接</span><span class="err">，</span><span class="n">Activity一旦死亡</span><span class="err">，</span><span class="n">服务也会死亡</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">安卓通过error触发unBindService</span><span class="err">，</span><span class="n">所以在此时报出的错误</span><span class="err">，</span><span class="n">并不会让程序崩溃</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">绑定只能绑定一次</span><span class="err">，</span><span class="n">重复解绑会崩溃</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;</span><span class="n">bindService这种方式可用于在Activity中调用Service中的方法</span><span class="err">，</span><span class="n">通过中间人调用</span><span class="o">&lt;/</span><span class="n">strong</span><span class="o">&gt;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="c1">//创建Service类</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ChuZhangService</span> <span class="kd">extends</span> <span class="n">Service</span> <span class="o">{</span>
+
+    <span class="c1">//创建中间人类</span>
+    <span class="kd">class</span> <span class="nc">ZhouMi</span> <span class="kd">extends</span> <span class="n">Binder</span><span class="o">{</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">qianXian</span><span class="o">()</span> <span class="o">{</span>
+            <span class="n">banZheng</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">IBinder</span> <span class="nf">onBind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// TODO Auto-generated method stub</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">ZhouMi</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">banZheng</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;处长办证！&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="n">ZhouMi</span> <span class="n">zm</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="c1">//在Activity中绑定Service，最好在onCreate中绑定，否则可能照成中间人没有初始化成功而失败</span>
+<span class="n">Intent</span> <span class="n">it</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">ChuZhangService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="n">bindService</span><span class="o">(</span><span class="n">it</span><span class="o">,</span> <span class="k">new</span> <span class="nf">MyConn</span><span class="o">(),</span> <span class="n">BIND_AUTO_CREATE</span><span class="o">);</span>
+
+
+<span class="c1">//调用处调用Service中的方法，通过中间人</span>
+<span class="n">zm</span><span class="o">.</span><span class="na">qianXian</span><span class="o">();</span>
+
+<span class="kd">class</span> <span class="nc">MyConn</span> <span class="kd">implements</span> <span class="n">ServiceConnection</span><span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onServiceConnected</span><span class="o">(</span><span class="n">ComponentName</span> <span class="n">name</span><span class="o">,</span> <span class="n">IBinder</span> <span class="n">service</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// TODO Auto-generated method stub</span>
+        <span class="c1">//初始化中间人</span>
+        <span class="n">zm</span> <span class="o">=</span> <span class="o">(</span><span class="n">ZhouMi</span><span class="o">)</span><span class="n">service</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onServiceDisconnected</span><span class="o">(</span><span class="n">ComponentName</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// TODO Auto-generated method stub</span>
+
+    <span class="o">}</span>
+
+<span class="o">}</span>
+
+<span class="c1">//注意优化</span>
+<span class="n">中间人周秘属于Service</span><span class="err">，</span><span class="n">Service可能有一些私有的方法交给周秘做</span><span class="err">，</span><span class="n">不想其他人访问到</span><span class="err">，</span><span class="n">我们可以定义一个对公接口</span><span class="err">，</span><span class="n">周秘实现这个接口</span><span class="err">，</span><span class="n">在Activity中获得这个接口</span><span class="err">，</span><span class="n">访问中间人方法</span><span class="err">，</span><span class="n">从而访问到Service中的方法</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.....................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">服务的混合调用</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">blockquote</span><span class="o">&gt;&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">先开始</span><span class="err">、</span><span class="n">再绑定</span><span class="err">、</span><span class="n">先解绑</span><span class="err">、</span><span class="n">再停止</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;&lt;/</span><span class="n">blockquote</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L..................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">启动远程服务</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L...............&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h4</span><span class="o">&gt;</span><span class="n">服务的分类</span><span class="o">&lt;/</span><span class="n">h4</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">本地服务</span><span class="err">：</span> <span class="n">指的是服务和启动服务的activity在同一个进程中</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">远程服务</span><span class="err">：</span> <span class="n">指的事服务和启动服务的activity在不同的进程中</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="c1">//启动远程服务</span>
+<span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">();</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="s">&quot;注册的远程服务的类名&quot;</span><span class="o">);</span>
+<span class="n">startService</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;AIDL.Android.interface.definition.language.&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h4</span><span class="o">&gt;</span><span class="n">AIDL</span><span class="o">(</span><span class="n">Android</span> <span class="kd">interface</span> <span class="nc">definition</span> <span class="n">language</span><span class="o">)&lt;/</span><span class="n">h4</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">访问远程服务中的远程方法</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.....................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h5</span><span class="o">&gt;</span><span class="n">项目一</span><span class="err">、</span><span class="n">服务端</span><span class="o">&lt;/</span><span class="n">h5</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="c1">//定义外部访问接口 RInterface.aidl</span>
+<span class="kd">interface</span> <span class="nc">RInterface</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">play</span><span class="o">();</span>
+    <span class="kt">void</span> <span class="nf">stop</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="c1">//定义远程服务 RService.java</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RService</span> <span class="kd">extends</span> <span class="n">Service</span> <span class="o">{</span>
+
+    <span class="c1">//Stub继承了Binder并实现了RInterface中的接口函数</span>
+    <span class="kd">class</span> <span class="nc">RControl</span> <span class="kd">extends</span> <span class="n">Stub</span><span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span> <span class="o">{</span>
+            <span class="n">RService</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">play</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span> <span class="o">{</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">IBinder</span> <span class="nf">onBind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">RControl</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">play</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;AnnPeter&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">//清单文件中注册Service</span>
+<span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">service</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;.RService&quot;</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+        <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">action</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;com.example.fun.RService&quot;</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;/</span><span class="n">action</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+    <span class="o">&amp;</span><span class="n">lt</span><span class="o">;/</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+<span class="o">&amp;</span><span class="n">lt</span><span class="o">;/</span><span class="n">service</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.....................&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h5</span><span class="o">&gt;</span><span class="n">项目二</span><span class="err">、</span><span class="n">客户端</span><span class="o">&lt;/</span><span class="n">h5</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;java&quot;</span><span class="o">&gt;</span><span class="c1">//在项目二中创建一个文件 RInterface.aidl，文件的包名必须和服务端的包名是一样的</span>
+
+
+<span class="c1">//客户端Activity调用服务接口</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+
+    <span class="n">RInterface</span> <span class="n">ri</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">MyConn</span> <span class="n">myConn</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+
+        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">();</span>
+        <span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="s">&quot;com.example.fun.RService&quot;</span><span class="o">);</span>
+        <span class="n">intent</span><span class="o">.</span><span class="na">setPackage</span><span class="o">(</span><span class="s">&quot;com.example.fun&quot;</span><span class="o">);</span>
+        <span class="n">myConn</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MyConn</span><span class="o">();</span>
+        <span class="n">bindService</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="n">myConn</span><span class="o">,</span> <span class="n">BIND_AUTO_CREATE</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">click</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">ri</span><span class="o">.</span><span class="na">play</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RemoteException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">class</span> <span class="nc">MyConn</span> <span class="kd">implements</span> <span class="n">ServiceConnection</span><span class="o">{</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onServiceConnected</span><span class="o">(</span><span class="n">ComponentName</span> <span class="n">name</span><span class="o">,</span> <span class="n">IBinder</span> <span class="n">service</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">ri</span> <span class="o">=</span> <span class="n">Stub</span><span class="o">.</span><span class="na">asInterface</span><span class="o">(</span><span class="n">service</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onServiceDisconnected</span><span class="o">(</span><span class="n">ComponentName</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L...............&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h2</span><span class="o">&gt;</span><span class="n">样式和主题</span><span class="o">&lt;/</span><span class="n">h2</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;L.........styles.xml...............&quot;</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;</span><span class="n">样式在styles</span><span class="o">.</span><span class="na">xml文件中定义</span><span class="o">&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="err">```</span><span class="n">xml</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+
+
+
+
+
+
+
+
+
+
+<span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;**</span><span class="n">在代码中设置主题</span><span class="err">（</span><span class="n">隐藏Title</span><span class="err">，</span><span class="n">只会对本Activity生效</span><span class="err">：</span><span class="n">requestWindowFeature</span><span class="o">(</span><span class="n">Window</span><span class="o">.</span><span class="na">FEATURE_NO_TITLE</span><span class="o">)</span><span class="err">）</span><span class="o">**</span>
+
+<span class="err">###</span><span class="n">主题</span><span class="err">，</span><span class="n">和样式定义方式是一样的</span><span class="err">，</span><span class="n">主题一般用于Activity和Application</span><span class="err">，</span><span class="n">样式一般用于View控件上</span>
+
+
+
+<span class="err">##</span><span class="n">多媒体编程</span>
+<span class="err">#####</span><span class="n">文本</span><span class="err">、</span><span class="n">图片</span><span class="err">、</span><span class="n">音频</span><span class="err">、</span><span class="n">视频</span>
+
+<span class="err">###</span><span class="n">图片</span>
+<span class="o">*</span> <span class="n">图片在计算机中大小的计算</span><span class="err">：</span><span class="n">图片的总大小</span><span class="err">＝</span><span class="n">图片的总像素</span><span class="err">＊</span><span class="n">每个像素占用的大小</span>
+<span class="o">*</span> <span class="n">单色位图</span><span class="err">：</span><span class="n">只能表示2种颜色</span><span class="err">，</span><span class="n">使用两个数字</span><span class="err">：</span><span class="mi">0</span><span class="n">和1</span><span class="err">，</span><span class="n">使用一个长度为1的二进制数字就可以表示了</span><span class="err">，</span><span class="n">每个像素占用1</span><span class="o">/</span><span class="mi">8</span><span class="n">个字节</span>
+<span class="o">*</span> <span class="mi">16</span><span class="n">色位图</span><span class="err">：</span><span class="n">只能表示16种颜色</span>
+ <span class="o">*</span> <span class="n">需要16个数字</span><span class="err">：</span><span class="mi">0</span><span class="o">-</span><span class="mi">15</span><span class="err">，</span><span class="mi">0000</span><span class="o">-</span><span class="mi">1111</span>
+ <span class="o">*</span> <span class="n">使用一个长度为4的二进制数组就可以表示了</span>
+ <span class="o">*</span> <span class="n">每个像素占用1</span><span class="o">/</span><span class="mi">2</span><span class="n">个字节</span>
+<span class="o">*</span> <span class="mi">256</span><span class="n">色位图</span><span class="err">：</span><span class="n">能表示256种颜色</span>
+ <span class="o">*</span> <span class="n">需要256个数字</span><span class="err">：</span><span class="mi">0</span><span class="o">-</span><span class="mi">255</span><span class="err">，</span>   <span class="mi">0000</span> <span class="mi">0000</span> <span class="err">－</span> <span class="mi">1111</span> <span class="mi">1111</span>
+ <span class="o">*</span> <span class="n">使用一个长度为8的二进制数字</span>
+ <span class="o">*</span> <span class="n">每个像素占用1个字节</span>
+<span class="o">*</span> <span class="mi">24</span><span class="n">位位图</span><span class="err">：</span>
+ <span class="o">*</span> <span class="n">每个像素占用24位</span><span class="err">，</span><span class="n">也就是3个字节</span><span class="err">，</span><span class="n">所以叫24位位图</span>
+ <span class="o">*</span> <span class="n">R</span><span class="err">：</span><span class="mi">0</span><span class="o">-</span><span class="mi">255</span><span class="err">，</span><span class="n">需要一个长度为8的二进制数字</span><span class="err">，</span><span class="n">占用1个字节</span>
+ <span class="o">*</span> <span class="n">G</span><span class="err">：</span><span class="mi">0</span><span class="o">-</span><span class="mi">255</span><span class="err">，</span><span class="n">需要一个长度为8的二进制数字</span><span class="err">，</span><span class="n">占用1个字节</span>
+ <span class="o">*</span> <span class="n">B</span><span class="err">：</span><span class="mi">0</span><span class="o">-</span><span class="mi">255</span><span class="err">，</span><span class="n">需要一个长度为8的二进制数字</span><span class="err">，</span><span class="n">占用1个字节</span>
+
+<span class="err">###</span><span class="n">加载大图片</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">ImageView</span> <span class="n">iv</span> <span class="o">=</span> <span class="o">(</span><span class="n">ImageView</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">iv</span><span class="o">);</span>
+<span class="n">Options</span> <span class="n">op</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Options</span><span class="o">();</span>
+<span class="c1">//设置先不加载像素内容，只加载边界信息，以获取图片大小</span>
+<span class="n">op</span><span class="o">.</span><span class="na">inJustDecodeBounds</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+<span class="n">Bitmap</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">BitmapFactory</span><span class="o">.</span><span class="na">decodeFile</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStorageDirectory</span><span class="o">()+&amp;</span><span class="n">ldquo</span><span class="o">;/</span><span class="n">a</span><span class="o">.</span><span class="na">jpg</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;,</span> <span class="n">op</span><span class="o">);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">//获取图片大小和屏幕大小，计算缩放比例</span>
+<span class="kt">int</span> <span class="n">imgW</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="na">outWidth</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">imgH</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="na">outHeight</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">Display</span> <span class="n">display</span> <span class="o">=</span> <span class="n">getWindowManager</span><span class="o">().</span><span class="na">getDefaultDisplay</span><span class="o">();</span>
+<span class="kt">int</span> <span class="n">sW</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="na">getWidth</span><span class="o">();</span>
+<span class="kt">int</span> <span class="n">sH</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="na">getHeight</span><span class="o">();&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">int</span> <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">scaleW</span> <span class="o">=</span> <span class="n">imgW</span> <span class="o">/</span> <span class="n">sW</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">scaleH</span> <span class="o">=</span> <span class="n">imgH</span> <span class="o">/</span> <span class="n">sH</span><span class="o">;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">if</span><span class="o">(</span><span class="n">scaleW</span> <span class="o">&gt;=</span> <span class="n">scaleH</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">scaleW</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">){</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">scaleW</span><span class="o">;</span>
+<span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">scaleW</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">scaleH</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">scaleW</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">){</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">scaleH</span><span class="o">;</span>
+<span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">op</span><span class="o">.</span><span class="na">inSampleSize</span> <span class="o">=</span> <span class="n">scale</span><span class="o">;</span>
+<span class="c1">//设置回加载像素模式，否则bm为null</span>
+<span class="n">op</span><span class="o">.</span><span class="na">inJustDecodeBounds</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+<span class="n">bm</span> <span class="o">=</span> <span class="n">BitmapFactory</span><span class="o">.</span><span class="na">decodeFile</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStorageDirectory</span><span class="o">()+&amp;</span><span class="n">ldquo</span><span class="o">;/</span><span class="n">a</span><span class="o">.</span><span class="na">jpg</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;,</span> <span class="n">op</span><span class="o">);</span>
+<span class="n">iv</span><span class="o">.</span><span class="na">setImageBitmap</span><span class="o">(</span><span class="n">bm</span><span class="o">);</span>
+</pre></div>

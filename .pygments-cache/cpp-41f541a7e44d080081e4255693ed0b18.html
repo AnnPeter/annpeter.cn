@@ -1,0 +1,8 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">platform_driver</span><span class="p">{</span>
+	<span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">*</span><span class="p">);</span><span class="c1">//找到设备时调用的函数</span>
+    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">remove</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">*</span><span class="p">);</span><span class="c1">//在删除设备的时候调用的函数</span>
+	<span class="k">struct</span> <span class="n">device_driver</span> <span class="n">driver</span><span class="p">;</span><span class="c1">//一般保存设备的名字等信息，用于驱动和设备匹配时使用</span>
+
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>

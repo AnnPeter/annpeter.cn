@@ -1,0 +1,325 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>ARM--mini2440--裸机--part01--核心初始化 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="ARM--mini2440--裸机--part01--核心初始化">
+	<meta name="keywords" content="ARM,mini2440,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">ARM--mini2440--裸机--part01--核心初始化</h2>
+		<div class="entry-content">
+			<p>本篇开始介绍mini2440裸机开发，本文主要讲裸机的核心初始化工作。</p>
+
+<!-- more -->
+
+
+<a name="L........................"></a>
+<h3>初始化异常向量表</h3>
+
+<p>ARM异常向量表</p>
+
+<p><img src="/upload/2016/JAN/29/imgs/1454013014.png" alt="ARM异常向量表" />
+所以设置异常向量表，我们只需要在对应地址位置设置好对应处理例程的操作即可。</p>
+
+<a name="L......CPU...............SVC......"></a>
+<h3>设置CPU工作模式为SVC模式</h3>
+
+<p>svc模式属于特权模式，可以访问所有硬件受控资源。相对于其他的模式，SVC模式可以访问的资源更多。而本段时期要做的事情就是初始化系统相关硬件受控资源，需要获取尽量多的权限，以方便操作硬件，初始化硬件。</p>
+
+<table>
+<thead>
+<tr>
+<th> 处理器模式 </th>
+<th> 说明 </th>
+<th> 备注 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户(usr)</td>
+<td>正常程序工作模式</td>
+<td>此模式下程序不能够访问一些受操作系统保护的系统资源，应用程序页不能直接进行处理器模式的切换</td>
+</tr>
+<tr>
+<td>系统(sys)</td>
+<td>用于支持操作系统的特权任务等</td>
+<td>与用户模式类似，但具有可以直接切换到其它模式等特权</td>
+</tr>
+<tr>
+<td>快中断</td>
+<td>支持高速数据传送及通道处理</td>
+<td>FIQ异常相应时进入此模式</td>
+</tr>
+<tr>
+<td>中断(irq)</td>
+<td>用于通用中断处理</td>
+<td>IRQ异常响应时进入此模式</td>
+</tr>
+<tr>
+<td>管理(svc)</td>
+<td>操作系统保护代码</td>
+<td>系统复位和软件中断响应时进入此模式</td>
+</tr>
+<tr>
+<td>中止(abt)</td>
+<td>用于支持虚拟内存和/或存储器保护</td>
+<td>在ARM7TDMI中没有大用处</td>
+</tr>
+<tr>
+<td>未定义(und)</td>
+<td>支持硬件协处理器的软件仿真</td>
+<td>未定义指令异常响应时进入此模式</td>
+</tr>
+</tbody>
+</table>
+
+
+<a name="L..............."></a>
+<h3>关闭看门狗</h3>
+
+<p>Watchdog在硬件上实现了计时工能，启动看门狗后，用户(软件)必须在计时器结束前重新开始计时(俗称“喂狗”)，如果超时后还没有重新开始计时(喂狗)，那么它就认为系统死机了，就会自动重启系统。</p>
+
+<p>由于在系统加载过程中认为代码量较小，不会出现死机等情况。所以关闭看门狗，避免要一直喂狗。</p>
+
+<a name="L............"></a>
+<h3>关闭中断</h3>
+
+<p>通过屏蔽寄存器屏蔽中断，使cpu不响应。</p>
+
+<a name="L......MMU"></a>
+<h3>关闭MMU</h3>
+
+<p>CP15中，通过寄存器使Ｉ-Cache,D-Cache失效</p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/01/15/mini2440--%E8%A3%B8%E6%9C%BA--part01--%E6%A0%B8%E5%BF%83%E5%88%9D%E5%A7%8B%E5%8C%96/mini2440--裸机--part01--核心初始化" data-title="ARM--mini2440--裸机--part01--核心初始化" data-url="http://www.annpeter.cn/blog/2016/01/15/mini2440--%E8%A3%B8%E6%9C%BA--part01--%E6%A0%B8%E5%BF%83%E5%88%9D%E5%A7%8B%E5%8C%96/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Jan 15th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

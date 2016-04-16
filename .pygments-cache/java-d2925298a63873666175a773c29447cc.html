@@ -1,0 +1,38 @@
+<div class="highlight"><pre><span class="n">ListView</span> <span class="n">lv</span> <span class="o">=</span> <span class="o">(</span><span class="n">ListView</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listView</span><span class="o">);</span>
+<span class="n">lv</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="k">new</span> <span class="nf">MyAdapter</span><span class="o">());</span>
+
+
+<span class="kd">class</span> <span class="nc">MyAdapter</span> <span class="kd">extends</span> <span class="n">BaseAdapter</span><span class="o">{</span>
+
+	<span class="c1">//系统调用，用来获知集合中有多少条元素</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCount</span><span class="o">()</span> <span class="o">{</span>
+		<span class="c1">// TODO Auto-generated method stub</span>
+		<span class="k">return</span> <span class="n">smsList</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+	<span class="o">}</span>
+
+	<span class="c1">//由系统调用，获取一个view对象，作为ListView的条目</span>
+	<span class="c1">//position:本次getView方法调用所返回的View对象，在ListView中处于第几个条目</span>
+	<span class="c1">//ListView在不可见时，可能会被系统销毁，以节约内存，取决于当前内存状态</span>
+	<span class="c1">//convertView缓存的是ListView的条目，缓存条目的个数是一屏能显示的最多条目的个数，</span>
+	<span class="c1">//所以在利用缓存的时候，条目里面显示的内容需要我们重新填充,之所以这么做是因为</span>
+	<span class="c1">//在使用布局文件填充view对象时，inflater方法比较耗费资源，容易内存溢出</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="n">View</span> <span class="nf">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">TextView</span> <span class="n">tv</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">TextView</span><span class="o">(</span><span class="n">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">);</span>
+		<span class="n">tv</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">smsList</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">position</span><span class="o">).</span><span class="na">getBody</span><span class="o">());</span>
+		<span class="n">tv</span><span class="o">.</span><span class="na">setTextSize</span><span class="o">(</span><span class="mi">18</span><span class="o">);</span>
+		<span class="k">return</span> <span class="n">tv</span><span class="o">;</span>
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="n">Object</span> <span class="nf">getItem</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">long</span> <span class="nf">getItemId</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="o">;</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

@@ -1,0 +1,23 @@
+<div class="highlight"><pre><span class="c1">//构建一个AlertDialog的创建器</span>
+<span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span> <span class="n">builder</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Builder</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+<span class="n">builder</span><span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="s">&quot;Title&quot;</span><span class="o">);</span>
+<span class="n">builder</span><span class="o">.</span><span class="na">setIcon</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">abc_ab_share_pack_mtrl_alpha</span><span class="o">);</span>
+<span class="n">builder</span><span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="s">&quot;Content&quot;</span><span class="o">);</span>
+<span class="n">builder</span><span class="o">.</span><span class="na">setPositiveButton</span><span class="o">(</span><span class="s">&quot;确定&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="nf">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialog</span><span class="o">,</span> <span class="kt">int</span> <span class="n">which</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">&quot;确定&quot;</span><span class="o">,</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_SHORT</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">});</span>
+
+<span class="n">builder</span><span class="o">.</span><span class="na">setNegativeButton</span><span class="o">(</span><span class="s">&quot;取消&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="nf">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialog</span><span class="o">,</span> <span class="kt">int</span> <span class="n">which</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">&quot;取消&quot;</span><span class="o">,</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_SHORT</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">});</span>
+
+<span class="c1">//创建一个AlertDialog</span>
+<span class="n">AlertDialog</span> <span class="n">dialog</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">create</span><span class="o">();</span>
+<span class="n">dialog</span><span class="o">.</span><span class="na">show</span><span class="o">();</span>
+</pre></div>

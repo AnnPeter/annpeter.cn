@@ -1,0 +1,28 @@
+<div class="highlight"><pre>方案一（比较麻烦）：
+<span class="sr">//</span>用dd命令新建硬盘镜像disk.img
+$ sudo dd <span class="k">if</span><span class="p">=</span><span class="sr">/dev/</span>zero of<span class="p">=</span>disk.img <span class="nb">bs</span><span class="p">=</span><span class="m">512</span> <span class="k">count</span><span class="p">=</span><span class="m">2880</span>
+
+<span class="sr">//</span>用losetup命令将<span class="nb">flp</span>.img与loop设备关联，这样我们就能通过<span class="sr">/dev/</span>loop0设备，像操作真实硬盘那样操作disk.img
+$ sudo losetup <span class="sr">/dev/</span>loop0 disk.img
+
+<span class="sr">//</span>将可执行文件boot中的引导代码写入disk.img的第一个扇区。
+<span class="sr">//</span>使用dd命令，将boot中的可执行代码拷贝到disk.img
+$ dd <span class="k">if</span><span class="p">=</span>boot of<span class="p">=</span><span class="sr">/dev/</span>loop0 <span class="nb">bs</span><span class="p">=</span><span class="m">512</span> <span class="k">count</span> <span class="p">=</span> <span class="m">1</span>
+
+<span class="sr">//</span>借助QEMU从引导镜像启动系统
+$ sudo qemu<span class="p">-</span>system<span class="p">-</span>x86_64 <span class="p">-</span>boot order<span class="p">=</span><span class="k">a</span> <span class="p">-</span>fda <span class="sr">/dev/</span>loop0
+
+
+
+
+方案二（简单）：
+<span class="sr">//</span>第二步可直接省略用boot文件直接启动系统
+$ qemu<span class="p">-</span>system<span class="p">-</span>i386 <span class="p">-</span>fda boot
+
+
+Tip:以上两个方案，如果要启动调试功能，请加上 <span class="p">-</span>gdb tcp::<span class="m">1234</span> <span class="p">-</span>S参数。（<span class="m">1234</span>是端口号）
+然后重新开启一个终端
+$ gdb
+target remote:<span class="m">1234</span>
+连接上就可以调试了
+</pre></div>

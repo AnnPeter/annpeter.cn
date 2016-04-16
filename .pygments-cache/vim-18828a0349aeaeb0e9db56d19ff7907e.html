@@ -1,0 +1,6 @@
+<div class="highlight"><pre><span class="sr">//</span>使用readelf命令读取ELF文件信息，如下图所示，我们可以看到，黄色框指出的就是ELF所有的头
+<span class="sr">//</span>信息了<span class="p">,</span>我们只需要用dd命令将其切除即可。
+$ readelf <span class="p">-</span><span class="k">a</span> head.elf
+$ dd <span class="k">if</span><span class="p">=</span>head.elf of<span class="p">=</span>head.<span class="nb">bin</span> <span class="nb">bs</span><span class="p">=</span><span class="m">1</span> skip<span class="p">=</span><span class="m">84</span> <span class="p">(</span><span class="nb">bs</span>指出了缓冲区大小，skip指出了源文件
+跳过的字节数<span class="p">)</span>
+</pre></div>

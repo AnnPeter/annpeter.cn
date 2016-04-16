@@ -1,0 +1,8 @@
+<div class="highlight"><pre><span class="cp">#include&lt;limits&gt;</span>
+
+<span class="n">cin</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+<span class="c1">// numeric_limits&lt;streamsize&gt;::max() 返回输入缓冲的大小。</span>
+<span class="c1">// ignore 函数在此将把输入流中的数据清空。</span>
+<span class="c1">// 这两个函数的具体用法请读者自行查询。</span>
+<span class="n">cin</span><span class="p">.</span><span class="n">ignore</span><span class="p">(</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">streamsize</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">(),</span> <span class="sc">&#39;\n&#39;</span> <span class="p">);</span>
+</pre></div>

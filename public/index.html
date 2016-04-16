@@ -1,0 +1,578 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content=" Option+Alt+L 整理代码 Apr 12th, 2016 others ">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner">
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">
+        
+            IntelJIDE快捷键</a>
+    </h2>
+    <div class="entry-content">
+        <ul>
+<li>Option+Alt+L    整理代码</li>
+</ul>
+
+
+        
+        
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Apr 12th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/others/'>others</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">
+        
+            正则表达式学习</a>
+    </h2>
+    <div class="entry-content">
+        <ol>
+<li><p>中括号:[判断字符为上内容]</p></li>
+<li><p>预定义字符:都带有反斜线</p>
+
+<ul>
+<li>.   :   任意字符</li>
+<li>\d  :   数字<a href="">0-9</a></li>
+<li>\D  :   非数字<a href="">^0-9</a></li>
+<li>\w  :   单词字符<a href="">a-zA-Z_0-9</a></li>
+</ul>
+</li>
+</ol>
+
+
+
+        
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Apr 9th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/others/'>others</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">
+        
+            Android反编译，携带id重签名</a>
+    </h2>
+    <div class="entry-content">
+        <p>为了掌握用户的上下线关系，我们可能需要在apk中动态携带信息。
+本文主要采用在AndroidManifest.xml文件中的versionName中，添加用户上线的id，达到传递信息的作用。</p>
+
+<a name="L.............................."></a>
+<h3>第一步，生成前面文件</h3>
+
+<blockquote><p>keytool -genkey -v -keystore insurance.keystore -alias insurance-release.keystore -keyalg RSA -validity 10000</p></blockquote>
+
+
+        
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Apr 1st, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/android/'>android</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">
+        
+            CentOS7安装Oracle12c</a>
+    </h2>
+    <div class="entry-content">
+        <p>首先请参考教程，卸载OpenJDK，安装JDK。</p>
+
+<ol>
+<li>修改hostname，这两个文件中的地址必须保持一致，根据自己的情况修改，可以使用内网地址
+
+<blockquote><p>$ /etc/hosts
+     10.144.140.88 CentOS
+$ /etc/sysconfig/network
+     HOSTNAME=10.144.140.88</p></blockquote></li>
+</ol>
+
+
+
+        
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Mar 21st, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">
+        
+            Apache源码安装</a>
+    </h2>
+    <div class="entry-content">
+        <a name="L.................."></a>
+<h2>依赖文件下载</h2>
+
+<ul>
+<li>wget <a href="http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz">http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz</a></li>
+<li>wget <a href="http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz">http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz</a></li>
+<li>wget <a href="http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz">http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz</a></li>
+</ul>
+
+
+
+        
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Mar 14th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/03/14/Linux%E4%B8%AD%E5%8D%B8%E8%BD%BDOpenJDK%EF%BC%8C%E5%AE%89%E8%A3%85JDK/index.html">
+        
+            Linux中卸载OpenJDK，安装JDK</a>
+    </h2>
+    <div class="entry-content">
+        <a name="L............Linux......OpenJDK..."></a>
+<h4>首先查询Linux中的OpenJDK。</h4>
+
+<blockquote><p>rpm -qa | grep java<br/></p></blockquote>
+
+<a name="L......................................."></a>
+<h4>如果有就删除，没有就算了。</h4>
+
+<blockquote><p>rpm -e &ndash;nodeps java-1.8.0-openjdk<br/>
+rpm -e &ndash;nodeps javapackages-tools<br/>
+rpm -e &ndash;nodeps javapackages-tools<br/>
+rpm -e &ndash;nodeps java-1.8.0-openjdk-headless<br/>
+rpm -e &ndash;nodeps tzdata-java<br/>
+rpm -e &ndash;nodeps python-javapackages<br/></p></blockquote>
+
+
+        
+        <a href="/blog/2016/03/14/Linux%E4%B8%AD%E5%8D%B8%E8%BD%BDOpenJDK%EF%BC%8C%E5%AE%89%E8%A3%85JDK/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Mar 14th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/03/12/Linux%E4%B8%8B%E7%9A%84%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/index.html">
+        
+            NAT网络问题</a>
+    </h2>
+    <div class="entry-content">
+        <p>最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。</p>
+
+<blockquote><p>$ route add default gw 10.0.2.2 dev eth0</p></blockquote>
+
+
+        
+        <a href="/blog/2016/03/12/Linux%E4%B8%8B%E7%9A%84%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Mar 12th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/index.html">
+        
+            Mini2440--part12--串口驱动设计</a>
+    </h2>
+    <div class="entry-content">
+        <a name="TTY............"></a>
+<h2>TTY驱动架构</h2>
+
+<p>在Linux中，终端是一类字符型设备，它包括多种类型，通常使用tty来简称各种类型的终端设备。</p>
+
+<ul>
+<li><p>串口终端(/dev/ttyS*)
+串口终端是使用计算机串口连接的终端设备。Linux把每个串行端口都看作是一个字符设备。这些串行端口所对应的设备名称是/dev/ttySAC0、/dev/ttySAC1。</p></li>
+<li><p>控制台终端(/dev/console)
+在Linux中，计算机的输出设备通常被称为控制台的终端(Console),这里特指printk信息输出到的设备。/dev/console是一个虚拟设备，它需要映射到一个真正的tty上，比如通过内核启动参数“console=ttySAC0”就把console映射到了串口0上。</p></li>
+<li><p>虚拟终端(/dev/tty*,如tty1，tty2&hellip;)
+当用户登录时，使用的是虚拟终端。使用ctcl+alt+[F1-F6]组合键，我们就可以切换到tty1-tty6上，它们被称为虚拟终端，而tty0则是当前所使用虚拟终端的一个别名。</p></li>
+</ul>
+
+
+
+        
+        <a href="/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Feb 6th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/index.html">
+        
+            Mini2440--part11--总线设备驱动</a>
+    </h2>
+    <div class="entry-content">
+        <a name="L........................"></a>
+<h1>总线设备驱动模型</h1>
+
+<a name="L......"></a>
+<h2>总线</h2>
+
+<ul>
+<li>总线结构描述
+在Linux内核中，总线由bus_type结构表示，定义在&lt;linux/device.h></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">bus_type</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//总线名称</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//驱动与设备的匹配函数</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+        
+        <a href="/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Feb 5th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+
+    <article class="post">
+    <h2 class="title">
+        
+        <a href="/blog/2016/02/05/mini2440--part10--%E9%98%BB%E5%A1%9E%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/index.html">
+        
+            Mini2440--part10--阻塞型驱动程序</a>
+    </h2>
+    <div class="entry-content">
+        <p>当一个设备无法立刻满足用户的读写请求时，驱动程序应当(缺省地)阻塞进程，使他进入等待(睡眠)状态，直到请求可以得到满足。</p>
+
+
+        
+        <a href="/blog/2016/02/05/mini2440--part10--%E9%98%BB%E5%A1%9E%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/index.html" class="more-link">Read on &rarr;</a>
+    </div>
+
+
+<div class="meta">
+    <div class="date">
+
+
+
+
+Feb 5th, 2016</div>
+    <div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+
+
+    
+</div>
+</article>
+
+<nav id="pagenavi">
+    
+    
+        <a href="/posts/2" class="next">Next</a>
+    
+</nav>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

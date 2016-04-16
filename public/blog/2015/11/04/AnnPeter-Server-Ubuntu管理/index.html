@@ -1,0 +1,565 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>AnnPeter-Server-Ubuntu管理 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="AnnPeter-Server-Ubuntu管理">
+	<meta name="keywords" content="Server,Ubuntu,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">AnnPeter-Server-Ubuntu管理</h2>
+		<div class="entry-content">
+			<p>本博文是我在阿里云服务器搭建的基础过程和相关配置，留作后用。</p>
+
+<!-- more -->
+
+
+<a name="Nginx.......80"></a>
+<h2>Nginx,端口80</h2>
+
+<ol>
+<li>/var/logs/nginx      日志文件</li>
+<li>/www                 访问目录</li>
+<li>/usr/local/nginx     配置文件</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>user  www<span class="p">-</span>data;
+</span><span class='line'>worker_processes  <span class="m">2</span>;
+</span><span class='line'>
+</span><span class='line'>error_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>error.log;
+</span><span class='line'>error_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>error.log  notice;
+</span><span class='line'>error_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>error.log  info;
+</span><span class='line'>
+</span><span class='line'>pid        <span class="sr">/var/</span>log<span class="sr">/nginx/</span>nginx.pid;
+</span><span class='line'>
+</span><span class='line'>events {
+</span><span class='line'>    worker_connections  <span class="m">1024</span>;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>http {
+</span><span class='line'>    <span class="nb">include</span>       mime.types;
+</span><span class='line'>    default_type  application/octet<span class="p">-</span>stream;
+</span><span class='line'>
+</span><span class='line'>    charset utf<span class="m">-8</span>;
+</span><span class='line'>
+</span><span class='line'>    log_format  <span class="k">main</span>  <span class="s1">&#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span>
+</span><span class='line'>                      <span class="s1">&#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span>
+</span><span class='line'>                      <span class="s1">&#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;</span>;
+</span><span class='line'>
+</span><span class='line'>    access_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>access.log  <span class="k">main</span>;
+</span><span class='line'>
+</span><span class='line'>    sendfile        <span class="k">on</span>;
+</span><span class='line'>
+</span><span class='line'>    keepalive_timeout  <span class="m">65</span>;
+</span><span class='line'>
+</span><span class='line'>    client_max_body_size <span class="m">5</span>m;
+</span><span class='line'>
+</span><span class='line'>    gzip <span class="k">on</span>; #开启gzip压缩输出
+</span><span class='line'>    gzip_min_length <span class="m">1</span>k; #最小压缩文件大小
+</span><span class='line'>    gzip_buffers <span class="m">4</span> <span class="m">16</span>k; #压缩缓冲区
+</span><span class='line'>    gzip_http_version <span class="m">1</span>.<span class="m">0</span>; #压缩版本（默认<span class="m">1</span>.<span class="m">1</span>，前端如果是squid2.<span class="m">5</span>请使用<span class="m">1</span>.<span class="m">0</span>）
+</span><span class='line'>    gzip_comp_level <span class="m">2</span>; #压缩等级
+</span><span class='line'>    gzip_types text<span class="sr">/plain application/</span><span class="k">x</span><span class="p">-</span>javascript text<span class="sr">/css application/</span>xml;
+</span><span class='line'>    #压缩类型，默认就已经包含textml，所以下面就不用再写了，写上去也不会有问题，但是会有一个<span class="nb">warn</span>。
+</span><span class='line'>    gzip_vary <span class="k">on</span>;
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen        <span class="m">80</span>;
+</span><span class='line'>        server_name dev.itpeter.<span class="k">cn</span>;
+</span><span class='line'>
+</span><span class='line'>        location / {
+</span><span class='line'>            root /www;
+</span><span class='line'>            autoindex <span class="k">on</span>;
+</span><span class='line'>            autoindex_exact_size off;
+</span><span class='line'>            autoindex_localtime <span class="k">on</span>;
+</span><span class='line'>
+</span><span class='line'>            fancyindex <span class="k">on</span>;
+</span><span class='line'>            fancyindex_header /.header.html;
+</span><span class='line'>            fancyindex_footer /.footer.html;
+</span><span class='line'>
+</span><span class='line'>            auth_basic <span class="s2">&quot;Password&quot;</span>;
+</span><span class='line'>            auth_basic_user_file <span class="sr">/usr/</span>local<span class="sr">/nginx/</span><span class="k">conf</span>/dev_htpasswd;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen <span class="m">81</span>;
+</span><span class='line'>        server_name www.itpeter.<span class="k">cn</span>;
+</span><span class='line'>
+</span><span class='line'>        location ^<span class="p">~</span> /static {
+</span><span class='line'>            root <span class="sr">/www/</span>chwlzzj;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location /{
+</span><span class='line'>            <span class="nb">include</span> uwsgi_params;
+</span><span class='line'>            uwsgi_pass <span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">8888</span>;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen       <span class="m">80</span>;
+</span><span class='line'>        server_name  www.itpeter.<span class="k">cn</span>;
+</span><span class='line'>
+</span><span class='line'>        location ^<span class="p">~</span> /static {
+</span><span class='line'>            root <span class="sr">/www/</span>annpeter.<span class="k">cn</span>;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location ^<span class="p">~</span> /upload {
+</span><span class='line'>            autoindex <span class="k">on</span>;
+</span><span class='line'>            autoindex_exact_size <span class="k">on</span>;
+</span><span class='line'>            autoindex_localtime <span class="k">on</span>;
+</span><span class='line'>            root <span class="sr">/www/</span>annpeter.<span class="k">cn</span>;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location  / {
+</span><span class='line'>            <span class="nb">include</span> uwsgi_params;
+</span><span class='line'>            uwsgi_pass            <span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">8800</span>;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    server {
+</span><span class='line'>        listen       <span class="m">80</span>;
+</span><span class='line'>        server_name  svn.itpeter.<span class="k">cn</span>;
+</span><span class='line'>
+</span><span class='line'>        location ^<span class="p">~</span> /mobilesafe {
+</span><span class='line'>            proxy_pass          http:<span class="sr">//</span>localhost:<span class="m">8000</span>;
+</span><span class='line'>            #proxy_set_header    Host             $host:<span class="m">80</span>;
+</span><span class='line'>            proxy_set_header    <span class="k">X</span><span class="p">-</span>Real<span class="p">-</span>IP        $remote_addr;
+</span><span class='line'>            proxy_set_header    <span class="k">X</span><span class="p">-</span>Forwarded<span class="p">-</span>For  $proxy_add_x_forwarded_for;
+</span><span class='line'>            proxy_set_header    Via              <span class="s2">&quot;nginx&quot;</span>;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        location ^<span class="p">~</span> /annpeter.<span class="k">cn</span> {
+</span><span class='line'>            proxy_pass          http:<span class="sr">//</span>localhost:<span class="m">9999</span>;
+</span><span class='line'>            proxy_set_header    <span class="k">X</span><span class="p">-</span>Real<span class="p">-</span>IP        $remote_addr;
+</span><span class='line'>            proxy_set_header    <span class="k">X</span><span class="p">-</span>Forwarded<span class="p">-</span>For  $proxy_add_x_forwarded_for;
+</span><span class='line'>            proxy_set_header    Via              <span class="s2">&quot;nginx&quot;</span>;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="Apache.........8000"></a>
+<h2>Apache，端口8000</h2>
+
+<blockquote><p>/etc/apache2/apache2.conf     配置文件</p></blockquote>
+
+<a name="Django"></a>
+<h2>Django</h2>
+
+<blockquote><p>$ sudo apt-get install python-pip<br>
+$ sudo pip install Django==1.8.5<br>
+$ sudo apt-get install python-mysqldb<br>
+<br>
+//Django搭建完成后，要启动供外网访问，启动方式<br>
+$ python manage.py runserver 0.0.0.0:8800<br>
+<br>
+<br>
+$ pip install uwsgi    //安装uwsgi<br>
+新建test.py文件，内容如下：<br>
+def application(env, start_response):<br>
+       start_response(&lsquo;200 OK&rsquo;, [(&lsquo;Content-Type&rsquo;,&lsquo;text/html&rsquo;)])<br>
+       return &ldquo;Hello World&rdquo;<br>
+$ apt-get install build-essential python-dev<br>
+$ uwsgi &ndash;http :8001 &ndash;wsgi-file test.py  //检查uwsgi是否安装成功<br>
+<br>
+<br>
+编写wsgi.py,放入Django项目根目录<br></p>
+
+<a name="L-.em.-coding:utf-8.-..em.-.br."></a>
+<h1>-<em>-coding:utf-8 -</em>-<br></h1>
+
+<p>import os,sys<br>
+sys.path.append(os.path.dirname(os.path.dirname(<strong>file</strong>)))<br>
+os.environ.setdefault(&ldquo;DJANGO_SETTINGS_MODULE&rdquo;, &ldquo;config.settings&rdquo;)<br>
+from django.core.wsgi import get_wsgi_application<br>
+application = get_wsgi_application()<br>
+<br>
+编写uwsgi8800.xml，放入etc目录下<br>
+<uwsgi><br>
+    <socket>:8800</socket><br>
+    <chdir>/www/annpeter.cn</chdir><br>
+    <module>wsgi</module><br>
+    <processes>4</processes> <!-- 进程数 --><br>
+    <daemonize>/var/log/uwsgi8800.log</daemonize><br>
+</uwsgi><br>
+<br>
+运行$ uwsgi -x /etc/uwsgi8800.xml启动web服务<br>
+<br>
+<br>
+然后再nginx.conf中配置转发<br>
+location  / {<br>
+  include uwsgi_params;<br>
+  uwsgi_pass          127.0.0.1:8800;<br>
+}<br></p></blockquote>
+
+<a name="L........."></a>
+<h2>防火墙</h2>
+
+<blockquote><p>允许22、80、3306端口的数据<br>
+$ sudo iptables -A INPUT -p tcp &ndash;dport 22 -j ACCEPT<br>
+$ sudo iptables -A INPUT -p tcp &ndash;dport 80 -j ACCEPT<br>
+$ sudo iptables -A INPUT -p tcp &ndash;dport 3306 -j ACCEPT<br>
+<br>
+允许loopback数据<br>
+$ sudo iptables -I INPUT 1 -i lo -j ACCEPT<br>
+<br>
+阻止其它数据<br>
+$ sudo iptables -P INPUT DROP<br>
+<br>
+查看设置好的规则<br>
+$ sudo iptables -L &ndash;line-numbers<br></p></blockquote>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2015/11/04/AnnPeter-Server-Ubuntu%E7%AE%A1%E7%90%86/AnnPeter-Server-Ubuntu管理" data-title="AnnPeter-Server-Ubuntu管理" data-url="http://www.annpeter.cn/blog/2015/11/04/AnnPeter-Server-Ubuntu%E7%AE%A1%E7%90%86/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Nov 4th, 2015</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

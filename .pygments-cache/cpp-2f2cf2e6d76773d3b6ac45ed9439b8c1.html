@@ -1,0 +1,16 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">platform_device</span><span class="p">{</span>
+	<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备名称</span>
+    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span> <span class="c1">//设备编号，配合设备名使用</span>
+    <span class="k">struct</span> <span class="n">device</span> <span class="n">dev</span><span class="p">;</span>
+    <span class="n">u32</span> <span class="n">num_resources</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">resource</span><span class="o">*</span> <span class="n">resource</span><span class="p">;</span><span class="c1">//设备资源，基地址，中断号等</span>
+<span class="p">}</span>
+
+<span class="k">struct</span> <span class="n">resource</span><span class="p">{</span>
+	<span class="kt">resource_size_t</span> <span class="n">start</span><span class="p">;</span>
+    <span class="kt">resource_size_t</span> <span class="n">end</span><span class="p">;</span>
+    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">flags</span><span class="p">;</span>	<span class="c1">//资源类型</span>
+    <span class="k">struct</span> <span class="n">resource</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="o">*</span> <span class="n">sibling</span><span class="p">,</span> <span class="o">*</span> <span class="n">child</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

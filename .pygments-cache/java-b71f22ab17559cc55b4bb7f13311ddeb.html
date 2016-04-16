@@ -1,0 +1,38 @@
+<div class="highlight"><pre><span class="c1">//模拟创建短信内容</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;</span> <span class="n">smsList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;();</span>
+<span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++){</span>
+	<span class="n">Message</span> <span class="n">message</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Message</span><span class="o">(</span><span class="s">&quot;AnnPeter is &quot;</span><span class="o">+</span> <span class="n">i</span><span class="o">,</span> <span class="s">&quot;2015-01-&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">,</span> <span class="s">&quot;1&quot;</span><span class="o">,</span> <span class="s">&quot;123456&quot;</span><span class="o">+</span><span class="n">i</span><span class="o">);</span>
+	<span class="n">smsList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="c1">//用StringBuffer方式拼接XML，下面还提供了XML序列化器的方式</span>
+<span class="n">StringBuffer</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">StringBuffer</span><span class="o">();</span>
+<span class="c1">//XML头的信息的顺序必须如此先version再encoding再standalone</span>
+<span class="c1">//XML下面子能有一个子元素</span>
+<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39; standalone=&#39;yes&#39; ?&gt;\n&quot;</span><span class="o">);</span>
+<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;&lt;message&gt;\n&quot;</span><span class="o">);</span>
+<span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">smsList</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++){</span>
+	<span class="n">Message</span> <span class="n">message</span> <span class="o">=</span> <span class="n">smsList</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+	<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;&lt;sms&gt;\n&quot;</span><span class="o">);</span>
+	<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;\t&lt;body&gt;&quot;</span><span class="o">+</span><span class="n">message</span><span class="o">.</span><span class="na">getBody</span><span class="o">()+</span><span class="s">&quot;&lt;/body&gt;\n&quot;</span><span class="o">);</span>
+	<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;\t&lt;data&gt;&quot;</span><span class="o">+</span><span class="n">message</span><span class="o">.</span><span class="na">getData</span><span class="o">()+</span><span class="s">&quot;&lt;/data&gt;\n&quot;</span><span class="o">);</span>
+	<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;\t&lt;type&gt;&quot;</span><span class="o">+</span><span class="n">message</span><span class="o">.</span><span class="na">getType</span><span class="o">()+</span><span class="s">&quot;&lt;/type&gt;\n&quot;</span><span class="o">);</span>
+	<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;\t&lt;adress&gt;&quot;</span><span class="o">+</span><span class="n">message</span><span class="o">.</span><span class="na">getAdress</span><span class="o">()+</span><span class="s">&quot;&lt;/adress&gt;\n&quot;</span><span class="o">);</span>
+	<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;&lt;/sms&gt;\n&quot;</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;&lt;/message&gt;\n&quot;</span><span class="o">);</span>
+
+<span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStorageDirectory</span><span class="o">();</span>
+<span class="c1">//Android目录不存在不会创建目录，但是文件不存在会创建文件</span>
+<span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">file</span><span class="o">,</span> <span class="s">&quot;/message.xml&quot;</span><span class="o">);</span>
+<span class="n">FileOutputStream</span> <span class="n">fos</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="k">try</span> <span class="o">{</span>
+	<span class="n">fos</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FileOutputStream</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
+	<span class="n">fos</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">sb</span><span class="o">.</span><span class="na">toString</span><span class="o">().</span><span class="na">getBytes</span><span class="o">());</span>
+	<span class="n">fos</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">FileNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>

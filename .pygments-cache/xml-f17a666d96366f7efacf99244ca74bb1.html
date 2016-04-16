@@ -1,0 +1,12 @@
+<div class="highlight"><pre><span class="nt">&lt;receiver</span>
+	<span class="na">android:name=</span><span class="s">&quot;.AdminReceiver&quot;</span>
+	<span class="na">android:description=</span><span class="s">&quot;@string/device_admin_desc&quot;</span>
+	<span class="na">android:label=</span><span class="s">&quot;手机安全卫士设备管理&quot;</span>
+	<span class="na">android:permission=</span><span class="s">&quot;android.permission.BIND_DEVICE_ADMIN&quot;</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;meta-data</span> <span class="na">android:name=</span><span class="s">&quot;android.app.device_admin&quot;</span>
+	   <span class="na">android:resource=</span><span class="s">&quot;@xml/device_admin&quot;</span> <span class="nt">/&gt;</span>
+	<span class="nt">&lt;intent-filter&gt;</span>
+		<span class="nt">&lt;action</span> <span class="na">android:name=</span><span class="s">&quot;android.app.action.DEVICE_ADMIN_ENABLED&quot;</span> <span class="nt">/&gt;</span>
+	<span class="nt">&lt;/intent-filter&gt;</span>
+<span class="nt">&lt;/receiver&gt;</span>
+</pre></div>

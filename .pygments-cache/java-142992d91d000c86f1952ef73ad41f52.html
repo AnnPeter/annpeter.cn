@@ -1,0 +1,14 @@
+<div class="highlight"><pre><span class="k">try</span><span class="o">{</span>
+	<span class="n">db</span><span class="o">.</span><span class="na">beginTransaction</span><span class="o">();</span>
+
+	<span class="c1">//数据库操作</span>
+
+	<span class="c1">//设置 表明事务执行成功</span>
+	<span class="n">db</span><span class="o">.</span><span class="na">setTransactionSuccessful</span><span class="o">();</span>
+<span class="o">}</span><span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span><span class="n">finallly</span><span class="o">{</span>
+	<span class="c1">//关闭事务，同时提交, 如果执行此代码时，已经表明事务执行成功，则此次SQL语句生效，反之自动执行事务回滚</span>
+	<span class="n">db</span><span class="o">.</span><span class="na">endTransation</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>

@@ -1,0 +1,11 @@
+<div class="highlight"><pre><span class="c1">//路径为 /data/data/应用包名/shared_prefs/info.xml</span>
+<span class="n">SharedPreference</span> <span class="n">sp</span> <span class="o">=</span> <span class="n">getSharedPreference</span><span class="o">(</span><span class="s">&quot;info&quot;</span><span class="o">,</span> <span class="n">MODE_PRIVATE</span><span class="o">);</span>
+<span class="c1">//拿到sp的编辑器</span>
+<span class="n">Editor</span> <span class="n">ed</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="na">edit</span><span class="o">();</span>
+<span class="c1">//以键值对方式写入</span>
+<span class="n">ed</span><span class="o">.</span><span class="na">putString</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span><span class="s">&quot;AnnPeter&quot;</span><span class="o">);</span>
+<span class="n">ed</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+
+<span class="c1">//读取</span>
+<span class="n">sp</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;defaultString&quot;</span><span class="o">);</span>	<span class="c1">//第二个参数为，获取失败时的字符串</span>
+</pre></div>

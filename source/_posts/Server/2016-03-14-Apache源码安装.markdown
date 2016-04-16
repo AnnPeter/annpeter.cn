@@ -1,0 +1,44 @@
+---
+layout: post
+title: "Apache源码安装"
+date: 2016-03-14 22:53:11 +1213
+comments: true
+categories: Server
+keywords: Server,Apache,Linux,博客,AnnPeter's Blog
+description: "Apache源码安装"
+
+---
+
+
+##依赖文件下载
+* wget http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz
+* wget http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz  
+* wget http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz  
+
+
+<!-- more -->
+
+
+###解决apr not found问题
+>$ tar -zxf apr-1.4.5.tar.gz  
+>$ cd  apr-1.4.5  
+>$ ./configure --prefix=/usr/local/apr  
+>$ make && make install
+
+###解决APR-util not found问题
+>$ tar -zxf apr-util-1.3.12.tar.gz  
+>$ cd apr-util-1.3.12  
+>$ ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr/bin/apr-1-config  
+>$ make && make install 
+
+###解决pcre问题
+>$ unzip -o pcre-8.10.zip  
+>$ cd pcre-8.10  
+>$ ./configure --prefix=/usr/local/pcre  
+>$ make && make install 
+
+###解决checking whether to enable mod_deflate... configure: error: mod_deflate has been requested but can not be built due to prerequisite failures
+>$ yum install gcc zlib-devel openssl-devel
+
+###解压Apache源码，进入源码目录编译安装
+>./configure --prefix=/usr/local/apache2 --enable-rewrite --enable-so --enable-headers --enable-expires --with-mpm=worker --enable-modules=most --enable-deflate  --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util  --with-pcre=/usr/local/pcre

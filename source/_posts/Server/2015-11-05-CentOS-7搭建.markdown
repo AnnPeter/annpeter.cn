@@ -1,0 +1,65 @@
+---
+layout: post
+title: "CentOS-7搭建"
+date: 2015-11-05 20:54:21 +1512
+comments: true
+categories: Server
+keywords: Server,CentOS,CentOS-7,博客,AnnPeter's Blog
+description: "CentOS-7搭建"
+
+---
+
+
+##安装Apache
+>yum install httpd<br>
+><br>
+>可能会用到的：<br>
+>systemctl start httpd.service #启动apache<br>
+>systemctl stop httpd.service #停止apache<br>
+>systemctl restart httpd.service #重启apache<br>
+>systemctl enable httpd.service #设置apache开机启动<br>
+
+<!-- more -->
+
+
+##安装MySql
+>$ wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm<br>
+>$ rpm -ivh mysql-community-release-el7-5.noarch.rpm<br>
+>$ yum install mysql-community-server<br>
+><br>
+>$ mysql_secure_installation #初始化mysql配置<br>
+
+##配置SFTP
+>为SFTP访问创建用户组，便于管理权限<br>
+>groupadd sftp-users<br>
+><br>
+>创建SFTP用户，并配置相应权限；<br>
+>这里第二行的意思是将alice从所有其他用户组中移除并加入到sftp-users组，并且关闭其Shell访问。<br>
+>adduser alice<br>
+>usermod -G sftp-users -s /bin/false alice<br>
+><br>
+>创建SSH用户组，并把管理员加到该组（注意usermod中的-a参数的意思是不从其他用户组中移除）<br>
+>groupadd ssh-users<br>
+>mkdir /sftp_root<br>
+>chown root:sftp_users /sftp_root<br>
+>chmod 770 /sftp_root<br>
+><br>
+>修改SSH配置文件<br>
+>vim /etc/ssh/sshd_config<br>
+>修改<br>
+>\#Subsystem      sftp    /usr/libexec/openssh/sftp-server<br>
+>Subsystem sftp internal-sftp<br>
+><br>
+>在ssh_config文件最后添加一下内容：<br>
+>Match Group sftp-users<br>
+>ChrootDirectory /sftp_root/www<br>
+>ForceCommand internal-sftp<br>
+>AllowTcpForwarding no<br>
+
+##图形界面和命令界面切换
+
+1.命令模式
+>$ systemctl set-default multi-user.target<br/>
+
+2.图形模式
+>$ systemctl set-default graphical.target<br/>

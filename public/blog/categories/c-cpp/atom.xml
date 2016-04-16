@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: c-cpp | AnnPeter's Blog]]></title>
+  <link href="http://www.annpeter.cn/blog/categories/c-cpp/atom.xml" rel="self"/>
+  <link href="http://www.annpeter.cn/"/>
+  <updated>2016-04-16T11:13:25+08:00</updated>
+  <id>http://www.annpeter.cn/</id>
+  <author>
+    <name><![CDATA[AnnPeter]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Linux中控制台输出字体颜色控制]]></title>
+    <link href="http://www.annpeter.cn/blog/2015/12/18/Linux%E4%B8%AD%E6%8E%A7%E5%88%B6%E5%8F%B0%E8%BE%93%E5%87%BA%E5%AD%97%E4%BD%93%E9%A2%9C%E8%89%B2%E6%8E%A7%E5%88%B6/index.html"/>
+    <updated>2015-12-18T06:45:52+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2015/12/18/Linux%E4%B8%AD%E6%8E%A7%E5%88%B6%E5%8F%B0%E8%BE%93%E5%87%BA%E5%AD%97%E4%BD%93%E9%A2%9C%E8%89%B2%E6%8E%A7%E5%88%B6/Linux中控制台输出字体颜色控制</id>
+    <content type="html"><![CDATA[<p>首先，来看下 在Linux 下颜色的表示</p>
+
+<!-- more -->
+
+
+<p>All the colors that I have found are:</p>
+
+<table>
+<thead>
+<tr>
+<th>    code    </th>
+<th>   color  </th>
+<th></th>
+<th>    code    </th>
+<th>   color    </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>\033[22;30m </td>
+<td> black    </td>
+<td></td>
+<td>\033[01;30m </td>
+<td> dark gray  </td>
+</tr>
+<tr>
+<td>\033[22;31m </td>
+<td> red      </td>
+<td></td>
+<td>\033[01;31m </td>
+<td> light red  </td>
+</tr>
+<tr>
+<td>\033[22;32m </td>
+<td> green    </td>
+<td></td>
+<td>\033[01;32m </td>
+<td> light green</td>
+</tr>
+<tr>
+<td>\033[22;33m </td>
+<td> brown    </td>
+<td></td>
+<td>\033[01;33m </td>
+<td> yellow     </td>
+</tr>
+<tr>
+<td>\033[22;34m </td>
+<td> blue     </td>
+<td></td>
+<td>\033[01;34m </td>
+<td> light blue </td>
+</tr>
+<tr>
+<td>\033[22;35m </td>
+<td> magenta  </td>
+<td></td>
+<td>\033[01;35m </td>
+<td> light magenta</td>
+</tr>
+<tr>
+<td>\033[22;36m </td>
+<td> cyan     </td>
+<td></td>
+<td>\033[01;36m </td>
+<td> light cyan </td>
+</tr>
+<tr>
+<td>\033[22;37m </td>
+<td> gray     </td>
+<td></td>
+<td>\033[01;37m </td>
+<td> white      </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>可以看出都是使用的转义字体来实现的</p>
+
+<p>使用方法：</p>
+
+<pre><code class="vim">Linux 终端输入：
+$ echo -e  "\033[35;1m Shocking \033[0m"
+
+C代码：
+printf("\033[34mThis is blue.\033[0m\n");
+</code></pre>
+
+<p>记得最后要 &ldquo;\033[0m&rdquo;  关闭所有属性，这样又回到了系统默认的颜色了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[关于cin的注意事项]]></title>
+    <link href="http://www.annpeter.cn/blog/2015/12/11/%E5%85%B3%E4%BA%8Ecin%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/index.html"/>
+    <updated>2015-12-11T01:39:42+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2015/12/11/%E5%85%B3%E4%BA%8Ecin%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/关于cin的注意事项</id>
+    <content type="html"><![CDATA[<a name="L....................."></a>
+<h2>关于回车的获取</h2>
+
+<pre><code class="c">int i;
+char ch;
+cin &gt;&gt; i;
+cin &gt;&gt; ch; //这里的ch并不能捕获到上次输入留下来的回车
+//可以通过cin.get()获取这个回车
+ch = cin.get();
+</code></pre>
+
+<!-- more -->
+
+
+<a name="L......stdin........."></a>
+<h2>清空stdin缓冲区</h2>
+
+<a name="C..."></a>
+<h4>C版</h4>
+
+<pre><code class="c">#include &lt;stdio.h&gt; 
+
+int c = 0;
+while ( (c = getchar()) != '\n' &amp;&amp; c != EOF ) ;
+</code></pre>
+
+<a name="C....."></a>
+<h4>C++版</h4>
+
+<pre><code class="cpp">#include&lt;limits&gt;
+
+cin.clear();
+// numeric_limits&lt;streamsize&gt;::max() 返回输入缓冲的大小。
+// ignore 函数在此将把输入流中的数据清空。
+// 这两个函数的具体用法请读者自行查询。
+cin.ignore( numeric_limits&lt;streamsize&gt;::max(), '\n' );
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

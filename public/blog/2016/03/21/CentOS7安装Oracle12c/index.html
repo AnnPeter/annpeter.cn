@@ -1,0 +1,368 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>CentOS7安装Oracle12c - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="CentOS7安装Oracle12c">
+	<meta name="keywords" content="Server,CentOS,Linux,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">CentOS7安装Oracle12c</h2>
+		<div class="entry-content">
+			<p>首先请参考教程，卸载OpenJDK，安装JDK。</p>
+
+<ol>
+<li>修改hostname，这两个文件中的地址必须保持一致，根据自己的情况修改，可以使用内网地址
+
+<blockquote><p>$ /etc/hosts
+     10.144.140.88 CentOS
+$ /etc/sysconfig/network
+     HOSTNAME=10.144.140.88</p></blockquote></li>
+</ol>
+
+
+<!-- more -->
+
+
+<ol>
+<li><p>关闭selinux</p>
+
+<blockquote><p>$ /etc/selinux/config
+     设置SELINUX=disabled</p></blockquote></li>
+<li><p>关闭防火墙</p>
+
+<blockquote><p>$ systemctl start firewalld.service*</p></blockquote></li>
+<li><p>安装依赖包</p>
+
+<blockquote><p>$ yum -y install binutils compat-libcap1  compat-libstdc++-33 compat-libstdc++-33<em>.i686 elfutils-libelf-devel gcc gcc-c++ glibc</em>.i686 glibc glibc-devel glibc-devel<em>.i686 ksh libgcc</em>.i686 libgcc libstdc++ libstdc++<em>.i686 libstdc++-devel libstdc++-devel</em>.i686 libaio libaio<em>.i686 libaio-devel libaio-devel</em>.i686 make sysstat unixODBC unixODBC<em>.i686 unixODBC-devel unixODBC-devel</em>.i686 libXp unzip</p></blockquote></li>
+<li><p>下载Oracle12c至/tmp目录，解压。</p></li>
+<li><p>添加安装用户和用户组</p>
+
+<blockquote><p>$ groupadd oinstall
+$ groupadd dba
+$ useradd -g oinstall -G dba oracle
+$ passwd oracle</p></blockquote></li>
+<li><p>添加安装目录</p>
+
+<blockquote><p>$ mkdir -p  /usr/local/oracle/product/12.1.0/dbhome_1
+$ chown -R oracle:oinstall /usr/local/oracle
+$ chmod -R 755 /usr/local/oracle</p></blockquote></li>
+<li><p>修改内核参数配置文件</p>
+
+<blockquote><p>fs.aio-max-nr = 1048576
+fs.file-max = 6815744
+kernel.shmall = 2097152
+kernel.shmmax = 1200000000
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048576</p>
+
+<p>$ sysctl –p //显示内核参数配置信息</p></blockquote></li>
+<li><p>修改用户限制文件</p>
+
+<blockquote><p>oracle              soft    nproc   2047
+oracle              hard    nproc   16384
+oracle              soft    nofile  1024
+oracle              hard    nofile  65536
+oracle              soft    stack   10240</p></blockquote></li>
+<li><p>修改文件/etc/pam.d/login
+在最后一个大项前面加入session    required     pam_limits.so</p></li>
+<li><p>修改文件/etc/profile，添加一下内容</p>
+
+<blockquote><p>  if [ $USER = &ldquo;oracle&rdquo; ]; then
+   if [ $SHELL = &ldquo;/bin/ksh&rdquo; ]; then
+        ulimit -p 16384
+        ulimit -n 65536
+    else
+        ulimit -u 16384 -n 65536
+    fi
+  fi</p></blockquote></li>
+<li><p>切换到oracle用户</p></li>
+<li><p>设置oracle用户的环境变量/home/oracle/.bash_profile
+TMP=/tmp; export TMP
+TMPDIR=$TMP; export TMPDIR
+ORACLE_HOSTNAME=10.144.140.88; export ORACLE_HOSTNAME
+ORACLE_BASE=/usr/local/oracle; export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/12.1.0/dbhome_1; export ORACLE_HOME
+ORACLE_SID=orcl; export ORACLE_SID
+PATH=$ORACLE_HOME/bin:/usr/sbin:$PATH; export PATH</p></li>
+<li><p>编辑静默安装响应文件</p>
+
+<blockquote><p>$ cp -R /tmp/database/response/  .
+$ cd response
+$ vim db_install.rsp</p></blockquote>
+
+<p>需要设置的选项如下：<br/>
+oracle.install.option=INSTALL_DB_SWONLY
+ORACLE_HOSTNAME=10.144.140.88
+UNIX_GROUP_NAME=oinstall
+INVENTORY_LOCATION=/usr/local/oracle/inventory
+SELECTED_LANGUAGES=en,zh_CN
+ORACLE_HOME=/usr/local/oracle/product/12.1.0/dbhome_1
+ORACLE_BASE=/usr/local/oracle
+oracle.install.db.InstallEdition=EE
+oracle.install.db.DBA_GROUP=dba
+oracle.install.db.OPER_GROUP=dba
+oracle.install.db.BACKUPDBA_GROUP=dba
+oracle.install.db.DGDBA_GROUP=dba
+oracle.install.db.KMDBA_GROUP=dba
+DECLINE_SECURITY_UPDATES=true</p></li>
+<li><p>添加swap空间，如果你有交换空间的话可以跳过这个步骤
+dd if=/dev/zero of=/home/swapfile bs=1M count=512
+mkswap /home/swapfile
+swapon /home/swapfile</p>
+
+<p>然后修改 /etc/fstab，加上：
+/home/swapfile swap swap defaults 0 0</p></li>
+<li><p>进入安装包目录/tmp/database/，执行安装</p>
+
+<blockquote><p>$ ./runInstaller -silent -noconfig -responseFile /home/oracle/response/db_install.rsp</p></blockquote></li>
+<li><p>可以通过top查看安装进程
+可以通过tail -f /usr/local/oracle/oraInventory/logs/installActions2016-03-12_04-40-06AM.log ，查看安装日志。</p></li>
+<li><p>安装完成，切换到root身份</p>
+
+<blockquote><p>$ sh /usr/local/oracle/inventory/orainstRoot.sh
+$ sh /usr/local/oracle/product/12.1.0/root.sh</p></blockquote></li>
+<li><p>重新登入oracle用户，以静默方式配置监听。如果未找到netca，请检查环境变量。</p>
+
+<blockquote><p>$ netca  /silent /responsefile /home/oracle/response/netca.rsp</p></blockquote></li>
+<li><p>通过netstat -nlpt，查看到端口1521正在被监听。</p></li>
+<li><p>以静默方式建立新库</p></li>
+</ol>
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/CentOS7安装Oracle12c" data-title="CentOS7安装Oracle12c" data-url="http://www.annpeter.cn/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Mar 21st, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/server/'>server</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

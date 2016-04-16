@@ -1,0 +1,9 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">device_driver</span><span class="p">{</span>
+	<span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//驱动名称</span>
+	<span class="k">struct</span> <span class="n">bus_type</span><span class="o">*</span> <span class="n">bus</span><span class="p">;</span><span class="c1">//驱动所在总线</span>
+
+	<span class="c1">//一个总线上可能挂载多个设备，如USB总线可能挂载无线鼠标，无线网卡等等，当总线匹配到该</span>
+	<span class="c1">//驱动可以处理该设备时，调用prove函数来处理设备。所以probe由总线调用。</span>
+	<span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>

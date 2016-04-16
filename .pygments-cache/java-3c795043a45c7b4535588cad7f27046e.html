@@ -1,0 +1,68 @@
+<div class="highlight"><pre><span class="c1">//定义数据库辅助类</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DBOpenHelper</span> <span class="kd">extends</span> <span class="n">SQLiteOpenHelper</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="nf">DBOpenHelper</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="s">&quot;peopel.db&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">SQLiteDatabase</span> <span class="n">db</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">db</span><span class="o">.</span><span class="na">execSQL</span><span class="o">(</span><span class="s">&quot;create table people(_id integer primary key autoincrement, name char(10), phone char(11))&quot;</span><span class="o">);</span>
+        <span class="n">db</span><span class="o">.</span><span class="na">execSQL</span><span class="o">(</span><span class="s">&quot;create table teacher(_id integer primary key autoincrement, name char(10)&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onUpgrade</span><span class="o">(</span><span class="n">SQLiteDatabase</span> <span class="n">db</span><span class="o">,</span> <span class="kt">int</span> <span class="n">oldVersion</span><span class="o">,</span> <span class="kt">int</span> <span class="n">newVersion</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+<span class="o">}</span>
+
+
+<span class="c1">//创建自定义内容提供者，重写内容提供者方法</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PeoplerProvider</span> <span class="kd">extends</span> <span class="n">ContentProvider</span><span class="o">{</span>
+    <span class="n">DBOpenHelper</span> <span class="n">dbOpenHelper</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="n">SQLiteDatabase</span> <span class="n">db</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">dbOpenHelper</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">DBOpenHelper</span><span class="o">(</span><span class="n">getContext</span><span class="o">());</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">dbOpenHelper</span><span class="o">.</span><span class="na">getWritableDatabase</span><span class="o">();</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Cursor</span> <span class="nf">query</span><span class="o">(</span><span class="n">Uri</span> <span class="n">uri</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">projection</span><span class="o">,</span> <span class="n">String</span> <span class="n">selection</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">selectionArgs</span><span class="o">,</span> <span class="n">String</span> <span class="n">sortOrder</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="s">&quot;people&quot;</span><span class="o">,</span> <span class="n">projection</span><span class="o">,</span> <span class="n">selection</span><span class="o">,</span> <span class="n">selectionArgs</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">sortOrder</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getType</span><span class="o">(</span><span class="n">Uri</span> <span class="n">uri</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Uri</span> <span class="nf">insert</span><span class="o">(</span><span class="n">Uri</span> <span class="n">uri</span><span class="o">,</span> <span class="n">ContentValues</span> <span class="n">values</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">db</span><span class="o">.</span><span class="na">insertOrThrow</span><span class="o">(</span><span class="s">&quot;people&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">uri</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">delete</span><span class="o">(</span><span class="n">Uri</span> <span class="n">uri</span><span class="o">,</span> <span class="n">String</span> <span class="n">selection</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">selectionArgs</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="s">&quot;people&quot;</span><span class="o">,</span> <span class="n">selection</span><span class="o">,</span> <span class="n">selectionArgs</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">update</span><span class="o">(</span><span class="n">Uri</span> <span class="n">uri</span><span class="o">,</span> <span class="n">ContentValues</span> <span class="n">values</span><span class="o">,</span> <span class="n">String</span> <span class="n">selection</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">selectionArgs</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="s">&quot;people&quot;</span><span class="o">,</span> <span class="n">values</span><span class="o">,</span> <span class="n">selection</span><span class="o">,</span> <span class="n">selectionArgs</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+
+<span class="c1">//在主配置文件中声明内容提供者</span>
+<span class="o">&lt;</span><span class="n">provider</span>
+    <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;com.example.contentprovider.provider.PeoplerProvider&quot;</span>
+    <span class="nl">android:</span><span class="n">authorities</span><span class="o">=</span><span class="s">&quot;com.example.contentprovider.provider.PeoplerProvider&quot;</span>
+    <span class="nl">android:</span><span class="n">exported</span><span class="o">=</span><span class="s">&quot;true&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">provider</span><span class="o">&gt;</span>
+</pre></div>

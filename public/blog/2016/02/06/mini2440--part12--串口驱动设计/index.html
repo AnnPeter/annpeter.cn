@@ -1,0 +1,344 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini2440--part12--串口驱动设计 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="mini2440--part12--串口驱动设计">
+	<meta name="keywords" content="ARM,mini2440,串口驱动设计,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">Mini2440--part12--串口驱动设计</h2>
+		<div class="entry-content">
+			<a name="TTY............"></a>
+<h2>TTY驱动架构</h2>
+
+<p>在Linux中，终端是一类字符型设备，它包括多种类型，通常使用tty来简称各种类型的终端设备。</p>
+
+<ul>
+<li><p>串口终端(/dev/ttyS*)
+串口终端是使用计算机串口连接的终端设备。Linux把每个串行端口都看作是一个字符设备。这些串行端口所对应的设备名称是/dev/ttySAC0、/dev/ttySAC1。</p></li>
+<li><p>控制台终端(/dev/console)
+在Linux中，计算机的输出设备通常被称为控制台的终端(Console),这里特指printk信息输出到的设备。/dev/console是一个虚拟设备，它需要映射到一个真正的tty上，比如通过内核启动参数“console=ttySAC0”就把console映射到了串口0上。</p></li>
+<li><p>虚拟终端(/dev/tty*,如tty1，tty2&hellip;)
+当用户登录时，使用的是虚拟终端。使用ctcl+alt+[F1-F6]组合键，我们就可以切换到tty1-tty6上，它们被称为虚拟终端，而tty0则是当前所使用虚拟终端的一个别名。</p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Linux tty子系统包含:tty核心,tty线路规程和tty驱动。tty核心是对整个tty设备的抽象,对用户提供统一的接口,tty线路规程是对传输数据的格式化,tty驱动则是面向tty设备的硬件驱动。</p>
+
+<p><img src="/upload/2016/FEB/08/imgs/1454928983.png" alt="tty架构分析" /></p>
+
+<p>串口调用例程回溯，在Linux中串口底层调用位于(/drivers/serial/samsung.c 中的 s3c24xx_serial_start_tx)，我们在此函数中添加dump_stark()。然后重新编译我们的内核，重启开发板，我们就能清除的看到调用的堆栈回溯。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>[<span class="p">&lt;</span>c0035270<span class="p">&gt;</span>] <span class="p">(</span>dump_backtrace<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x10c) from [&lt;c033a868&gt;] (dump_stack+0x18/</span><span class="m">0</span>x<span class="m">1</span>c<span class="p">)</span>
+</span><span class='line'> r7:<span class="m">00000000</span> r6:c3901800 r5:c3901c02 r4:c046e0bc
+</span><span class='line'>[<span class="p">&lt;</span>c033a850<span class="p">&gt;</span>] <span class="p">(</span>dump_stack<span class="p">+</span><span class="m">0</span>x<span class="m">0</span>/<span class="m">0</span>x<span class="m">1</span>c<span class="p">)</span> from [<span class="p">&lt;</span>c01830a0<span class="p">&gt;</span>] <span class="p">(</span>s3c24xx_serial_start_tx<span class="p">+</span><span class="m">0</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c018308c<span class="p">&gt;</span>] <span class="p">(</span>s3c24xx_serial_start_tx<span class="p">+</span><span class="m">0</span>x<span class="m">0</span>/<span class="m">0</span>x<span class="m">64</span><span class="p">)</span> from [<span class="p">&lt;</span>c017f2ac<span class="p">&gt;</span>] <span class="p">(</span>uart_start<span class="p">+</span><span class="m">0</span><span class="p">)</span>
+</span><span class='line'> r5:c3901c02 r4:a0000013
+</span><span class='line'>[<span class="p">&lt;</span>c017f244<span class="p">&gt;</span>] <span class="p">(</span>uart_start<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x6c) from [&lt;c017f504&gt;] (uart_flush_chars+0x10/</span><span class="m">0</span>x<span class="m">1</span><span class="p">)</span>
+</span><span class='line'> r5:c3901c02 r4:<span class="m">00000002</span>
+</span><span class='line'>[<span class="p">&lt;</span>c017f4f4<span class="p">&gt;</span>] <span class="p">(</span>uart_flush_chars<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x14) from [&lt;c016bde8&gt;] (n_tty_write+0x230/</span><span class="m">0</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c016bbb8<span class="p">&gt;</span>] <span class="p">(</span>n_tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x448) from [&lt;c01693e0&gt;] (tty_write+0x14c/</span><span class="m">0</span>x<span class="m">244</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c0169294<span class="p">&gt;</span>] <span class="p">(</span>tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span>/<span class="m">0</span>x<span class="m">244</span><span class="p">)</span> from [<span class="p">&lt;</span>c0169560<span class="p">&gt;</span>] <span class="p">(</span>redirected_tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">88</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c01694d8<span class="p">&gt;</span>] <span class="p">(</span>redirected_tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x98) from [&lt;c009e044&gt;] (vfs_write+0xb4/</span><span class="p">)</span>
+</span><span class='line'> r9:c39a0000 r8:c00310c8 r7:<span class="m">00000004</span> r6:c39a1f78 r5:<span class="m">40000000</span>
+</span><span class='line'>r4:c3939380
+</span><span class='line'>[<span class="p">&lt;</span>c009df90<span class="p">&gt;</span>] <span class="p">(</span>vfs_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0xe8) from [&lt;c009e15c&gt;] (sys_write+0x4c/</span><span class="m">0</span>x<span class="m">84</span><span class="p">)</span>
+</span><span class='line'> r7:<span class="m">00000004</span> r6:c3939380 r5:<span class="m">00000000</span> r4:<span class="m">00000000</span>
+</span><span class='line'>[<span class="p">&lt;</span>c009e110<span class="p">&gt;</span>] <span class="p">(</span>sys_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x84) from [&lt;c0030f20&gt;] (ret_fast_syscall+0x0/</span><span class="m">0</span>x<span class="m">28</span><span class="p">)</span>
+</span><span class='line'> r6:<span class="m">001</span>d<span class="m">27</span>f<span class="m">8</span> r5:<span class="m">40000000</span> r4:<span class="m">00000002</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L............"></a>
+<h2>串口驱动</h2>
+
+<p>UART驱动中的数据结构：</p>
+
+<ul>
+<li>UART驱动程序结构：<strong>struct uart_driver</strong></li>
+<li>UART端口结构：<strong>struct uart_port</strong></li>
+<li>UART相关操作函数结构：<strong>struct uart_ops</strong></li>
+<li>UART状态结构：struct uart_stat</li>
+<li>UART信息结构：struct uart_info</li>
+</ul>
+
+
+<p><img src="/upload/2016/FEB/08/imgs/1454946151.jpg" alt="uart驱动常用的数据结构" /></p>
+
+<p>串口的初始化工作：
+在linux中，串口的初始化工作主要在(drivers/serial/samsung.c 和 s3c2440.c中)
+1. 注册串口驱动程序，使用函数 int uart_register_driver(struct uart_driver *drv);
+2. 初始化(在平台设备中注册设备，当设备与驱动匹配时，调用probe进行初始化)</p>
+
+<ul>
+<li>取出相应的uart_port</li>
+<li>初始化uart_port
+
+<ul>
+<li>获取虚拟基地址</li>
+<li>获取中断号</li>
+<li>复位FIFO</li>
+</ul>
+</li>
+<li>添加uart_port，使用函数int uart_add_one_port(struct uart_driver <em>drv, struct uart_port </em>uport);</li>
+<li>创建属性文件，使用函数int device_create_file(struct device <em>dev, struct device_attribute </em>attr);</li>
+<li>初始化动态频率调节</li>
+</ul>
+
+
+<p>串口发送数据：</p>
+
+<p>串口接收数据：</p>
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/mini2440--part12--串口驱动设计" data-title="mini2440--part12--串口驱动设计" data-url="http://www.annpeter.cn/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Feb 6th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

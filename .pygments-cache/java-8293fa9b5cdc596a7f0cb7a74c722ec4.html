@@ -1,0 +1,30 @@
+<div class="highlight"><pre><span class="c1">//发送有序广播</span>
+<span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Intent</span><span class="o">();</span>
+<span class="n">intent</span><span class="o">.</span><span class="na">setAction</span><span class="o">(</span><span class="s">&quot;cn.annpeter.wwww&quot;</span><span class="o">);</span>
+
+<span class="c1">//第三个参数，指定广播接收者（被称为最终接收者，最终接收者一定可以收到广播，</span>
+<span class="c1">//优先级最低，最后收到广播，无论中间是否进行了拦截，并且无需在清单文件中配置action等内容）</span>
+<span class="n">sendOrderBroadcast</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="s">&quot;参数，比较简单时，直接在这里传参&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+
+<span class="c1">//接收有序广播</span>
+<span class="o">&lt;</span><span class="n">receiver</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.www.R1&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span> <span class="nl">android:</span><span class="n">priority</span><span class="o">=</span><span class="s">&quot;1000&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">action</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.www&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;/</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">receiver</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">receiver</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.www.R2&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span> <span class="nl">android:</span><span class="n">priority</span><span class="o">=</span><span class="s">&quot;800&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">action</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.www&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;/</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">receiver</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">receiver</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.www.R3&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span> <span class="nl">android:</span><span class="n">priority</span><span class="o">=</span><span class="s">&quot;600&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">action</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;cn.annpeter.www&quot;</span><span class="o">/&gt;</span>
+    <span class="o">&lt;/</span><span class="n">intent</span><span class="o">-</span><span class="n">filter</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">receiver</span><span class="o">&gt;</span>
+
+<span class="c1">//接收广播</span>
+<span class="n">String</span> <span class="n">text</span> <span class="o">=</span> <span class="n">getResultData</span><span class="o">();</span>
+<span class="c1">//修改广播内容 (只能在有序广播中才有效，无序广播无效)</span>
+<span class="n">setResultData</span><span class="o">(</span><span class="s">&quot;这是修改后的广播，低优先级收到！&quot;</span><span class="o">);</span>
+</pre></div>

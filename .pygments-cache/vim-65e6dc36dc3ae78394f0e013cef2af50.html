@@ -1,0 +1,96 @@
+<div class="highlight"><pre>@*************************************************************************
+@    <span class="p">&gt;</span> File Name: <span class="k">start</span>.<span class="k">s</span>
+@    <span class="p">&gt;</span> Author: AnnPeter
+@    <span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span> 
+@    <span class="p">&gt;</span> Created Time: Thu <span class="m">28</span> Jan <span class="m">2016</span> <span class="m">08</span>:<span class="m">07</span>:<span class="m">42</span> PM CST
+@ ************************************************************************
+
+
+.text
+.global _start
+							@查看ARM芯片手册我们可以看到
+							@从地址<span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0000</span>开始是ARM的异常处理程序
+_start:						@依次是：
+	<span class="k">b</span> reset							@Rest<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0000</span><span class="p">)</span>
+	ldr <span class="k">pc</span><span class="p">,</span>	_undefined_instruction	@Undefined instructions<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0004</span><span class="p">)</span>
+	ldr <span class="k">pc</span><span class="p">,</span> _software_interrupt		@Software interrupt<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0008</span><span class="p">)</span>
+	ldr <span class="k">pc</span><span class="p">,</span> _prefetch_abort			@Prefetch Abort<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">000</span>C<span class="p">)</span>
+	ldr <span class="k">pc</span><span class="p">,</span> _data_abort				@Data Abort<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0010</span><span class="p">)</span>
+	ldr <span class="k">pc</span><span class="p">,</span> _not_used				@保留，没有用
+	ldr <span class="k">pc</span><span class="p">,</span> _irq					@IRQ<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0018</span><span class="p">)</span>
+	ldr <span class="k">pc</span><span class="p">,</span> _fiq					@FIQ<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">001</span>C<span class="p">)</span>
+
+_undefined_instruction:	.word undefined_instruction
+_software_interrupt:	.word software_interrupt
+_prefetch_abort:		.word prefetch_abort
+_data_abort:			.word data_abort
+_not_used:				.word not_used
+_irq:					.word irq
+_fiq:					.word fiq
+
+undefined_instruction:
+	nop
+software_interrupt:
+	nop
+prefetch_abort:
+	nop
+data_abort:
+	nop
+not_used:
+	nop
+irq:
+	nop
+fiq:
+	nop
+reset:
+	<span class="k">bl</span> set_svc	@设置cpu工作模式，arm处理器共支持<span class="m">7</span>种工作模式，在svc模式下
+				@cpu具有更多权限，能访问更多硬件资源
+				@设置svc模式，只要将cpsr后<span class="m">5</span>位设置位<span class="m">10011</span><span class="p">(</span>即<span class="m">0</span>x<span class="m">13</span><span class="p">)</span>
+				@但在此，我们将后<span class="m">8</span>位设置为<span class="m">1101</span><span class="p">,</span><span class="m">0011</span><span class="p">(</span>即<span class="m">0</span>xD<span class="m">3</span><span class="p">)</span>，高两位用于屏蔽
+				@中断<span class="p">(</span>irq<span class="p">,</span>fiq<span class="p">)</span>
+	<span class="k">bl</span> disable_watchdog
+	<span class="k">bl</span> disable_interrupt
+	<span class="k">bl</span> disable_mmu
+	<span class="k">bl</span> light_led
+
+set_svc:
+	mrs r0<span class="p">,</span> cpsr		@将cpsr加载至r0中，cpsr不能直接操作
+	bic r0<span class="p">,</span> r0<span class="p">,</span> #<span class="m">0</span>x<span class="m">1</span>F	@将r0低<span class="m">5</span>位置<span class="m">0</span>
+	orr r0<span class="p">,</span> r0<span class="p">,</span>	#<span class="m">0</span>xD<span class="m">3</span>	@设置位svc所需要的<span class="m">0</span>xD<span class="m">3</span>
+	msr cpsr<span class="p">,</span> r0
+	mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>	@<span class="k">bl</span>在执行时会将下一条指令的地址保存在<span class="k">lr</span>寄存器中
+				@这里就相当于<span class="k">ret</span>，只不过现在还没有堆栈而已
+
+#<span class="nb">define</span> pWTCHON <span class="m">0</span>x<span class="m">53000000</span>
+disable_watchdog:
+	ldr r0<span class="p">,</span> <span class="p">=</span>pWTCHON	@这里不使用mov的原因是装载的数据超过了<span class="m">8</span>位
+	mov r1<span class="p">,</span> #<span class="m">0</span>x<span class="m">0</span>		@mov使用<span class="m">12</span>bit表示立即数<span class="p">,</span>其中<span class="m">4</span>bit表示移位的位数<span class="p">(</span>循环
+	str r1<span class="p">,</span> [r0]		@右移<span class="p">,</span>且数值*<span class="m">2</span><span class="p">),</span><span class="m">8</span>bit用来表示移位的基数，所以mov指令
+	mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>			@后面这个立即数必须能由一个<span class="m">8</span>位二进制数经过偶数次右
+						@移后得到的合法数据
+#<span class="nb">define</span> pINTMASK <span class="m">0</span>x<span class="m">4</span>A<span class="m">000008</span>
+disable_interrupt:
+	mvn r1<span class="p">,</span> #<span class="m">0</span>x<span class="m">0</span> @mvn将第二个操作数取反，写入第一个操作数中
+	ldr r0<span class="p">,</span> <span class="p">=</span>pINTMASK
+	str r1<span class="p">,</span> [r0]
+	mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>
+
+disable_mmu:
+	mcr p15<span class="p">,</span> <span class="m">0</span><span class="p">,</span> r0<span class="p">,</span> c7<span class="p">,</span> c7<span class="p">,</span> <span class="m">0</span>	@invalidate ICache and DCache
+	mrc p15<span class="p">,</span> <span class="m">0</span><span class="p">,</span> r0<span class="p">,</span> c1<span class="p">,</span> c0<span class="p">,</span> <span class="m">0</span>
+	bic r0<span class="p">,</span> r0<span class="p">,</span> #<span class="m">0</span>x<span class="m">00000007</span>
+	mcr p15<span class="p">,</span> <span class="m">0</span><span class="p">,</span> r0<span class="p">,</span> c1<span class="p">,</span> c0<span class="p">,</span> <span class="m">0</span>	@关闭DCache、MMU<span class="p">,</span>ICache关不关无所谓
+	mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>
+
+#<span class="nb">define</span> pGPBCON <span class="m">0</span>x<span class="m">56000010</span>
+#<span class="nb">define</span> pGPBDAT <span class="m">0</span>x<span class="m">56000014</span>
+light_led:
+	ldr r0<span class="p">,</span> <span class="p">=</span>pGPBCON
+	ldr r1<span class="p">,</span> <span class="p">=</span><span class="m">0</span>x<span class="m">00015400</span>
+	str r1<span class="p">,</span> [r0]
+
+	ldr r0<span class="p">,</span> <span class="p">=</span>pGPBDAT
+	ldr r1<span class="p">,</span> <span class="p">=</span><span class="m">0</span>x<span class="m">0</span>
+	str r1<span class="p">,</span> [r0]
+	mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>
+</pre></div>

@@ -1,0 +1,21 @@
+---
+layout: post
+title: "SSH远程连接信任"
+date: 2015-11-18 22:10:15 +5325
+comments: true
+categories: Server
+keywords: Server,SSH,博客,AnnPeter's Blog
+description: "SSH远程连接信任"
+
+---
+
+首先在一台客户机上生成公钥
+>$ ssh-keygen -t rsa
+
+然后将公钥拷贝到服务器上
+>$ scp authorized_keys.pub  annpeter@www.itpeter.cn:/home/annpeter/.ssh/authorized_keys
+
+<br/>
+注意：
+服务器上用户的.ssh文件权限一定要为700。否则还是需要密码认证。
+

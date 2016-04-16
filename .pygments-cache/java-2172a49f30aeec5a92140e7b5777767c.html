@@ -1,0 +1,32 @@
+<div class="highlight"><pre><span class="kd">static</span> <span class="n">UriMatcher</span> <span class="n">um</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">UriMatcher</span><span class="o">(</span><span class="n">UriMatcher</span><span class="o">.</span><span class="na">NO_MATCH</span><span class="o">);</span>
+<span class="kd">static</span><span class="o">{</span>
+    <span class="c1">//content://com.example.contentprovider.provider.PeoplerProvider/people</span>
+    <span class="n">um</span><span class="o">.</span><span class="na">addURI</span><span class="o">(</span><span class="s">&quot;com.example.contentprovider.provider.PeoplerProvider&quot;</span><span class="o">,</span> <span class="s">&quot;people&quot;</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="c1">//content://com.example.contentprovider.provider.PeoplerProvider/teacher</span>
+    <span class="n">um</span><span class="o">.</span><span class="na">addURI</span><span class="o">(</span><span class="s">&quot;com.example.contentprovider.provider.PeoplerProvider&quot;</span><span class="o">,</span> <span class="s">&quot;teacher&quot;</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+    <span class="c1">//content://com.example.contentprovider.provider.PeoplerProvider/teacher/#</span>
+    <span class="n">um</span><span class="o">.</span><span class="na">addURI</span><span class="o">(</span><span class="s">&quot;com.example.contentprovider.provider.PeoplerProvider/#&quot;</span><span class="o">,</span> <span class="s">&quot;teacher&quot;</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+<span class="o">}</span>
+
+
+
+<span class="c1">//调用的时候</span>
+<span class="c1">//Uri uri = Uri.parse(&quot;content://com.example.contentprovider.provider.PeoplerProvider/people/123&quot;);</span>
+<span class="c1">//cr.insert(uri, values);</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="n">Uri</span> <span class="nf">insert</span><span class="o">(</span><span class="n">Uri</span> <span class="n">uri</span><span class="o">,</span> <span class="n">ContentValues</span> <span class="n">values</span><span class="o">){</span>
+    <span class="c1">//使用uri匹配器匹配传入的uri</span>
+    <span class="k">if</span><span class="o">(</span><span class="n">um</span><span class="o">.</span><span class="na">match</span><span class="o">(</span><span class="n">uri</span><span class="o">)</span> <span class="o">==</span> <span class="mi">1</span><span class="o">){</span>
+        <span class="n">db</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="s">&quot;people&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+    <span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">um</span><span class="o">.</span><span class="na">match</span><span class="o">(</span><span class="s">&quot;teacher&quot;</span><span class="o">)</span> <span class="o">==</span> <span class="mi">2</span><span class="o">){</span>
+        <span class="n">db</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="s">&quot;teacher&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+    <span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">um</span><span class="o">.</span><span class="na">match</span><span class="o">(</span><span class="s">&quot;teacher&quot;</span><span class="o">)</span> <span class="o">==</span> <span class="mi">3</span><span class="o">){</span>
+        <span class="c1">//获取uri末尾携带的数字</span>
+        <span class="c1">//long id = ContentUris.parseId(uri);</span>
+        <span class="n">db</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="s">&quot;teacher&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+    <span class="o">}</span><span class="k">else</span><span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">&quot;error args&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">uri</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>

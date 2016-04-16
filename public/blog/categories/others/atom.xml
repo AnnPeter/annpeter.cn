@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: others | AnnPeter's Blog]]></title>
+  <link href="http://www.annpeter.cn/blog/categories/others/atom.xml" rel="self"/>
+  <link href="http://www.annpeter.cn/"/>
+  <updated>2016-04-16T11:13:25+08:00</updated>
+  <id>http://www.annpeter.cn/</id>
+  <author>
+    <name><![CDATA[AnnPeter]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[IntelJIDE快捷键]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html"/>
+    <updated>2016-04-12T09:31:23+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/IntelJIDE快捷键</id>
+    <content type="html"><![CDATA[<ul>
+<li>Option+Alt+L    整理代码</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[正则表达式学习]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html"/>
+    <updated>2016-04-09T11:08:12+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/正则表达式学习</id>
+    <content type="html"><![CDATA[<ol>
+<li><p>中括号:[判断字符为上内容]</p></li>
+<li><p>预定义字符:都带有反斜线</p>
+
+<ul>
+<li>.   :   任意字符</li>
+<li>\d  :   数字<a href="">0-9</a></li>
+<li>\D  :   非数字<a href="">^0-9</a></li>
+<li>\w  :   单词字符<a href="">a-zA-Z_0-9</a></li>
+</ul>
+</li>
+</ol>
+
+
+<!-- more -->
+
+
+<ol>
+<li><p>边界字符:</p>
+
+<ul>
+<li>^   :   行开头</li>
+<li>$   :   行结尾</li>
+<li>\b  :   单词边界</li>
+</ul>
+</li>
+<li><p>数量词:必须结合内容</p>
+
+<ul>
+<li>X?      :   X内容出现零次或一次</li>
+<li>X      :   X内容出现零次或多次</li>
+<li>X+      :   X内容出现一次或多次</li>
+<li>X{n}    :   X内容出现n次</li>
+<li>X{n,}   :   X内容出现至少n次</li>
+<li>X{n,m}  :   X内容出现n到m次</li>
+</ul>
+</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SourceInsight的使用]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/24/SourceInsight%E7%9A%84%E4%BD%BF%E7%94%A8/index.html"/>
+    <updated>2016-01-24T21:59:23+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/24/SourceInsight%E7%9A%84%E4%BD%BF%E7%94%A8/SourceInsight的使用</id>
+    <content type="html"><![CDATA[<p>本文主要介绍SourceInsight的简单使用，主要用于查看项目。</p>
+
+<!-- more -->
+
+
+<ol>
+<li>Project->New project新建一个项目，为每个项目设置自己的配置文件，设置项目信息路径</li>
+<li>Project->Add and Remove Project Files添加项目文件(最好把要分析的源码拷贝至SourceInsight中，以防要编译使用的源码在查看中被修改)，选择文件路径然后Add Tree。</li>
+<li>Options->Preferences->Display->Trim long path name with ellipses，取消该选项。在标题栏显示文件全路径</li>
+<li>Project->Default Project Settings，设置Project Source Directory。显示项目文件相对路径。</li>
+<li>Options->Document Options，File filer添加.s;.S。使项目能添加汇编文件，添加后需重新Add Files。</li>
+<li>Project->Rebuild Project，重新编译项目，使我们能方便查询到函数定义。</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SublimeText使用]]></title>
+    <link href="http://www.annpeter.cn/blog/2015/12/26/SublimeText%E4%BD%BF%E7%94%A8/index.html"/>
+    <updated>2015-12-26T03:54:32+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2015/12/26/SublimeText%E4%BD%BF%E7%94%A8/SublimeText使用</id>
+    <content type="html"><![CDATA[<a name="L.................."></a>
+<h2>插件安装准备</h2>
+
+<a name="L1......Ctrl........console"></a>
+<h5>1、按Ctrl+`调出console</h5>
+
+<a name="L2..................................................."></a>
+<h5>2、粘贴以下代码到底部命令行并回车：</h5>
+
+<blockquote><p>import urllib2,os;pf=&lsquo;Package Control.sublime-package&rsquo;;ipp=sublime.installed_packages_path();os.makedirs(ipp) if not os.path.exists(ipp) else None;open(os.path.join(ipp,pf),&lsquo;wb&rsquo;).write(urllib2.urlopen(&lsquo;http://sublime.wbond.net/&rsquo;+pf.replace(&lsquo; &rsquo;,&lsquo;%20&rsquo;)).read())</p></blockquote>
+
+<!-- more -->
+
+
+<a name="L3.........Sublime.Text.2..."></a>
+<h5>3、重启Sublime Text 2。</h5>
+
+<a name="L4............Perferences-.package.settings.........package.control.............................."></a>
+<h5>4、如果在Perferences->package settings中看到package control这一项，则安装成功。</h5>
+
+<a name="L......Markdown........."></a>
+<h3>编辑Markdown小技巧</h3>
+
+<blockquote><p>选中多行，按下Command+Shift+L  &mdash;&mdash;&mdash;-   可以同时编辑这些行<br>
+然后使用Command+左右键 &mdash;&mdash;&mdash;-   移动光标至行首，行尾<br>
+然后进行多行编辑编辑<br></p></blockquote>
+
+<a name="L......"></a>
+<h2>插件</h2>
+
+<a name="autofilename"></a>
+<h3>autofilename</h3>
+
+<ul>
+<li>功能：快捷输入文件名</li>
+<li>输入" / &ldquo;即可看到相对于本项目文件夹的其它文件</li>
+</ul>
+
+
+<a name="Convert...To...UTF8"></a>
+<h3>Convert​To​UTF8</h3>
+
+<ul>
+<li>功能：解决JBK编码文件自动转换为utf-8格式，解决乱码问题</li>
+</ul>
+
+
+<a name="SublimeLinter"></a>
+<h3>SublimeLinter</h3>
+
+<ul>
+<li>代码校验插件，支持多种语言</li>
+</ul>
+
+
+<a name="Colorcoder"></a>
+<h3>Colorcoder</h3>
+
+<ul>
+<li>高亮所有变量，因此可以极大的简化代码定位。尤其是对那些有阅读障碍的程序员非常有帮助。</li>
+</ul>
+
+
+<a name="Emmet"></a>
+<h3>Emmet</h3>
+
+<ul>
+<li>功能：html标签快捷输入</li>
+<li><p>语法</p>
+
+<pre><code class="``css">  后代：&gt;
+  缩写：nav&gt;ul&gt;li
+  &lt;nav&gt;
+      &lt;ul&gt;
+          &lt;li&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+  &lt;/nav&gt;
+</code></pre>
+
+<pre><code class="``css">  兄弟：+
+  缩写：div+p+bq
+  &lt;div&gt;&lt;/div&gt;
+  &lt;p&gt;&lt;/p&gt;
+  &lt;blockquote&gt;&lt;/blockquote&gt;
+</code></pre>
+
+<pre><code class="``css">  上级：^
+  缩写：div+div&gt;p&gt;span+em^bq
+  &lt;div&gt;&lt;/div&gt;
+  &lt;div&gt;
+      &lt;p&gt;&lt;span&gt;&lt;/span&gt;&lt;em&gt;&lt;/em&gt;&lt;/p&gt;
+      &lt;blockquote&gt;&lt;/blockquote&gt;
+  &lt;/div&gt;
+</code></pre>
+
+<pre><code class="``css">  分组：(   )
+  缩写：div&gt;(header&gt;ul&gt;li*2&gt;a)+footer&gt;p
+  &lt;div&gt;
+      &lt;header&gt;
+          &lt;ul&gt;
+              &lt;li&gt;&lt;a href=""&gt;&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href=""&gt;&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+      &lt;/header&gt;
+      &lt;footer&gt;
+          &lt;p&gt;&lt;/p&gt;
+      &lt;/footer&gt;
+  &lt;/div&gt;
+
+
+  缩写：(div&gt;dl&gt;(dt+dd)*3)+footer&gt;p
+  &lt;div&gt;
+      &lt;dl&gt;
+          &lt;dt&gt;&lt;/dt&gt;
+          &lt;dd&gt;&lt;/dd&gt;
+          &lt;dt&gt;&lt;/dt&gt;
+          &lt;dd&gt;&lt;/dd&gt;
+          &lt;dt&gt;&lt;/dt&gt;
+          &lt;dd&gt;&lt;/dd&gt;
+      &lt;/dl&gt;
+  &lt;/div&gt;
+  &lt;footer&gt;
+      &lt;p&gt;&lt;/p&gt;
+  &lt;/footer&gt;
+</code></pre>
+
+<pre><code class="``css">  乘法：*
+  缩写：ul&gt;li*5
+  &lt;ul&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+</code></pre>
+
+<pre><code class="``css">  自增符号：$
+  缩写：ul&gt;li.item$*5
+  &lt;ul&gt;
+      &lt;li class="item1"&gt;&lt;/li&gt;
+      &lt;li class="item2"&gt;&lt;/li&gt;
+      &lt;li class="item3"&gt;&lt;/li&gt;
+      &lt;li class="item4"&gt;&lt;/li&gt;
+      &lt;li class="item5"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  缩写：ul&gt;li.item$$$*5
+  &lt;ul&gt;
+      &lt;li class="item001"&gt;&lt;/li&gt;
+      &lt;li class="item002"&gt;&lt;/li&gt;
+      &lt;li class="item003"&gt;&lt;/li&gt;
+      &lt;li class="item004"&gt;&lt;/li&gt;
+      &lt;li class="item005"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  缩写：ul&gt;li.item$@-*5
+  &lt;ul&gt;
+      &lt;li class="item5"&gt;&lt;/li&gt;
+      &lt;li class="item4"&gt;&lt;/li&gt;
+      &lt;li class="item3"&gt;&lt;/li&gt;
+      &lt;li class="item2"&gt;&lt;/li&gt;
+      &lt;li class="item1"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+
+  缩写：ul&gt;li.item$@3*5
+  &lt;ul&gt;
+      &lt;li class="item3"&gt;&lt;/li&gt;
+      &lt;li class="item4"&gt;&lt;/li&gt;
+      &lt;li class="item5"&gt;&lt;/li&gt;
+      &lt;li class="item6"&gt;&lt;/li&gt;
+      &lt;li class="item7"&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+</code></pre>
+
+<pre><code class="``css">  id和class属性
+  缩写：form#search.wide
+  &lt;form id="search" class="wide"&gt;&lt;/form&gt;
+
+  缩写：p.class1.class2.class3
+  &lt;p class="class1 class2 class3"&gt;&lt;/p&gt;
+
+  自定义属性
+  缩写：[a='value1' b="value2"]
+  &lt;div a="value1" b="value2"&gt;&lt;/div&gt;
+</code></pre>
+
+<pre><code class="``css">  缩写：option[value=$]*12&gt;{$月份}
+
+  &lt;option value="1"&gt;1月份&lt;/option&gt;
+  &lt;option value="2"&gt;2月份&lt;/option&gt;
+  &lt;option value="3"&gt;3月份&lt;/option&gt;
+  &lt;option value="4"&gt;4月份&lt;/option&gt;
+  &lt;option value="5"&gt;5月份&lt;/option&gt;
+  &lt;option value="6"&gt;6月份&lt;/option&gt;
+  &lt;option value="7"&gt;7月份&lt;/option&gt;
+  &lt;option value="8"&gt;8月份&lt;/option&gt;
+  &lt;option value="9"&gt;9月份&lt;/option&gt;
+  &lt;option value="10"&gt;10月份&lt;/option&gt;
+  &lt;option value="11"&gt;11月份&lt;/option&gt;
+  &lt;option value="12"&gt;12月份&lt;/option&gt;
+</code></pre>
+
+<pre><code class="``css">  文本：{}
+  缩写：a{Click me}
+  &lt;a href=""&gt;Click me&lt;/a&gt;
+
+  缩写：p&gt;{Click }+a{here}+{ to continue}
+  &lt;p&gt;Click &lt;a href=""&gt;here&lt;/a&gt; to continue&lt;/p&gt;
+</code></pre>
+
+<pre><code class="``css">  缩写：script:src
+  &lt;script src=""&gt;&lt;/script&gt;
+</code></pre></li>
+</ul>
+
+
+<a name="L......Emmet......"></a>
+<h3>更多Emmet语法</h3>
+
+<p><img src="/upload/2015/OCT/12/imgs/1444639540.png" alt="更多Emmet语法" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Ubuntu安装BCM4322驱动]]></title>
+    <link href="http://www.annpeter.cn/blog/2015/12/21/Ubuntu%E5%AE%89%E8%A3%85BCM4322%E9%A9%B1%E5%8A%A8/index.html"/>
+    <updated>2015-12-21T01:31:45+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2015/12/21/Ubuntu%E5%AE%89%E8%A3%85BCM4322%E9%A9%B1%E5%8A%A8/Ubuntu安装BCM4322驱动</id>
+    <content type="html"><![CDATA[<p>本文主要介绍联想Y410(网卡已更换为BCM4322，黑果网卡)在Ubuntu15.10下的无线网卡驱动。</p>
+
+<!-- more -->
+
+
+<pre><code class="vim">系统:Ubuntu15.10
+网卡:BCM4322
+
+$ sudo apt-get install linux-headers-generic build-essential
+$ sudo apt-get install broadcom-sta-dkms
+$ sudo apt-get install bcmwl-kernel-source
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

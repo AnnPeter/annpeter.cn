@@ -1,0 +1,17 @@
+---
+layout: post
+title: "Android模拟器位置服务"
+date: 2015-11-22 16:06:53 +7525
+comments: true
+categories: Android
+keywords: Android,模拟器,位置服务,博客,AnnPeter's Blog
+description: "Android模拟器位置服务"
+
+---
+
+在安卓模拟器中开启位置服务，方便调试
+
+>$ telnet localhost 5554  	//5554指的是当前模拟器编号<br>
+><br>
+>连接上模拟器后发送位置xinxi<br>
+>geo fix 139  35   			//139表示经度，35表示纬度<br>

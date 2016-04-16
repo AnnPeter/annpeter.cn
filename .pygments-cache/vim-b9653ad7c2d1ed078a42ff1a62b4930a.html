@@ -1,0 +1,8 @@
+<div class="highlight"><pre>$ as86 <span class="m">-0</span> <span class="p">-</span><span class="k">a</span> <span class="p">-</span><span class="k">o</span> bootsect.<span class="k">o</span> bootsect.<span class="k">s</span>     ; 生成与<span class="k">as</span>部分兼容的目标文件<span class="p">(-</span><span class="k">a</span><span class="p">)</span>
+$ ld86 <span class="m">-0</span> <span class="p">-</span><span class="k">s</span> <span class="p">-</span><span class="k">o</span> bootsect bootsect.<span class="k">o</span>       ; 链接<span class="p">,</span> 去掉符号信息<span class="p">(-</span><span class="k">s</span><span class="p">)</span>
+
+<span class="sr">//</span>上面给出的版本是真机调试的版本，在使用qemu调试的版本中，使用<span class="k">ll</span>命令查看bootsect<span class="p">,</span>最后生成的bootsect为<span class="m">544</span>字节<span class="p">,</span>
+<span class="sr">//</span>并非<span class="m">512</span><span class="p">,</span> 多出来的<span class="m">32</span>字节是MINIX可执行文件的头结构<span class="p">,</span> 为了使这个程序能引导启动机器<span class="p">,</span>需要人工去掉这<span class="m">32</span>字节
+
+$dd <span class="nb">bs</span><span class="p">=</span><span class="m">32</span> <span class="k">if</span><span class="p">=</span>bootsect of<span class="p">=</span>boot skip<span class="p">=</span><span class="m">1</span>
+</pre></div>

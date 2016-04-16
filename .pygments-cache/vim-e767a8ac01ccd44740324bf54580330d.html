@@ -1,0 +1,11 @@
+<div class="highlight"><pre>如果要添加为开机启动执行的脚本文件，
+可先将脚本复制或者软连接到<span class="sr">/etc/</span>init.<span class="k">d</span>/目录下，
+修改文件权限为<span class="m">755</span>
+然后用：
+$ <span class="k">cd</span> <span class="sr">/etc/</span>init.<span class="k">d</span>
+$ sudo <span class="k">update</span><span class="p">-</span>rc.<span class="k">d</span> test defaults NN命令<span class="p">(</span>NN为启动顺序<span class="p">)</span>，
+将脚本添加到初始化执行的队列中去。
+注意如果脚本需要用到网络，则NN需设置一个比较大的数字，如<span class="m">99</span>。
+
+卸载命令为：$ sudo <span class="k">update</span><span class="p">-</span>rc.<span class="k">d</span> <span class="p">-</span><span class="k">f</span> test remove
+</pre></div>

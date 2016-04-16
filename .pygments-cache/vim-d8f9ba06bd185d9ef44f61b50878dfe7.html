@@ -1,0 +1,10 @@
+<div class="highlight"><pre>$ tar xvzf arm<span class="p">-</span>linux<span class="p">-</span>gcc<span class="m">-4</span>.<span class="m">3</span>.<span class="m">2</span>.tgz <span class="p">-</span>C /
+<span class="sr">//</span>解压后在<span class="sr">/usr/</span>local/下
+
+$ <span class="k">cp</span> <span class="p">-</span><span class="k">r</span> arm <span class="sr">/usr/</span>local/
+<span class="sr">//</span>现在交叉编译程序集都在<span class="sr">/usr/</span>local<span class="sr">/arm/</span><span class="m">4</span>.<span class="m">3</span>.<span class="m">2</span>/<span class="nb">bin</span>下了
+
+<span class="sr">//</span>修改<span class="k">i</span><span class="sr">/ect/</span>profile<span class="p">,</span>增加环境变量
+export PATH<span class="p">=</span><span class="s2">&quot;$PATH:/usr/local/arm/4.3.2/bin&quot;</span>
+$source <span class="sr">/etc/</span>profile
+</pre></div>

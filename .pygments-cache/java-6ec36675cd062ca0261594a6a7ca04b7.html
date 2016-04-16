@@ -1,0 +1,23 @@
+<div class="highlight"><pre><span class="n">WindowManager</span> <span class="n">windowManager</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="kd">private</span> <span class="n">TextView</span> <span class="n">view</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span>
+
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">showToast</span><span class="o">(</span><span class="n">String</span> <span class="n">text</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">windowManager</span> <span class="o">=</span>  <span class="o">(</span><span class="n">WindowManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">WINDOW_SERVICE</span><span class="o">);</span>
+	<span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span> <span class="n">params</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">();</span>
+	<span class="n">params</span><span class="o">.</span><span class="na">height</span> <span class="o">=</span> <span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">.</span><span class="na">WRAP_CONTENT</span><span class="o">;</span>
+	<span class="n">params</span><span class="o">.</span><span class="na">width</span> <span class="o">=</span> <span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">.</span><span class="na">WRAP_CONTENT</span><span class="o">;</span>
+	<span class="n">params</span><span class="o">.</span><span class="na">flags</span> <span class="o">=</span> <span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">.</span><span class="na">FLAG_NOT_FOCUSABLE</span>
+    <span class="o">|</span><span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">.</span><span class="na">FLAG_NOT_TOUCHABLE</span>
+    <span class="o">|</span><span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">.</span><span class="na">FLAG_KEEP_SCREEN_ON</span><span class="o">;</span>
+	<span class="n">params</span><span class="o">.</span><span class="na">format</span> <span class="o">=</span> <span class="n">PixelFormat</span><span class="o">.</span><span class="na">TRANSLUCENT</span><span class="o">;</span>
+	<span class="n">params</span><span class="o">.</span><span class="na">type</span> <span class="o">=</span> <span class="n">WindowManager</span><span class="o">.</span><span class="na">LayoutParams</span><span class="o">.</span><span class="na">TYPE_TOAST</span><span class="o">;</span>
+	<span class="n">params</span><span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="s">&quot;Toast&quot;</span><span class="o">);</span>
+	<span class="n">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">TextView</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+	<span class="n">view</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">text</span><span class="o">);</span>
+	<span class="n">view</span><span class="o">.</span><span class="na">setTextColor</span><span class="o">(</span><span class="n">Color</span><span class="o">.</span><span class="na">RED</span><span class="o">);</span>
+	<span class="n">windowManager</span><span class="o">.</span><span class="na">addView</span><span class="o">(</span><span class="n">view</span><span class="o">,</span> <span class="n">params</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">removeToast</span><span class="o">()</span> <span class="o">{</span>
+	<span class="n">windowManager</span><span class="o">.</span><span class="na">removeView</span><span class="o">(</span><span class="n">view</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>

@@ -1,0 +1,43 @@
+---
+layout: post
+title: "关于cin的注意事项"
+date: 2015-12-10 17:39:42 +7452
+comments: true
+categories: C-CPP
+keywords: C,CPP,cin,博客,AnnPeter's Blog
+description: "关于cin的注意事项"
+
+---
+
+##关于回车的获取
+```c
+int i;
+char ch;
+cin >> i;
+cin >> ch; //这里的ch并不能捕获到上次输入留下来的回车
+//可以通过cin.get()获取这个回车
+ch = cin.get();
+
+```
+
+<!-- more -->
+
+##清空stdin缓冲区
+####C版
+```c
+#include <stdio.h> 
+
+int c = 0;
+while ( (c = getchar()) != '\n' && c != EOF ) ;
+```
+
+####C++版
+```cpp
+#include<limits>
+
+cin.clear();
+// numeric_limits<streamsize>::max() 返回输入缓冲的大小。
+// ignore 函数在此将把输入流中的数据清空。
+// 这两个函数的具体用法请读者自行查询。
+cin.ignore( numeric_limits<streamsize>::max(), '\n' );
+```

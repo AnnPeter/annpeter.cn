@@ -1,0 +1,9 @@
+<div class="highlight"><pre>接下来编译程序:
+$ gcc <span class="p">-</span><span class="k">o</span> dnw dnw.<span class="k">c</span>
+
+使用fdisk查看U盘的位置
+$ sudo fdisk <span class="p">-</span><span class="k">l</span>	#一般为<span class="sr">/dev/</span>sd*<span class="p">(</span>我的U盘在<span class="sr">/dev/</span>sdd下<span class="p">)</span>
+
+使用dnw工具，将boot拷贝到U盘中
+$ sudo .<span class="sr">/dnw boot /</span>dev/sdd
+</pre></div>

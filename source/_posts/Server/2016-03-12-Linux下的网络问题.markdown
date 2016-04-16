@@ -1,0 +1,23 @@
+---
+layout: post
+title: "NAT网络问题"
+date: 2016-03-12 12:10:15 +5325
+comments: true
+categories: Server
+keywords: Server,NAT,CentOS,Linux,博客,AnnPeter's Blog
+description: "NAT网络问题"
+
+---
+
+
+最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。
+>$ route add default gw 10.0.2.2 dev eth0
+
+<!-- more -->
+最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。
+>$ route add default gw 10.0.2.2 dev eth0
+
+
+
+顺便说句，关闭NetworkManager后，网卡开机总是不能自启，设置ONBOOT=yes也不行，这时候发大招了。
+>$ chkconfig network on

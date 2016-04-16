@@ -1,0 +1,452 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini2440--裸机--part02--点亮LED - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="mini2440--裸机--part01--点亮LED">
+	<meta name="keywords" content="ARM,mini2440,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">mini2440--裸机--part02--点亮LED</h2>
+		<div class="entry-content">
+			<p>在前面<a href="/blog/2016/01/15/mini2440--%E8%A3%B8%E6%9C%BA--part01--%E6%A0%B8%E5%BF%83%E5%88%9D%E5%A7%8B%E5%8C%96/index.html">mini2440&ndash;裸机&ndash;part01&ndash;核心初始化</a>部分，我们初始化了几个重要的核心部件，那现在我们要查看程序是否大致能正常运行怎么办，我们需要通过与外部的交互来看。所以本次，我们将要点亮LED等来初步判断我们初始化是否成功。</p>
+
+<!-- more -->
+
+
+<ol>
+<li><p>首先我们来查看核心板原理图，搜索<strong>LED</strong>关键字，我们看到LED的原理图，我们只需要将nLED_1~nLED_4配置为低电平，即可点亮LED。</p>
+
+<p> <img src="/upload/2016/JAN/29/imgs/1454052312.png" alt="LED原理图" /></p></li>
+<li><p>搜索关键字<strong>ｎLED_</strong>，找到nLED_1~nLED_4连在cpu的什么位置，通过查看核心板原理图，可以发现，nLED1~nLED４对应GPIO口的GPB5~GPB8。</p></li>
+</ol>
+
+
+<p><img src="/upload/2016/JAN/29/imgs/1454052717.png" alt="LED对应GPIO位置" /></p>
+
+<p>　　GPIO(General-Purpose Input/Output Ports):通用输入/输出端口。在嵌入式系统中，ＣＰＵ经常需要控制许多结构简单的外部设置或者电路，这些设备通常只要求两种状态(开/关)，对于这些设备的控制，使用传统的串口或者USB口就显得复杂了，所以，在嵌入式微处理器上通常提供了一种"通用可编程I/)端口",也就是GPIO。GPIO一般来说有两部分寄存器组成，一部分是控制寄存器，通常用于控制端口状态是输入还是输出；另一部分是数据寄存器，当端口配置为输入端口时，相应位为引脚状态,当端口配置为输出端口时，引脚状态将与相应位相同。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>@*************************************************************************
+</span><span class='line'>@    <span class="p">&gt;</span> File Name: <span class="k">start</span>.<span class="k">s</span>
+</span><span class='line'>@    <span class="p">&gt;</span> Author: AnnPeter
+</span><span class='line'>@    <span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span>
+</span><span class='line'>@    <span class="p">&gt;</span> Created Time: Thu <span class="m">28</span> Jan <span class="m">2016</span> <span class="m">08</span>:<span class="m">07</span>:<span class="m">42</span> PM CST
+</span><span class='line'>@ ************************************************************************
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>.text
+</span><span class='line'>.global _start
+</span><span class='line'>                          @查看ARM芯片手册我们可以看到
+</span><span class='line'>                          @从地址<span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0000</span>开始是ARM的异常处理程序
+</span><span class='line'>_start:                       @依次是：
+</span><span class='line'>  <span class="k">b</span> reset                          @Rest<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0000</span><span class="p">)</span>
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span>   _undefined_instruction  @Undefined instructions<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0004</span><span class="p">)</span>
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span> _software_interrupt       @Software interrupt<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0008</span><span class="p">)</span>
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span> _prefetch_abort           @Prefetch Abort<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">000</span>C<span class="p">)</span>
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span> _data_abort               @Data Abort<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0010</span><span class="p">)</span>
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span> _not_used             @保留，没有用
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span> _irq                  @IRQ<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">0018</span><span class="p">)</span>
+</span><span class='line'>  ldr <span class="k">pc</span><span class="p">,</span> _fiq                  @FIQ<span class="p">(</span><span class="m">0</span>x<span class="m">0000</span><span class="p">,</span><span class="m">001</span>C<span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>_undefined_instruction:   .word undefined_instruction
+</span><span class='line'>_software_interrupt:  .word software_interrupt
+</span><span class='line'>_prefetch_abort:      .word prefetch_abort
+</span><span class='line'>_data_abort:          .word data_abort
+</span><span class='line'>_not_used:                .word not_used
+</span><span class='line'>_irq:                 .word irq
+</span><span class='line'>_fiq:                 .word fiq
+</span><span class='line'>
+</span><span class='line'>undefined_instruction:
+</span><span class='line'>  nop
+</span><span class='line'>software_interrupt:
+</span><span class='line'>  nop
+</span><span class='line'>prefetch_abort:
+</span><span class='line'>  nop
+</span><span class='line'>data_abort:
+</span><span class='line'>  nop
+</span><span class='line'>not_used:
+</span><span class='line'>  nop
+</span><span class='line'>irq:
+</span><span class='line'>  nop
+</span><span class='line'>fiq:
+</span><span class='line'>  nop
+</span><span class='line'>reset:
+</span><span class='line'>  <span class="k">bl</span> set_svc   @设置cpu工作模式，arm处理器共支持<span class="m">7</span>种工作模式，在svc模式下
+</span><span class='line'>              @cpu具有更多权限，能访问更多硬件资源
+</span><span class='line'>              @设置svc模式，只要将cpsr后<span class="m">5</span>位设置位<span class="m">10011</span><span class="p">(</span>即<span class="m">0</span>x<span class="m">13</span><span class="p">)</span>
+</span><span class='line'>              @但在此，我们将后<span class="m">8</span>位设置为<span class="m">1101</span><span class="p">,</span><span class="m">0011</span><span class="p">(</span>即<span class="m">0</span>xD<span class="m">3</span><span class="p">)</span>，高两位用于屏蔽
+</span><span class='line'>              @中断<span class="p">(</span>irq<span class="p">,</span>fiq<span class="p">)</span>
+</span><span class='line'>  <span class="k">bl</span> disable_watchdog
+</span><span class='line'>  <span class="k">bl</span> disable_interrupt
+</span><span class='line'>  <span class="k">bl</span> disable_mmu
+</span><span class='line'>  <span class="k">bl</span> light_led
+</span><span class='line'>
+</span><span class='line'>set_svc:
+</span><span class='line'>  mrs r0<span class="p">,</span> cpsr     @将cpsr加载至r0中，cpsr不能直接操作
+</span><span class='line'>  bic r0<span class="p">,</span> r0<span class="p">,</span> #<span class="m">0</span>x<span class="m">1</span>F   @将r0低<span class="m">5</span>位置<span class="m">0</span>
+</span><span class='line'>  orr r0<span class="p">,</span> r0<span class="p">,</span>   #<span class="m">0</span>xD<span class="m">3</span> @设置位svc所需要的<span class="m">0</span>xD<span class="m">3</span>
+</span><span class='line'>  msr cpsr<span class="p">,</span> r0
+</span><span class='line'>  mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span> @<span class="k">bl</span>在执行时会将下一条指令的地址保存在<span class="k">lr</span>寄存器中
+</span><span class='line'>              @这里就相当于<span class="k">ret</span>，只不过现在还没有堆栈而已
+</span><span class='line'>
+</span><span class='line'>#<span class="nb">define</span> pWTCHON <span class="m">0</span>x<span class="m">53000000</span>
+</span><span class='line'>disable_watchdog:
+</span><span class='line'>  ldr r0<span class="p">,</span> <span class="p">=</span>pWTCHON  @这里不使用mov的原因是装载的数据超过了<span class="m">8</span>位
+</span><span class='line'>  mov r1<span class="p">,</span> #<span class="m">0</span>x<span class="m">0</span>       @mov使用<span class="m">12</span>bit表示立即数<span class="p">,</span>其中<span class="m">4</span>bit表示移位的位数<span class="p">(</span>循环
+</span><span class='line'>  str r1<span class="p">,</span> [r0]     @右移<span class="p">,</span>且数值*<span class="m">2</span><span class="p">),</span><span class="m">8</span>bit用来表示移位的基数，所以mov指令
+</span><span class='line'>  mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>         @后面这个立即数必须能由一个<span class="m">8</span>位二进制数经过偶数次右
+</span><span class='line'>                      @移后得到的合法数据
+</span><span class='line'>#<span class="nb">define</span> pINTMASK <span class="m">0</span>x<span class="m">4</span>A<span class="m">000008</span>
+</span><span class='line'>disable_interrupt:
+</span><span class='line'>  mvn r1<span class="p">,</span> #<span class="m">0</span>x<span class="m">0</span> @mvn将第二个操作数取反，写入第一个操作数中
+</span><span class='line'>  ldr r0<span class="p">,</span> <span class="p">=</span>pINTMASK
+</span><span class='line'>  str r1<span class="p">,</span> [r0]
+</span><span class='line'>  mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>
+</span><span class='line'>
+</span><span class='line'>disable_mmu:
+</span><span class='line'>  mcr p15<span class="p">,</span> <span class="m">0</span><span class="p">,</span> r0<span class="p">,</span> c7<span class="p">,</span> c7<span class="p">,</span> <span class="m">0</span>  @invalidate ICache and DCache
+</span><span class='line'>  mrc p15<span class="p">,</span> <span class="m">0</span><span class="p">,</span> r0<span class="p">,</span> c1<span class="p">,</span> c0<span class="p">,</span> <span class="m">0</span>
+</span><span class='line'>  bic r0<span class="p">,</span> r0<span class="p">,</span> #<span class="m">0</span>x<span class="m">00000007</span>
+</span><span class='line'>  mcr p15<span class="p">,</span> <span class="m">0</span><span class="p">,</span> r0<span class="p">,</span> c1<span class="p">,</span> c0<span class="p">,</span> <span class="m">0</span>  @关闭DCache、MMU<span class="p">,</span>ICache关不关无所谓
+</span><span class='line'>  mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>
+</span><span class='line'>
+</span><span class='line'>#<span class="nb">define</span> pGPBCON <span class="m">0</span>x<span class="m">56000010</span>
+</span><span class='line'>#<span class="nb">define</span> pGPBDAT <span class="m">0</span>x<span class="m">56000014</span>
+</span><span class='line'>light_led:
+</span><span class='line'>  ldr r0<span class="p">,</span> <span class="p">=</span>pGPBCON
+</span><span class='line'>  ldr r1<span class="p">,</span> <span class="p">=</span><span class="m">0</span>x<span class="m">00015400</span>
+</span><span class='line'>  str r1<span class="p">,</span> [r0]
+</span><span class='line'>
+</span><span class='line'>  ldr r0<span class="p">,</span> <span class="p">=</span>pGPBDAT
+</span><span class='line'>  ldr r1<span class="p">,</span> <span class="p">=</span><span class="m">0</span>x<span class="m">0</span>
+</span><span class='line'>  str r1<span class="p">,</span> [r0]
+</span><span class='line'>  mov <span class="k">pc</span><span class="p">,</span> <span class="k">lr</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/01/17/mini2440--%E8%A3%B8%E6%9C%BA--part02--%E7%82%B9%E4%BA%AELED/mini2440--裸机--part02--点亮LED" data-title="mini2440--裸机--part02--点亮LED" data-url="http://www.annpeter.cn/blog/2016/01/17/mini2440--%E8%A3%B8%E6%9C%BA--part02--%E7%82%B9%E4%BA%AELED/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Jan 17th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

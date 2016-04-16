@@ -1,0 +1,31 @@
+<div class="highlight"><pre><span class="n">ImageView</span> <span class="n">iv</span> <span class="o">=</span> <span class="o">(</span><span class="n">ImageView</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">iv</span><span class="o">);</span>
+<span class="n">Options</span> <span class="n">op</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Options</span><span class="o">();</span>
+<span class="c1">//设置先不加载像素内容，只加载边界信息，以获取图片大小</span>
+<span class="n">op</span><span class="o">.</span><span class="na">inJustDecodeBounds</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+<span class="n">Bitmap</span> <span class="n">bm</span> <span class="o">=</span> <span class="n">BitmapFactory</span><span class="o">.</span><span class="na">decodeFile</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStorageDirectory</span><span class="o">()+</span><span class="s">&quot;/a.jpg&quot;</span><span class="o">,</span> <span class="n">op</span><span class="o">);</span>
+
+<span class="c1">//获取图片大小和屏幕大小，计算缩放比例</span>
+<span class="kt">int</span> <span class="n">imgW</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="na">outWidth</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">imgH</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="na">outHeight</span><span class="o">;</span>
+
+<span class="n">Display</span> <span class="n">display</span> <span class="o">=</span> <span class="n">getWindowManager</span><span class="o">().</span><span class="na">getDefaultDisplay</span><span class="o">();</span>
+<span class="kt">int</span> <span class="n">sW</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="na">getWidth</span><span class="o">();</span>
+<span class="kt">int</span> <span class="n">sH</span> <span class="o">=</span> <span class="n">display</span><span class="o">.</span><span class="na">getHeight</span><span class="o">();</span>
+
+<span class="kt">int</span> <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">scaleW</span> <span class="o">=</span> <span class="n">imgW</span> <span class="o">/</span> <span class="n">sW</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">scaleH</span> <span class="o">=</span> <span class="n">imgH</span> <span class="o">/</span> <span class="n">sH</span><span class="o">;</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">scaleW</span> <span class="o">&gt;=</span> <span class="n">scaleH</span> <span class="o">&amp;&amp;</span> <span class="n">scaleW</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">){</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">scaleW</span><span class="o">;</span>
+<span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">scaleW</span> <span class="o">&lt;</span> <span class="n">scaleH</span> <span class="o">&amp;&amp;</span> <span class="n">scaleW</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">){</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">scaleH</span><span class="o">;</span>
+<span class="o">}</span>
+
+
+<span class="n">op</span><span class="o">.</span><span class="na">inSampleSize</span> <span class="o">=</span> <span class="n">scale</span><span class="o">;</span>
+<span class="c1">//设置回加载像素模式，否则bm为null</span>
+<span class="n">op</span><span class="o">.</span><span class="na">inJustDecodeBounds</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+<span class="n">bm</span> <span class="o">=</span> <span class="n">BitmapFactory</span><span class="o">.</span><span class="na">decodeFile</span><span class="o">(</span><span class="n">Environment</span><span class="o">.</span><span class="na">getExternalStorageDirectory</span><span class="o">()+</span><span class="s">&quot;/a.jpg&quot;</span><span class="o">,</span> <span class="n">op</span><span class="o">);</span>
+<span class="n">iv</span><span class="o">.</span><span class="na">setImageBitmap</span><span class="o">(</span><span class="n">bm</span><span class="o">);</span>
+</pre></div>

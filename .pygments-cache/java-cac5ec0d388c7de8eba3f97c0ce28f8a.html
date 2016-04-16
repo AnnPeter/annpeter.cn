@@ -1,0 +1,37 @@
+<div class="highlight"><pre><span class="n">PackageManager</span> <span class="n">packageManager</span> <span class="o">=</span> <span class="n">gerPackageManager</span><span class="o">();</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">PackageInfo</span><span class="o">&gt;</span> <span class="n">installedPackages</span> <span class="o">=</span> <span class="n">packageManager</span><span class="o">.</span><span class="na">getInstalledPackages</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+<span class="k">for</span><span class="o">(</span><span class="n">PackageInfo</span> <span class="nl">packageInfo:</span> <span class="n">installedPackages</span><span class="o">){</span>
+    <span class="n">String</span> <span class="n">sourceDir</span> <span class="o">=</span> <span class="n">packageInfo</span><span class="o">.</span><span class="na">applicationInfo</span><span class="o">.</span><span class="na">sourceDir</span><span class="o">;</span>
+
+    <span class="n">String</span> <span class="n">md5</span> <span class="o">=</span> <span class="n">getFileMd5</span><span class="o">(</span><span class="n">sourceDir</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="n">String</span> <span class="nf">getFileMd5</span><span class="o">(</span><span class="n">String</span> <span class="n">sourceDir</span><span class="o">){</span>
+    <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">sourceDir</span><span class="o">);</span>
+    <span class="n">StringBuffer</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">StringBuffer</span><span class="o">();</span>
+
+    <span class="k">try</span><span class="o">{</span>
+        <span class="n">FileInputStream</span> <span class="n">fis</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FileInputStream</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
+
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">];</span>
+        <span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="c1">//获取到数字摘要</span>
+        <span class="n">MessageDigest</span> <span class="n">messagedigest</span> <span class="o">=</span> <span class="n">MessageDigest</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">&quot;md5&quot;</span><span class="o">);</span>
+        <span class="k">while</span><span class="o">((</span><span class="n">len</span> <span class="o">=</span> <span class="n">fis</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">){</span>
+            <span class="n">messagedigest</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">len</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">digest</span> <span class="o">=</span> <span class="n">messagedigest</span><span class="o">.</span><span class="na">digest</span><span class="o">();</span>
+
+        <span class="k">for</span><span class="o">(</span><span class="kt">byte</span> <span class="n">b</span> <span class="o">:</span> <span class="n">digest</span><span class="o">){</span>
+            <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">b</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="o">;</span><span class="c1">//获取字节的低八位</span>
+            <span class="n">String</span> <span class="n">hexString</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">toHexString</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+
+            <span class="k">if</span><span class="o">(</span><span class="n">hexString</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">){</span>
+                <span class="n">hexString</span> <span class="o">=</span> <span class="s">&quot;0&quot;</span> <span class="o">+</span> <span class="n">hexString</span><span class="o">;</span><span class="c1">//如果是1位的话，补0转为两位</span>
+            <span class="o">}</span>
+            <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">hexString</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">sb</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>

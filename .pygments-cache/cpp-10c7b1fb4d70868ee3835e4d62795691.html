@@ -1,0 +1,9 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">cdev</span><span class="p">{</span>
+	<span class="k">struct</span> <span class="n">kobject</span> <span class="n">kobj</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">module</span><span class="o">*</span> <span class="n">owner</span><span class="p">;</span>
+    <span class="k">const</span> <span class="k">struct</span> <span class="n">file_operation</span><span class="o">*</span> <span class="n">ops</span><span class="p">;</span> <span class="c1">//设备操作集</span>
+    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+    <span class="kt">dev_t</span> <span class="n">dev</span><span class="p">;</span>	<span class="c1">//设备号，dev_t实际上就是u32类型</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">count</span><span class="p">;</span>	<span class="c1">//设备数</span>
+<span class="p">};</span>
+</pre></div>

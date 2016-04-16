@@ -1,0 +1,67 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LocationService</span> <span class="kd">extends</span> <span class="n">Service</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">CODE_LOCATION</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">LocationManager</span> <span class="n">locationManager</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">LocationListener</span> <span class="n">locationListener</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">IBinder</span> <span class="nf">onBind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+
+        <span class="n">locationManager</span> <span class="o">=</span> <span class="o">(</span><span class="n">LocationManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">LOCATION_SERVICE</span><span class="o">);</span>
+
+        <span class="n">Criteria</span> <span class="n">criteria</span> <span class="o">=</span>  <span class="k">new</span> <span class="nf">Criteria</span><span class="o">();</span>
+        <span class="n">criteria</span><span class="o">.</span><span class="na">setCostAllowed</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span><span class="c1">//设置是否付费，比如使用3g网络</span>
+        <span class="n">criteria</span><span class="o">.</span><span class="na">setAccuracy</span><span class="o">(</span><span class="n">Criteria</span><span class="o">.</span><span class="na">ACCURACY_FINE</span><span class="o">);</span><span class="c1">//设置精确度</span>
+        <span class="n">String</span> <span class="n">bestService</span> <span class="o">=</span> <span class="n">locationManager</span><span class="o">.</span><span class="na">getBestProvider</span><span class="o">(</span><span class="n">criteria</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+
+        <span class="n">locationListener</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">LocationListener</span><span class="o">()</span> <span class="o">{</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onStatusChanged</span><span class="o">(</span><span class="n">String</span> <span class="n">provider</span><span class="o">,</span> <span class="kt">int</span> <span class="n">status</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">extras</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onProviderEnabled</span><span class="o">(</span><span class="n">String</span> <span class="n">provider</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onProviderDisabled</span><span class="o">(</span><span class="n">String</span> <span class="n">provider</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onLocationChanged</span><span class="o">(</span><span class="n">Location</span> <span class="n">location</span><span class="o">)</span> <span class="o">{</span>
+                <span class="kt">double</span> <span class="n">longitude</span> <span class="o">=</span> <span class="n">location</span><span class="o">.</span><span class="na">getLongitude</span><span class="o">();</span>
+                <span class="kt">double</span> <span class="n">latitude</span> <span class="o">=</span> <span class="n">location</span><span class="o">.</span><span class="na">getLatitude</span><span class="o">();</span>
+
+                <span class="n">Bundle</span> <span class="n">bundle</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Bundle</span><span class="o">();</span>
+                <span class="n">bundle</span><span class="o">.</span><span class="na">putDouble</span><span class="o">(</span><span class="s">&quot;longtitude&quot;</span><span class="o">,</span> <span class="n">longitude</span><span class="o">);</span>
+                <span class="n">bundle</span><span class="o">.</span><span class="na">putDouble</span><span class="o">(</span><span class="s">&quot;lativude&quot;</span><span class="o">,</span> <span class="n">latitude</span><span class="o">);</span>
+
+                <span class="n">Message</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">Message</span><span class="o">.</span><span class="na">obtain</span><span class="o">();</span>
+                <span class="n">msg</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">bundle</span><span class="o">);</span>
+                <span class="n">msg</span><span class="o">.</span><span class="na">what</span> <span class="o">=</span> <span class="n">CODE_LOCATION</span><span class="o">;</span>
+                <span class="n">SMSReceiver</span><span class="o">.</span><span class="na">handler</span><span class="o">.</span><span class="na">sendMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+
+                <span class="n">stopSelf</span><span class="o">();</span><span class="c1">//停止服务，省电</span>
+            <span class="o">}</span>
+        <span class="o">};</span>
+
+        <span class="n">locationManager</span><span class="o">.</span><span class="na">requestLocationUpdates</span><span class="o">(</span><span class="n">bestService</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">locationListener</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">locationManager</span><span class="o">.</span><span class="na">removeUpdates</span><span class="o">(</span><span class="n">locationListener</span><span class="o">);</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onDestroy</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

@@ -1,0 +1,8 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">map_desc</span><span class="p">{</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="k">virtual</span><span class="p">;</span> <span class="c1">//映射后的虚拟地址</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">pfn</span><span class="p">;</span>	<span class="c1">//物理地址所在的页帧号</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span>	<span class="c1">//映射长度</span>
+<span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">type</span><span class="p">;</span>	<span class="c1">//映射的设备类型</span>
+<span class="p">};</span>
+<span class="c1">//pfn:在驱动程序中，利用__phys_to_pfn(物理地址)可以计算出物理地址所在的物理页帧号</span>
+</pre></div>

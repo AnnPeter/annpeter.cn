@@ -1,0 +1,8 @@
+<div class="highlight"><pre><span class="nv">obj-m</span> <span class="o">:=</span> led_module.o
+<span class="nv">MDIR</span>  <span class="o">:=</span> /home/annpeter/Desktop/linux-mini2440/
+<span class="nf">all</span><span class="o">:</span>
+	make -C <span class="k">$(</span>MDIR<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-
+
+<span class="nf">clean</span><span class="o">:</span>
+	rm -rf *.o *.order *.symvers
+</pre></div>

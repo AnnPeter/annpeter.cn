@@ -1,0 +1,73 @@
+---
+layout: post
+title: "mini2440--part04--Linux系统调用"
+date: 2016-01-24 21:06:35 +4450
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,Linux系统调用,博客,AnnPeter's Blog
+description: "mini2440--part04--Linux系统调用"
+zTree: true
+
+---
+
+一般进程是不能访问内核的。它不能访问内核所占内存空间也不能调用内核函数。CPU硬件决定了这些（这就是为什么它被称作"保护模式"）。为了和用户空间上运行的进程进行交互，内核提供了一组接口。透过该接口，应用程序可以访问硬件设备和其他操作系统资源。在Linux中，系统调用是用户空间访问内核的惟一手段；除异常和中断外，它们是内核惟一的合法入口。
+
+<!-- more -->
+
+####系统调用的实现
+应用程序通知内核的机制是靠软中断实现的。首先，用户程序为系统设置调用参数，其中一个参数是系统调用编号。参数设置完成后，程序执行“系统调用”指令。x86系统上的软中断由int产生。这个指令会导致一个异常：产生一个事件，这个事件会致使处理器切换到内核态并跳转到一个新的地址，并开始执行那里的异常处理程序。此时的异常处理程序实际上就是系统调用处理程序。它与硬件体系结构紧密相关。
+
+新地址的指令会保存程序的状态，计算出应该调用哪个系统调用，调用内核中实现那个系统调用的函数，恢复用户程序状态，然后将控制权返还给用户程序
+
+在entry-common.S中，应用程序将系统调用号设置至r7寄存器,然后内核根据事先设置好的calls.S中的sys_call_table找到对应系统调用(调用表的基地址由__NR_SYSCALL_BASE给出，可在Unistd.h中看到基地址和每个系统调用所对应的地址)。实现一个自己的系统调用，C函数的接口可放在printk.c中。
+
+##添加一个自己的系统调用函数
+(1) 在kernel/printk.c中编写c调用接口
+```vim
+void ap_printk()
+{
+	printl("this is a new sys call!\n");
+}
+```
+
+(2) 在arch/arm/kernel/calls.S中调用该C函数，写在最后，记住相应的系统调用号
+```vim
+CALL(ap_printk)
+```
+
+(3) 在arch/arm/include/asm/unistd.h中在系统调用表中指定位置，偏移量为对应中断号
+```vim
+#define __NR_ap_printk	(_NR_SYSCALL_BASE+365)
+```
+
+(4) 编写C语言测试程序
+
+```vim
+/*************************************************************************
+	> File Name: test.c
+	> Author: AnnPeter
+	> Mail: 864587669@qq.com
+	> Created Time: Tue 02 Feb 2016 05:04:40 PM CST
+ ************************************************************************/
+
+void ap_pk()
+{
+	__asm__(
+	"ldr r7, =365 \n"
+	"swi \n"
+	:
+	:
+	:"memory");
+}
+
+void main()
+{
+	ap_pk();
+}
+```
+
+(5) 编译C函数，拷贝值arm中运行
+
+```vim
+$ arm-linux-gcc -static test.c -o test
+```

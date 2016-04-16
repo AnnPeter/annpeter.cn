@@ -1,0 +1,132 @@
+---
+layout: post
+title: "Linux常用命令"
+date: 2015-11-12 22:14:11 +1151
+comments: true
+categories: Server
+keywords: Server,Linux命令,博客,AnnPeter's Blog
+description: "Linux常用命令"
+
+---
+
+
+##软、硬链接
+* 软链接(soft link)：A是B的软链接（A和B都是文件名），A的目录项中的inode节点号与B的目录项中的inode节点号不相同，A和B指向的是两个不同的inode，继而指向两块不同的数据块。但是A的数据块中存放的只是B的路径名（可以根据这个找到B的目录项）。A和B之间是“主从”关系，如果B被删除了，A仍然存在（因为两个是不同的文件），但指向的是一个无效的链接。
+ * 软链接可以 跨文件系统 ，硬链接不可以
+ * 软链接可以对一个不存在的文件名进行链接
+ * 软链接可以对目录进行链接
+<!-- more -->
+* 硬链接(hard link)：A是B的硬链接（A和B都是文件名），则A的目录项中的inode节点号与B的目录项中的inode节点号相同，即一个inode节点对应两个不同的文件名，两个文件名指向同一个文件，A和B对文件系统来说是完全平等的。如果删除了其中一个，对另外一个没有影响。每增加一个文件名，inode节点上的链接数增加一，每删除一个对应的文件名，inode节点上的链接数减一，直到为0，inode节点和对应的数据块被回收。注：文件和文件名是不同的东西，rm A删除的只是A这个文件名，而A对应的数据块（文件）只有在inode节点链接数减少为0的时候才会被系统回收。
+ * 硬链接只有在同一个文件系统中才能创建。
+ * 不允许给目录创建硬链接。
+
+>硬：ln 源文件 链接名<br>
+>软：ln -s 源文件 链接名<br>
+
+---
+
+##scp远程文件拷贝
+>1. 拷贝远程主机文件至本机<br>
+>$ scp -r root@www.itpeter.cn:/www  ~/Desktop<br>
+>2. 拷贝本机文件至远程主机<br>
+>$ scp -r ~/Desktop root@www.itpeter.cn:/www<br>
+
+
+##MySql操作
+
+####创建用户
+> mysql\> CREATE USER 'peter'@'%' IDENTIFIED BY 'peter';<br>
+> mysql\> GRANT ALL ON *microengine*.* TO 'peter'@'%';<br>
+
+####修改密码
+>方法一:<br>
+>(适用于管理员或者有全局权限的用户重设其它用户的密码)<br>
+>进入命令行模式<br>
+>$ mysql -u root -p<br>
+><br>
+>mysql>use mysql;<br>
+>mysql> UPDATE user SET password=PASSWORD("new password") WHERE user='username';<br>
+>mysql> FLUSH PRIVILEGES;<br>
+>mysql> quit;<br>
+><br>
+>方法二:<br>
+>$ mysql -u root -p<br>
+>mysql>use mysql;<br>
+>mysql> SET PASSWORD FOR   username=PASSWORD('new password');<br>
+>mysql> QUIT<br>
+><br>
+>方法三:<br>
+>$ mysqladmin -u root "old password" "new password"<br>
+
+####允许root远程登录
+>mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;<br>
+>mysql> FLUSH PRIVILEGES;<br>
+>修改/etc/mysql/my.cnf  将bind-address=127.0.0.1注释掉<br>
+
+##htpasswd使用，用于生成密码文件
+>$ htpasswd -c dev_htpasswd AnnPeter  	新建dev_htpasswd，并添加用户<br>
+>$ htpasswd dev_htpasswd Peter			添加用户<br>
+
+##查看端口占用情况
+>$ netstat -lpnt
+
+##可视化路由
+>$ traceroute www.itpeter.cn
+
+##后台运行软件
+在命令后面加上 **&** 即可
+
+##命令行访问web服务器
+>$ curl http://www.baidu.com
+
+##Ubuntu添加开机自启
+>如果要添加为开机启动执行的脚本文件，<br>
+>可先将脚本复制或者软连接到/etc/init.d/目录下，<br>
+>修改文件权限为755<br>
+>然后用：<br>
+>$ cd /etc/init.d<br>
+>$ sudo update-rc.d test defaults NN命令(NN为启动顺序)，<br>
+>将脚本添加到初始化执行的队列中去。<br>
+>注意如果脚本需要用到网络，则NN需设置一个比较大的数字，如99。<br>
+><br>
+>卸载命令为：<br>
+>$ sudo update-rc.d -f test remove<br>
+
+##Nginx在安装完成后，需要添加新模块时
+>$ nginx -V //查看一起的编译选项<br>
+>$ 然后联合要添加的模块和以前的模块一起config<br>
+>$ 然后make（不要make install，会覆盖）<br>
+>$ 备份以前的nginx可执行文件<br>
+>$ 将编译好的nginx拷贝过去<br>
+
+##压缩解压
+>###tar命令<br>
+>* 打包tar.gz<br>
+>$ tar zcvf XX.tar.gz  XX<br>
+>* 查看包内内容<br>
+>$ tar tvf XX.tar.gz<br>
+>
+><br>
+>###rar解压<br>
+>$ rar e XX.rar<br>
+
+
+##ftp连接
+>$ ftp ip or 域名
+>$ Name:
+>$ Password:
+
+##find
+>$ find . -name "*.xml" |xargs grep "hello world" 递归查找所有文件内容中包含hello world的xml文件
+
+##stat
+>$ stat example.txt //查看文件Inode信息
+
+##用户管理
+>\#添加用户<br>
+>\#-m 添加用户目录<br>
+>\#-s 指定bash脚本<br>
+>useradd -m -s /bin/bash annpeter<br>
+><br>
+>\#添加用户到组www-data，-a表示append<br>
+>$ usermod -a -G www-data annpeter<br>

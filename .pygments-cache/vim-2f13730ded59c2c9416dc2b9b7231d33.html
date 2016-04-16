@@ -1,0 +1,118 @@
+<div class="highlight"><pre>user  www<span class="p">-</span>data;
+worker_processes  <span class="m">2</span>;
+
+error_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>error.log;
+error_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>error.log  notice;
+error_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>error.log  info;
+
+pid        <span class="sr">/var/</span>log<span class="sr">/nginx/</span>nginx.pid;
+
+events {
+    worker_connections  <span class="m">1024</span>;
+}
+
+
+http {
+    <span class="nb">include</span>       mime.types;
+    default_type  application/octet<span class="p">-</span>stream;
+
+    charset utf<span class="m">-8</span>;
+
+    log_format  <span class="k">main</span>  <span class="s1">&#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span>
+                      <span class="s1">&#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span>
+                      <span class="s1">&#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;</span>;
+
+    access_log  <span class="sr">/var/</span>log<span class="sr">/nginx/</span>access.log  <span class="k">main</span>;
+
+    sendfile        <span class="k">on</span>;
+
+    keepalive_timeout  <span class="m">65</span>;
+
+    client_max_body_size <span class="m">5</span>m;
+
+    gzip <span class="k">on</span>; #开启gzip压缩输出
+    gzip_min_length <span class="m">1</span>k; #最小压缩文件大小
+    gzip_buffers <span class="m">4</span> <span class="m">16</span>k; #压缩缓冲区
+    gzip_http_version <span class="m">1</span>.<span class="m">0</span>; #压缩版本（默认<span class="m">1</span>.<span class="m">1</span>，前端如果是squid2.<span class="m">5</span>请使用<span class="m">1</span>.<span class="m">0</span>）
+    gzip_comp_level <span class="m">2</span>; #压缩等级
+    gzip_types text<span class="sr">/plain application/</span><span class="k">x</span><span class="p">-</span>javascript text<span class="sr">/css application/</span>xml;
+    #压缩类型，默认就已经包含textml，所以下面就不用再写了，写上去也不会有问题，但是会有一个<span class="nb">warn</span>。
+    gzip_vary <span class="k">on</span>;
+
+    server {
+        listen		<span class="m">80</span>;
+        server_name dev.itpeter.<span class="k">cn</span>;
+
+        location / {
+            root /www;
+            autoindex <span class="k">on</span>;
+            autoindex_exact_size off;
+            autoindex_localtime <span class="k">on</span>;
+
+            fancyindex <span class="k">on</span>;
+            fancyindex_header /.header.html;
+            fancyindex_footer /.footer.html;
+
+            auth_basic <span class="s2">&quot;Password&quot;</span>;
+            auth_basic_user_file <span class="sr">/usr/</span>local<span class="sr">/nginx/</span><span class="k">conf</span>/dev_htpasswd;
+        }
+    }
+
+    server {
+        listen <span class="m">81</span>;
+        server_name www.itpeter.<span class="k">cn</span>;
+
+        location ^<span class="p">~</span> /static {
+            root <span class="sr">/www/</span>chwlzzj;
+        }
+
+        location /{
+            <span class="nb">include</span> uwsgi_params;
+            uwsgi_pass <span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">8888</span>;
+        }
+    }
+
+    server {
+        listen       <span class="m">80</span>;
+        server_name  www.itpeter.<span class="k">cn</span>;
+
+        location ^<span class="p">~</span> /static {
+            root <span class="sr">/www/</span>annpeter.<span class="k">cn</span>;
+        }
+
+        location ^<span class="p">~</span> /upload {
+            autoindex <span class="k">on</span>;
+            autoindex_exact_size <span class="k">on</span>;
+            autoindex_localtime <span class="k">on</span>;
+            root <span class="sr">/www/</span>annpeter.<span class="k">cn</span>;
+        }
+
+        location  / {
+            <span class="nb">include</span> uwsgi_params;
+            uwsgi_pass			<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">8800</span>;
+        }
+    }
+
+
+    server {
+        listen       <span class="m">80</span>;
+        server_name  svn.itpeter.<span class="k">cn</span>;
+
+        location ^<span class="p">~</span> /mobilesafe {
+            proxy_pass          http:<span class="sr">//</span>localhost:<span class="m">8000</span>;
+            #proxy_set_header    Host             $host:<span class="m">80</span>;
+            proxy_set_header    <span class="k">X</span><span class="p">-</span>Real<span class="p">-</span>IP        $remote_addr;
+            proxy_set_header    <span class="k">X</span><span class="p">-</span>Forwarded<span class="p">-</span>For  $proxy_add_x_forwarded_for;
+            proxy_set_header    Via              <span class="s2">&quot;nginx&quot;</span>;
+        }
+
+        location ^<span class="p">~</span> /annpeter.<span class="k">cn</span> {
+            proxy_pass          http:<span class="sr">//</span>localhost:<span class="m">9999</span>;
+            proxy_set_header    <span class="k">X</span><span class="p">-</span>Real<span class="p">-</span>IP        $remote_addr;
+            proxy_set_header    <span class="k">X</span><span class="p">-</span>Forwarded<span class="p">-</span>For  $proxy_add_x_forwarded_for;
+            proxy_set_header    Via              <span class="s2">&quot;nginx&quot;</span>;
+        }
+    }
+
+}
+</pre></div>

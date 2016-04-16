@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="c1">//1.在内存中创建一个与原图一样大小的Bitmap对象，创建与原图大小一致的白纸</span>
+<span class="n">Bitmap</span> <span class="n">bitmap</span> <span class="o">=</span> <span class="n">Bitmap</span><span class="o">.</span><span class="na">createBitmap</span><span class="o">(</span><span class="n">bm</span><span class="o">.</span><span class="na">getWidth</span><span class="o">(),</span> <span class="n">bm</span><span class="o">.</span><span class="na">getHeight</span><span class="o">(),</span> <span class="n">bm</span><span class="o">.</span><span class="na">getConfig</span><span class="o">());</span>
+
+<span class="c1">//2.创建画笔对象</span>
+<span class="n">Paint</span> <span class="n">paint</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Paint</span><span class="o">();</span>
+
+<span class="c1">//3.创建画板对象，把白纸铺在画板上</span>
+<span class="n">Canvas</span> <span class="n">canvas</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Canvas</span><span class="o">(</span><span class="n">bitmap</span><span class="o">);</span>
+
+<span class="c1">//4.开始作画，把原图的内容绘制在白纸上</span>
+<span class="n">Matrix</span> <span class="n">mt</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Matrix</span><span class="o">();</span>
+
+<span class="c1">//效果一</span>
+<span class="c1">//以中心点缩放0.5倍</span>
+<span class="c1">//mt.setScale(0.5f, 0.5f, bm.getWidth()/2, bm.getHeight()/2);</span>
+
+<span class="c1">//效果二</span>
+<span class="c1">//镜面效果</span>
+<span class="c1">//mt.setScale(-1, 1);</span>
+<span class="c1">//mt.postTranslate(bm.getWidth(), 0); //由于使用了两个效果，所以第二个使用post</span>
+
+<span class="n">canvas</span><span class="o">.</span><span class="na">drawBitmap</span><span class="o">(</span><span class="n">bm</span><span class="o">,</span> <span class="n">mt</span><span class="o">,</span> <span class="n">paint</span><span class="o">);</span>
+
+<span class="n">iv</span><span class="o">.</span><span class="na">setImageBitmap</span><span class="o">(</span><span class="n">bitmap</span><span class="o">);</span>
+</pre></div>

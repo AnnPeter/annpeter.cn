@@ -1,0 +1,21 @@
+<div class="highlight"><pre>##.9.png  (9-Patch)
+通过黑色边线来描述图片的拉伸情况和文字填充文字的方式
+
+* 上边线表示图片水平拉伸，左边线表示垂直拉伸
+* 右边线表示垂直填充区域，下边线表示水平填充区域
+
+##自定义Button样式
+* 在drawable中新建一个xml文件设置状态选择器，以selector为根节点
+* 然后将选择器设置给button的background样式（只要能被点击的view就可以设置状态选择器）
+
+
+##ImageView背景
+background会根据ImageView组件给定的长宽进行拉伸，而src就存放的是原图的大小，不会进行拉伸。src是图片内容（前景），bg是背景，可以同时使用。
+此外：scaleType只对src起作用；bg可设置透明度，比如在ImageButton中就可以用android:scaleType控制图片的缩放方式
+
+##号码归属地查询
+先将数据库文件放在assets中，然后使用代码将数据库导入到**data/data/项目目录/file中**
+
+##输入框抖动效果
+在anim文件夹中添加shake.xml文件，内容为
+</pre></div>

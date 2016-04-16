@@ -1,0 +1,8 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">timer_list</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">entry</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">expires</span><span class="p">;</span>	<span class="c1">//超时时间</span>
+    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">function</span><span class="p">)(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">);</span>	<span class="c1">//操作函数</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">data</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">tvec_base</span> <span class="o">*</span><span class="n">base</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>

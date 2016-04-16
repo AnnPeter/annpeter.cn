@@ -1,0 +1,82 @@
+<div class="highlight"><pre><span class="cm">/*************************************************************************</span>
+<span class="cm">    &gt; File Name: dnw.c</span>
+<span class="cm">    &gt; Author: AnnPeter</span>
+<span class="cm">    &gt; Mail: 864587669@qq.com</span>
+<span class="cm">    &gt; Created Time: Fri 15 Jan 2016 08:06:03 AM CST</span>
+<span class="cm"> ************************************************************************/</span>
+
+<span class="cp">#include &lt;unistd.h&gt;</span>
+<span class="cp">#include &lt;sys/types.h&gt;</span>
+<span class="cp">#include &lt;sys/stat.h&gt;</span>
+<span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;fcntl.h&gt;</span>
+<span class="cp">#include &lt;stdlib.h&gt;</span>
+
+<span class="kt">void</span> <span class="nf">print_msg</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">msg</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flag</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kt">char</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">//print success info</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\033</span><span class="s">[22;34m%s</span><span class="se">\033</span><span class="s">[0m&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">flag</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">//print error info</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\033</span><span class="s">[22;31m%s</span><span class="se">\033</span><span class="s">[0m&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">puts</span><span class="p">(</span><span class="n">temp</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">ap_perror</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">msg</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">print_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">ap_success</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">msg</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">print_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">ap_perror</span><span class="p">(</span><span class="s">&quot;use like: ./dnw sour_file dest_file&quot;</span><span class="p">);</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="kt">char</span><span class="o">*</span> <span class="n">sour_file</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+	<span class="kt">char</span><span class="o">*</span> <span class="n">dest_file</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+
+	<span class="kt">int</span> <span class="n">dev_desc</span><span class="p">,</span> <span class="n">file_desc</span><span class="p">;</span>
+	<span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">512</span><span class="p">];</span>
+	<span class="n">file_desc</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">sour_file</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">file_desc</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">ap_perror</span><span class="p">(</span><span class="s">&quot;failed to read file boot&quot;</span><span class="p">);</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="n">read</span><span class="p">(</span><span class="n">file_desc</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="mi">510</span><span class="p">);</span>
+	<span class="n">close</span><span class="p">(</span><span class="n">file_desc</span><span class="p">);</span>
+
+	<span class="n">buffer</span><span class="p">[</span><span class="mi">510</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0x55</span><span class="p">;</span>
+	<span class="n">buffer</span><span class="p">[</span><span class="mi">511</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xaa</span><span class="p">;</span>
+
+	<span class="n">dev_desc</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">dest_file</span><span class="p">,</span> <span class="n">O_RDWR</span><span class="o">|</span><span class="n">O_CREAT</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">dev_desc</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="kt">char</span> <span class="n">erro_info</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">erro_info</span><span class="p">,</span> <span class="s">&quot;failed to open device %s, maybe you should use sudo.&quot;</span><span class="p">,</span> <span class="n">dest_file</span><span class="p">);</span>
+		<span class="n">ap_perror</span><span class="p">(</span><span class="n">erro_info</span><span class="p">);</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="n">write</span><span class="p">(</span><span class="n">dev_desc</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="mi">512</span><span class="p">);</span>
+	<span class="n">close</span><span class="p">(</span><span class="n">dev_desc</span><span class="p">);</span>
+	<span class="n">ap_success</span><span class="p">(</span><span class="s">&quot;file write done.&quot;</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

@@ -1,0 +1,42 @@
+<div class="highlight"><pre><span class="cm">/*************************************************************************</span>
+<span class="cm">    &gt; File Name: bus.c</span>
+<span class="cm">    &gt; Author: AnnPeter</span>
+<span class="cm">    &gt; Mail: 864587669@qq.com</span>
+<span class="cm">    &gt; Created Time: Sun 07 Feb 2016 10:11:28 AM CST</span>
+<span class="cm"> ************************************************************************/</span>
+
+
+<span class="cp">#include &lt;linux/init.h&gt;</span>
+<span class="cp">#include &lt;linux/module.h&gt;</span>
+<span class="cp">#include &lt;linux/kernel.h&gt;</span>
+<span class="cp">#include &lt;linux/device.h&gt;</span>
+
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">ap_match</span><span class="p">(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">)</span>
+<span class="p">{</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">struct</span> <span class="n">bus_type</span> <span class="n">bus</span><span class="o">=</span>
+<span class="p">{</span>
+	<span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ap_bus&quot;</span><span class="p">,</span>
+	<span class="p">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">ap_match</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">bus_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">bus_register</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">bus_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">bus_unregister</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">bus_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">bus_exit</span><span class="p">);</span>
+</pre></div>

@@ -1,0 +1,26 @@
+---
+layout: post
+title: "去除ELF头信息，保留可执行代码"
+date: 2016-01-03 19:15:43 +0153
+comments: true
+categories: OS
+keywords: OS,去除ELF头,博客,AnnPeter's Blog
+description: "去除ELF头信息，保留可执行代码"
+zTree: true
+
+---
+
+
+```vim
+//使用readelf命令读取ELF文件信息，如下图所示，我们可以看到，黄色框指出的就是ELF所有的头
+//信息了,我们只需要用dd命令将其切除即可。
+$ readelf -a head.elf
+$ dd if=head.elf of=head.bin bs=1 skip=84 (bs指出了缓冲区大小，skip指出了源文件
+跳过的字节数)
+```
+
+<!-- more -->
+
+![样例图片](http://localhost/upload/2016/JAN/27/imgs/1453895902.png)
+
+<div></div>

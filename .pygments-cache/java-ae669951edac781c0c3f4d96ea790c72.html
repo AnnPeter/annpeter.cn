@@ -1,0 +1,26 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ScreenReceiver</span> <span class="kd">extends</span> <span class="n">BroadcastReceiver</span> <span class="o">{</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onReceive</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">String</span> <span class="n">action</span> <span class="o">=</span> <span class="n">intent</span><span class="o">.</span><span class="na">getAction</span><span class="o">();</span>
+		<span class="k">if</span><span class="o">(</span><span class="n">intent</span><span class="o">.</span><span class="na">ACTION_SCREEN_ON</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">action</span><span class="o">)){</span>
+			<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;屏幕关闭&quot;</span><span class="o">);</span>
+		<span class="o">}</span><span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">intent</span><span class="o">.</span><span class="na">ACTION_SCREEN_OFF</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">action</span><span class="o">)){</span>
+			<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;屏幕打开&quot;</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">//注册广播接收者</span>
+<span class="c1">//创建对象</span>
+<span class="n">ScreenReceiver</span> <span class="n">receiver</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ScreenReceiver</span><span class="o">();</span>
+<span class="c1">//创建intent-filter对象</span>
+<span class="n">IntentFilter</span> <span class="n">filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">IntentFilter</span><span class="o">();</span>
+<span class="n">filter</span><span class="o">.</span><span class="na">addAction</span><span class="o">(</span><span class="n">intent</span><span class="o">.</span><span class="na">ACTION_SCREEN_ON</span><span class="o">);</span>
+<span class="n">filter</span><span class="o">.</span><span class="na">addAction</span><span class="o">(</span><span class="n">intent</span><span class="o">.</span><span class="na">ACTION_SCREEN_OFF</span><span class="o">);</span>
+<span class="c1">//注册广播接收者</span>
+<span class="n">registerReceiver</span><span class="o">(</span><span class="n">receiver</span><span class="o">,</span> <span class="n">filter</span><span class="o">);</span>
+
+<span class="c1">//解除注册</span>
+<span class="n">unregisterReceiver</span><span class="o">(</span><span class="n">receiver</span><span class="o">);</span>
+</pre></div>

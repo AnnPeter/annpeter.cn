@@ -1,0 +1,10 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">miscdevice</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">minor</span><span class="p">;</span>
+    <span class="cm">/* 次设备号*/</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="cm">/* 设备名*/</span>
+    <span class="k">const</span> <span class="k">struct</span> <span class="n">file_operations</span> <span class="o">*</span><span class="n">fops</span><span class="p">;</span> <span class="cm">/*文件操作*/</span>
+    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">device</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">device</span> <span class="o">*</span><span class="n">this_device</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>

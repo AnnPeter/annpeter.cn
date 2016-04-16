@@ -1,0 +1,13 @@
+<div class="highlight"><pre><span class="n">String</span><span class="o">[]</span> <span class="n">strArr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span>
+	<span class="s">&quot;Ann&quot;</span><span class="o">,</span>
+	<span class="s">&quot;Peter&quot;</span><span class="o">,</span>
+	<span class="s">&quot;AnnPeter&quot;</span>
+<span class="o">};</span>
+
+<span class="n">ListView</span> <span class="n">lv</span> <span class="o">=</span> <span class="o">(</span><span class="n">ListView</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listView</span><span class="o">);</span>
+<span class="c1">//ArrayAdapter只能处理一种类型的数据</span>
+<span class="n">ArrayAdapter</span> <span class="n">arrayAdapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span><span class="k">this</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">item</span><span class="o">,</span>
+										<span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">textView</span><span class="o">,</span> <span class="n">strArr</span><span class="o">);</span>
+<span class="n">lv</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">arrayAdapter</span><span class="o">);</span>
+<span class="n">arrayAdapter</span><span class="o">.</span><span class="na">notifyDataSetChanged</span><span class="o">();</span> <span class="c1">//当strArr发生改变，动态刷新ListView</span>
+</pre></div>

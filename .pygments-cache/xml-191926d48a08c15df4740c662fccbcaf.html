@@ -1,0 +1,16 @@
+<div class="highlight"><pre><span class="nt">&lt;style</span> <span class="na">name=</span><span class="s">&quot;styleName&quot;</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">&quot;android:textSize&quot;</span><span class="nt">&gt;</span>22sp<span class="nt">&lt;/item&gt;</span>
+	<span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">&quot;android:textColor&quot;</span><span class="nt">&gt;</span>#00ff00<span class="nt">&lt;/item&gt;</span>
+	...
+<span class="nt">&lt;/style&gt;</span>
+
+<span class="nt">&lt;style</span> <span class="na">name=</span><span class="s">&quot;styleName1&quot;</span> <span class="na">parent=</span><span class="s">&quot;styleName&quot;</span><span class="nt">&gt;</span>  //继承自styleName样式
+	<span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">&quot;android:textSize&quot;</span><span class="nt">&gt;</span>30sp<span class="nt">&lt;/item&gt;</span>
+	...
+<span class="nt">&lt;/style&gt;</span>
+
+<span class="nt">&lt;style</span> <span class="na">name=</span><span class="s">&quot;styleName.styleName2&quot;</span><span class="nt">&gt;</span>  //继承自styleName样式，在样式表中引用时使用&quot;@style/styleName.styleName2&quot;
+	<span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">&quot;android:textSize&quot;</span><span class="nt">&gt;</span>40sp<span class="nt">&lt;/item&gt;</span>
+	...
+<span class="nt">&lt;/style&gt;</span>
+</pre></div>

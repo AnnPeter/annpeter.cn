@@ -1,0 +1,394 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini2440--裸机--part03--时钟初始化 - AnnPeter's Blog</title>
+	<meta name="author" content="AnnPeter">
+
+	
+	<meta name="description" content="mini2440--裸机--part03--时钟初始化">
+	<meta name="keywords" content="ARM,mini2440,博客,AnnPeter's Blog">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="" rel="alternate" title="AnnPeter's Blog" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.ico" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+	
+	<link href="/stylesheets/pygments.css">
+
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+	<script src="/javascripts/jquery-1.10.2.js"></script>
+	<script src="/javascripts/jquery-migrate-1.2.1.js"></script>
+
+
+	
+	
+
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">AnnPeter's Blog</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.annpeter.cn">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		
+		<a class="github" href="https://github.com/annpeter" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:www.annpeter.cn">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post"><div id="rightArticle">
+	
+		<h2 class="title">Mini2440--裸机--part03--时钟初始化</h2>
+		<div class="entry-content">
+			<p>时钟信号主要由晶振和锁相环PLL产生。</p>
+
+<ol>
+<li><p>晶振全称晶体振荡器，是用石英晶体做成。由于石英晶体化学性能非常稳定，热膨胀系数非常小，其振荡频率也非常稳定。
+它的主要优点有结构简单和噪声低，但要批量生产特定频率的晶体生产成本高、交货周期较长。</p></li>
+<li><p>PLL(锁相环)合成器由一个外部晶体提供和能够对晶体的特定频率加倍或分频的集成锁相环(PLL)电路构成。</p></li>
+</ol>
+
+
+<!-- more -->
+
+
+<p>首先，我们应该知道一点，mini2440开发板在没有开启时钟前，整个开发板全靠一个12MHz的外部晶振提供频率来工作运行的，也就是说CPU、内存、UART、ADC等所有需要用到时钟频率的硬件都工作在12MHz下，而S3C2440A可以正常工作在400MHz下，可想而知两者速度相差会有多大了。如果CPU工作在12MHz频率下，开发板的使用效率非常低，所有依赖系统时钟工作的硬件，其工作效率也很低，比如，我们电脑里面经常提到的超频，超频就是让CPU工作在更高的频率下，让电脑运算速度更快，虽然频率是越高越好，但是由于硬件特性决定了任何一个设备都不可能无止境的超频，电脑超频时要考虑到CPU或主板发热过大，烧坏的危险，同样开发板的主板上的外设和CPU也有一个频率限度。ARM920T内核的S3C2440的最高正常工作频率如下：</p>
+
+<ul>
+<li>FCLK:400MHz</li>
+<li>HCLK:100MHz</li>
+<li>PCLK:500MHz</li>
+</ul>
+
+
+<p>mini2440时钟体系</p>
+
+<table>
+<thead>
+<tr>
+<th> 时钟 </th>
+<th> 应用场合 </th>
+<th> 应用举例 </th>
+<th> 所属PLL </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FCLK</td>
+<td>处理器</td>
+<td>arm920T</td>
+<td>MPLL</td>
+</tr>
+<tr>
+<td>HCLK</td>
+<td>AHB总线</td>
+<td>LCD,DMA</td>
+<td>MPLL</td>
+</tr>
+<tr>
+<td>PCLK</td>
+<td>APB总线</td>
+<td>Uart,GPIO</td>
+<td>MPLL</td>
+</tr>
+<tr>
+<td>UCLK</td>
+<td>USB总线</td>
+<td>USB主从口</td>
+<td>UPLL</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>总的来说，与S3C2440处理器有关的时钟主要有4种：Fin、FCLK、HCLK、PCLK。
+* Fin：外部输入的晶振频率
+* FCLK：用于CPU核。由Fin得来
+* HCLK：用在与AHB总线互连的设备(如存储控制器、LCD控制器、NAND、中断控制器、DMA等)上。由FCLK得来
+* PCLK：用在与APB总线互连的低俗设备上(如定时器、UART、ADC、GPIO等)上。由FCLK得来
+* UCLK：主要用于USB总线(USB主从口)上。这里不做考虑</p>
+
+<p><img src="/upload/2016/JAN/29/imgs/1454095788.png" alt="mini2440时钟原理图" /></p>
+
+<p>系统上电后，S3C2440处理器会自动锁存OM3和OM2引脚的电平值，这两个引脚用于选择外部时钟输入方式，如下表所示。你可以从我们的mini2440开发板的电路图看到，开发板上的OM3和OM2均接地，即OM[3:2]=00。所以，时钟源为外部晶振。</p>
+
+<p>外部时钟输入方式选择</p>
+
+<table>
+<thead>
+<tr>
+<th> 模式 OM[3:2] </th>
+<th> MPLL状态 </th>
+<th> UPLL状态 </th>
+<th> 主时钟源 </th>
+<th> USB时钟源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td>开启</td>
+<td>开启</td>
+<td>外部晶振</td>
+<td>外部晶振</td>
+</tr>
+<tr>
+<td>01</td>
+<td>开启</td>
+<td>开启</td>
+<td>外部晶振</td>
+<td>外部时钟</td>
+</tr>
+<tr>
+<td>10</td>
+<td>开启</td>
+<td>开启</td>
+<td>外部时钟</td>
+<td>外部晶振</td>
+</tr>
+<tr>
+<td>11</td>
+<td>开启</td>
+<td>开启</td>
+<td>外部时钟</td>
+<td>外部时钟</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>[Tip:]外部晶振，就是时钟产生电路在内部，只是使用了一个外部的晶振，外部时钟，则时钟产生电路在外部，至于是否使用晶振，要看它的具体实现。</p>
+
+<p>系统时钟初始化流程如下：
+ ① 系统刚上电几毫秒后，FCLK等于外部晶振(OSC)的时钟频率，即FCLK=Fin；
+ ② 当复位信号nRESET恢复高电平后，锁相环按照寄存器MPLLCON和CLKDIVN设定的倍频比例开始生成所需要的时钟频率。从图1可以看到，从锁相环开始工作到输出新的稳定的频率值需要一定的时间(Lock Time，也叫锁相环的捕获时间)，经过这段时间后，锁相环输出新的频率值，这时FCLK等于锁相环的输出。寄存器LOCKTIME中的值对应着图1中的Lock Time，初始化时一般将其设为0xffffff，这是S3C2440数据手册上给出的默认值，一般按照这个值初始化LOCKTIME寄存器即可满足要求。
+ ③ 经过一段时间后，锁相环PLL输出新的时钟频率。</p>
+
+<p><img src="/upload/2016/JAN/29/imgs/1454097484.png" alt="系统时钟初始化流程-当外部时钟源为晶振时" /></p>
+
+<p>S3C2440处理器内部有两个寄存器：MPLLCON寄存器控制FCLK与Fin的比例关系，CLKDIVN寄存器控制FCLK和HCLK、PCLK的比例关系。</p>
+
+<p><img src="/upload/2016/JAN/29/imgs/1454098767.png" alt="各个时钟间的关系" /></p>
+
+<ol>
+<li>Fin得到FCLK，Fin与FCLK之间的关系为：FCLK=(2<em>m</em>Fin) / (p*2<sup>s</sup>)。
+ 式中，m=MDIV+8，p=PDIV+2，s=SDIV。其中，MDIV、PDIV和SDIV是MPLLCON寄存器中的数据
+ <img src="/upload/2016/JAN/29/imgs/1454099167.png" alt="PLLCON中的值" /></li>
+<li>通过FCLK得到HCLK、PCLK
+ 在CLKDIVN寄存器中，HDIVN用于控制FCLK和PCLK的比例关系，PDIVN主要用于控制HCLK和PCLK的比例关系
+ <img src="/upload/2016/JAN/29/imgs/1454099521.png" alt="时钟间的关系" />
+ [Tip:]如果HDIVN不为0(即FCLK和PCLK不相等时),CPU总线模式应该从快总线模式改变为异步总线模式(S3C2440不支持同步总线模式)</li>
+</ol>
+
+
+<a name="L....................................4......"></a>
+<h2>所以，我们的工作大概分为4步：</h2>
+
+<ol>
+<li>设置lock time</li>
+<li>设置分频系数</li>
+<li>设置cpu到异步工作模式</li>
+<li>设置fclk</li>
+</ol>
+
+
+
+
+	
+			<div style="height:50px;width:100%;"></div>
+			
+			    <div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+			
+
+			
+			  <section>
+			   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/01/19/mini2440--%E8%A3%B8%E6%9C%BA--part03--%E6%97%B6%E9%92%9F%E5%88%9D%E5%A7%8B%E5%8C%96/mini2440--裸机--part03--时钟初始化" data-title="mini2440--裸机--part03--时钟初始化" data-url="http://www.annpeter.cn/blog/2016/01/19/mini2440--%E8%A3%B8%E6%9C%BA--part03--%E6%97%B6%E9%92%9F%E5%88%9D%E5%A7%8B%E5%8C%96/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"annpeter"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+			  </section>
+			 
+		</div>
+
+
+
+	
+</div>
+
+<div class="meta" id="leftSidebar" style="top:30px">
+	<div class="date">
+
+
+
+
+Jan 19th, 2016</div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/arm/'>arm</a>, <a class='category' href='/blog/categories/mini2440/'>mini2440</a>
+
+
+</div>
+	
+	<div style="height:30px;"></div>
+
+	
+	<aside class="sidebar thirds">
+	  
+	    <section> 
+  <h1>分类目录</h1> 
+  <ul id="categories"> 
+    <li class='category'><a href='/blog/categories/android/'>android (5)</a></li>
+<li class='category'><a href='/blog/categories/apos/'>apos (3)</a></li>
+<li class='category'><a href='/blog/categories/arm/'>arm (17)</a></li>
+<li class='category'><a href='/blog/categories/c-cpp/'>c-cpp (2)</a></li>
+<li class='category'><a href='/blog/categories/mini2440/'>mini2440 (17)</a></li>
+<li class='category'><a href='/blog/categories/os/'>os (7)</a></li>
+<li class='category'><a href='/blog/categories/others/'>others (7)</a></li>
+<li class='category'><a href='/blog/categories/server/'>server (11)</a></li>
+ 
+  </ul> 
+</section>
+<section>
+  <h1>最近博文</h1> 
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">IntelJIDE快捷键</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html">正则表达式学习</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html">Android反编译，携带id重签名</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html">CentOS7安装Oracle12c</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html">Apache源码安装</a>
+      </li>
+    
+  </ul>
+</section>
+
+	  
+	</aside>
+	
+
+	
+</div>
+
+<!-- 用于避免文章太短，侧边栏太长 -->
+<script type="text/javascript">
+	(function($){
+		var heightSideBar = $('#leftSidebar').height()+parseInt($('#leftSidebar').css('top'));
+		var heightArticle = $('#rightArticle').height()+277; //其中277为多说的高度
+
+		if(heightArticle < heightSideBar)
+		{
+			$('#rightArticle').height(heightSideBar);	
+		}
+	})(jQuery);
+</script>
+
+
+</article>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2016
+
+    AnnPeter
+
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+</body>
+</html>

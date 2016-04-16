@@ -1,0 +1,155 @@
+---
+layout: post
+title: "mini2440--part07--Mini2440LED驱动"
+date: 2016-01-28 18:39:45 +2344
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,Mini2440LED驱动,博客,AnnPeter's Blog
+description: "mini2440--part07--Mini2440LED驱动"
+zTree: true
+
+---
+
+
+本文主要实现了，在Linux中驱动mini2440的LED。
+
+<!-- more -->
+
+```cpp
+/*************************************************************************
+    > File Name: led_module.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Wed 03 Feb 2016 04:45:37 PM CST
+ ************************************************************************/
+
+
+#include <linux/module.h>
+#include <linux/init.h>
+#include <asm/io.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/types.h>
+#include "./led_module.h"
+
+
+struct cdev led_dev;
+int led_no;
+
+#define GPBCON 0x56000010
+#define GPBDAT 0x56000014
+
+int* led_con;
+int* led_dat;
+
+int led_open(struct inode* node, struct file* filp)
+{
+	led_con = ioremap(GPBCON, 4);
+	led_dat = ioremap(GPBDAT, 4);
+
+	writel(0x00015400, led_con);
+
+	printk("led is open");
+
+	return 0;
+}
+
+long led_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
+{
+	switch(cmd)
+	{
+		case LED_ON:
+			writel(0x00000000, led_dat);
+			return 0;
+		case LED_OFF:
+			writel(0xFFFFFFFF, led_dat);
+			return 0;
+		default:
+			break;
+	}
+
+	return -1;
+}
+
+const struct file_operations led_fops=
+{
+	.open			= led_open,
+	.unlocked_ioctl  = led_ioctl,
+};
+
+int led_init(void)
+{
+	cdev_init(&led_dev, &led_fops);
+	alloc_chrdev_region(&led_no, 0, 1, "ap_led");
+	cdev_add(&led_dev, led_no, 1);
+
+	return 0;
+}
+
+void led_exit(void)
+{
+	cdev_del(&led_dev);
+	unregister_chrdev_region(led_no, 1);
+}
+
+module_init(led_init);
+module_exit(led_exit);
+```
+
+```Makefile
+obj-m := led_module.o
+MDIR  := /home/annpeter/Desktop/linux-mini2440/
+all:
+	make -C $(MDIR) M=$(PWD) modules ARCH=arm CROSS_COMPILE=arm-linux-
+
+clean:
+	rm -rf *.o *.order *.symvers
+```
+
+```cpp
+/*************************************************************************
+    > File Name: led_test.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Thu 04 Feb 2016 02:16:07 AM CST
+ ************************************************************************/
+
+#include "ap_io.h"
+#include "./led_module.h"
+#include <sys/types.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+	int fd = open("/dev/ap_led", O_RDWR);
+
+	if(argc != 2)
+	{
+		print_error("error args\n");
+		print_info("please use:./led_test 1 to open the led\n");
+		print_info("           ./led_test 0 to close the led\n");
+		return -1;
+	}
+
+	if(fd == -1)
+	{
+		print_error("dev open err\n");
+	}
+
+	int cmd = atoi(argv[1]);
+	if(cmd == 1)
+	{
+		ioctl(fd, LED_ON);
+	}
+	else
+	{
+		ioctl(fd, LED_OFF);
+	}
+
+	return 0;
+}
+
+```

@@ -1,0 +1,41 @@
+---
+layout: post
+title: "Linux中控制台输出字体颜色控制"
+date: 2015-12-17 22:45:52 +2363
+comments: true
+categories: C-CPP
+keywords: 控制台颜色,C,CPP,Linux,AnnPeter's Blog
+description: "Linux中控制台输出字体颜色控制"
+
+---
+
+首先，来看下 在Linux 下颜色的表示
+
+<!-- more -->
+
+All the colors that I have found are:
+
+|    code    |   color  ||    code    |   color    |
+|------------|----------||------------|------------|
+|\033[22;30m | black	||\033[01;30m | dark gray  |
+|\033[22;31m | red		||\033[01;31m | light red  |
+|\033[22;32m | green	||\033[01;32m | light green|
+|\033[22;33m | brown	||\033[01;33m | yellow     |
+|\033[22;34m | blue		||\033[01;34m | light blue |
+|\033[22;35m | magenta	||\033[01;35m | light magenta|
+|\033[22;36m | cyan		||\033[01;36m | light cyan |
+|\033[22;37m | gray		||\033[01;37m | white      |
+
+可以看出都是使用的转义字体来实现的
+
+使用方法：
+
+```vim
+Linux 终端输入：
+$ echo -e  "\033[35;1m Shocking \033[0m"
+
+C代码：
+printf("\033[34mThis is blue.\033[0m\n");
+```
+
+记得最后要 "\033[0m"  关闭所有属性，这样又回到了系统默认的颜色了。

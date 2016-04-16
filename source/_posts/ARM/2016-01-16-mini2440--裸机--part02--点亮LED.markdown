@@ -1,0 +1,124 @@
+---
+layout: post
+title: "mini2440--裸机--part02--点亮LED"
+date: 2016-01-16 20:22:01 +7005
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,博客,AnnPeter's Blog
+description: "mini2440--裸机--part01--点亮LED"
+zTree: true
+
+---
+
+在前面[mini2440--裸机--part01--核心初始化](/blog/2016/01/15/mini2440--%E8%A3%B8%E6%9C%BA--part01--%E6%A0%B8%E5%BF%83%E5%88%9D%E5%A7%8B%E5%8C%96/index.html)部分，我们初始化了几个重要的核心部件，那现在我们要查看程序是否大致能正常运行怎么办，我们需要通过与外部的交互来看。所以本次，我们将要点亮LED等来初步判断我们初始化是否成功。
+
+<!-- more -->
+
+1. 首先我们来查看核心板原理图，搜索**LED**关键字，我们看到LED的原理图，我们只需要将nLED_1~nLED_4配置为低电平，即可点亮LED。
+
+	![LED原理图](/upload/2016/JAN/29/imgs/1454052312.png)
+
+2. 搜索关键字**ｎLED_**，找到nLED_1~nLED_4连在cpu的什么位置，通过查看核心板原理图，可以发现，nLED1~nLED４对应GPIO口的GPB5~GPB8。
+
+![LED对应GPIO位置](/upload/2016/JAN/29/imgs/1454052717.png)
+
+　　GPIO(General-Purpose Input/Output Ports):通用输入/输出端口。在嵌入式系统中，ＣＰＵ经常需要控制许多结构简单的外部设置或者电路，这些设备通常只要求两种状态(开/关)，对于这些设备的控制，使用传统的串口或者USB口就显得复杂了，所以，在嵌入式微处理器上通常提供了一种"通用可编程I/)端口",也就是GPIO。GPIO一般来说有两部分寄存器组成，一部分是控制寄存器，通常用于控制端口状态是输入还是输出；另一部分是数据寄存器，当端口配置为输入端口时，相应位为引脚状态,当端口配置为输出端口时，引脚状态将与相应位相同。
+
+```vim
+@*************************************************************************
+@    > File Name: start.s
+@    > Author: AnnPeter
+@    > Mail: 864587669@qq.com 
+@    > Created Time: Thu 28 Jan 2016 08:07:42 PM CST
+@ ************************************************************************
+
+
+.text
+.global _start
+							@查看ARM芯片手册我们可以看到
+							@从地址0x0000,0000开始是ARM的异常处理程序
+_start:						@依次是：
+	b reset							@Rest(0x0000,0000)
+	ldr pc,	_undefined_instruction	@Undefined instructions(0x0000,0004)
+	ldr pc, _software_interrupt		@Software interrupt(0x0000,0008)
+	ldr pc, _prefetch_abort			@Prefetch Abort(0x0000,000C)
+	ldr pc, _data_abort				@Data Abort(0x0000,0010)
+	ldr pc, _not_used				@保留，没有用
+	ldr pc, _irq					@IRQ(0x0000,0018)
+	ldr pc, _fiq					@FIQ(0x0000,001C)
+
+_undefined_instruction:	.word undefined_instruction
+_software_interrupt:	.word software_interrupt
+_prefetch_abort:		.word prefetch_abort
+_data_abort:			.word data_abort
+_not_used:				.word not_used
+_irq:					.word irq
+_fiq:					.word fiq
+
+undefined_instruction:
+	nop
+software_interrupt:
+	nop
+prefetch_abort:
+	nop
+data_abort:
+	nop
+not_used:
+	nop
+irq:
+	nop
+fiq:
+	nop
+reset:
+	bl set_svc	@设置cpu工作模式，arm处理器共支持7种工作模式，在svc模式下
+				@cpu具有更多权限，能访问更多硬件资源
+				@设置svc模式，只要将cpsr后5位设置位10011(即0x13)
+				@但在此，我们将后8位设置为1101,0011(即0xD3)，高两位用于屏蔽
+				@中断(irq,fiq)
+	bl disable_watchdog
+	bl disable_interrupt
+	bl disable_mmu
+	bl light_led
+
+set_svc:
+	mrs r0, cpsr		@将cpsr加载至r0中，cpsr不能直接操作
+	bic r0, r0, #0x1F	@将r0低5位置0
+	orr r0, r0,	#0xD3	@设置位svc所需要的0xD3
+	msr cpsr, r0
+	mov pc, lr	@bl在执行时会将下一条指令的地址保存在lr寄存器中
+				@这里就相当于ret，只不过现在还没有堆栈而已
+
+#define pWTCHON 0x53000000
+disable_watchdog:
+	ldr r0, =pWTCHON	@这里不使用mov的原因是装载的数据超过了8位
+	mov r1, #0x0		@mov使用12bit表示立即数,其中4bit表示移位的位数(循环
+	str r1, [r0]		@右移,且数值*2),8bit用来表示移位的基数，所以mov指令
+	mov pc, lr			@后面这个立即数必须能由一个8位二进制数经过偶数次右
+						@移后得到的合法数据
+#define pINTMASK 0x4A000008
+disable_interrupt:
+	mvn r1, #0x0 @mvn将第二个操作数取反，写入第一个操作数中
+	ldr r0, =pINTMASK
+	str r1, [r0]
+	mov pc, lr
+
+disable_mmu:
+	mcr p15, 0, r0, c7, c7, 0	@invalidate ICache and DCache
+	mrc p15, 0, r0, c1, c0, 0
+	bic r0, r0, #0x00000007
+	mcr p15, 0, r0, c1, c0, 0	@关闭DCache、MMU,ICache关不关无所谓
+	mov pc, lr
+
+#define pGPBCON 0x56000010
+#define pGPBDAT 0x56000014
+light_led:
+	ldr r0, =pGPBCON
+	ldr r1, =0x00015400
+	str r1, [r0]
+
+	ldr r0, =pGPBDAT
+	ldr r1, =0x0
+	str r1, [r0]
+	mov pc, lr
+
+```

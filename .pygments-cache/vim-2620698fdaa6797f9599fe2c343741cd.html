@@ -1,0 +1,6 @@
+<div class="highlight"><pre>#在<span class="sr">/etc/</span>profile文件最后添加代码
+export PATH<span class="p">=</span><span class="s2">&quot;$PATH:/usr/local/nginx/sbin&quot;</span>
+
+如果在sudo的时候找不到环境变量，可以给nginx做一个软链接，链接至<span class="sr">/usr/</span>local/sbin
+可以在<span class="sr">/etc/</span>sudoers中查看sudo的环境变量路径。
+</pre></div>

@@ -1,0 +1,21 @@
+<div class="highlight"><pre><span class="nd">@override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onReceive</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">Intent</span> <span class="n">intent</span><span class="o">){</span>
+
+	<span class="c1">//拿到短信的内容</span>
+	<span class="c1">//短信内容封装到intent中</span>
+	<span class="n">Bundle</span> <span class="n">bundle</span> <span class="o">=</span> <span class="n">intent</span><span class="o">.</span><span class="na">getExtras</span><span class="o">();</span>
+	<span class="c1">//以pdus为键，取出一个object数组，数组中的每一个元素，都是一条短信</span>
+	<span class="n">Object</span><span class="o">[]</span> <span class="n">objects</span> <span class="o">=</span> <span class="o">(</span><span class="n">Object</span><span class="o">[])</span> <span class="n">bundle</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;pdus&quot;</span><span class="o">);</span>
+
+	<span class="c1">//为什么会有多条短信？  短信内容长度有限制，超出长度会分多条短信发送。</span>
+	<span class="k">for</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span> <span class="o">:</span> <span class="n">objects</span><span class="o">){</span>
+		<span class="n">SmsMessage</span> <span class="n">sms</span> <span class="o">=</span> <span class="n">SmsMessage</span><span class="o">.</span><span class="na">createFromPdu</span><span class="o">((</span><span class="kt">byte</span><span class="o">[])</span> <span class="n">object</span><span class="o">);</span>
+		<span class="n">String</span> <span class="n">phone</span> <span class="o">=</span> <span class="n">sms</span><span class="o">.</span><span class="na">getOriginatingAddress</span><span class="o">();</span>
+		<span class="n">String</span> <span class="n">con</span> <span class="o">=</span> <span class="n">sms</span><span class="o">.</span><span class="na">getMessageBody</span><span class="o">();</span>
+
+		<span class="k">if</span><span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">equal</span><span class="o">(</span><span class="s">&quot;要拦截的号码&quot;</span><span class="o">)){</span>
+			<span class="n">abortBroadcast</span><span class="o">();</span><span class="c1">//阻止广播向其他程序传播</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

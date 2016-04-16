@@ -1,0 +1,2557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[AnnPeter's Blog]]></title>
+  <link href="http://www.annpeter.cn/atom.xml" rel="self"/>
+  <link href="http://www.annpeter.cn/"/>
+  <updated>2016-04-16T11:13:25+08:00</updated>
+  <id>http://www.annpeter.cn/</id>
+  <author>
+    <name><![CDATA[AnnPeter]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[IntelJIDE快捷键]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html"/>
+    <updated>2016-04-12T09:31:23+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/04/12/IntelJIDE%E5%BF%AB%E6%8D%B7%E9%94%AE/IntelJIDE快捷键</id>
+    <content type="html"><![CDATA[<ul>
+<li>Option+Alt+L    整理代码</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[正则表达式学习]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/index.html"/>
+    <updated>2016-04-09T11:08:12+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/04/09/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0/正则表达式学习</id>
+    <content type="html"><![CDATA[<ol>
+<li><p>中括号:[判断字符为上内容]</p></li>
+<li><p>预定义字符:都带有反斜线</p>
+
+<ul>
+<li>.   :   任意字符</li>
+<li>\d  :   数字<a href="">0-9</a></li>
+<li>\D  :   非数字<a href="">^0-9</a></li>
+<li>\w  :   单词字符<a href="">a-zA-Z_0-9</a></li>
+</ul>
+</li>
+</ol>
+
+
+<!-- more -->
+
+
+<ol>
+<li><p>边界字符:</p>
+
+<ul>
+<li>^   :   行开头</li>
+<li>$   :   行结尾</li>
+<li>\b  :   单词边界</li>
+</ul>
+</li>
+<li><p>数量词:必须结合内容</p>
+
+<ul>
+<li>X?      :   X内容出现零次或一次</li>
+<li>X      :   X内容出现零次或多次</li>
+<li>X+      :   X内容出现一次或多次</li>
+<li>X{n}    :   X内容出现n次</li>
+<li>X{n,}   :   X内容出现至少n次</li>
+<li>X{n,m}  :   X内容出现n到m次</li>
+</ul>
+</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Android反编译，携带id重签名]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/index.html"/>
+    <updated>2016-04-01T13:00:32+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/04/01/Android%E5%8F%8D%E7%BC%96%E8%AF%91%EF%BC%8C%E6%90%BA%E5%B8%A6id%E9%87%8D%E7%AD%BE%E5%90%8D/Android反编译，携带id重签名</id>
+    <content type="html"><![CDATA[<p>为了掌握用户的上下线关系，我们可能需要在apk中动态携带信息。
+本文主要采用在AndroidManifest.xml文件中的versionName中，添加用户上线的id，达到传递信息的作用。</p>
+
+<a name="L.............................."></a>
+<h3>第一步，生成前面文件</h3>
+
+<blockquote><p>keytool -genkey -v -keystore insurance.keystore -alias insurance-release.keystore -keyalg RSA -validity 10000</p></blockquote>
+
+<!-- more -->
+
+
+<a name="L....................."></a>
+<h3>第二步，反编译</h3>
+
+<blockquote><p>./apktool d insurance.apk -o insurance</p></blockquote>
+
+<a name="L...............apktool.yml.........versionName..................................................................."></a>
+<h3>第三步，在apktool.yml中修改versionName,如果要动态修改，自己写程序修改这个文件就好啦</h3>
+
+<a name="L........................"></a>
+<h3>第四步，重新编译</h3>
+
+<blockquote><p>./apktool b insurance -o new.apk</p></blockquote>
+
+<a name="L........................"></a>
+<h3>第五步，重新签名</h3>
+
+<blockquote><p>jarsigner  -verbose -keystore insurance.keystore  -storepass insurance -signedjar  insurance_sign.apk new.apk  insurance-release.keystore</p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[CentOS7安装Oracle12c]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html"/>
+    <updated>2016-03-21T06:10:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/CentOS7安装Oracle12c</id>
+    <content type="html"><![CDATA[<p>首先请参考教程，卸载OpenJDK，安装JDK。</p>
+
+<ol>
+<li>修改hostname，这两个文件中的地址必须保持一致，根据自己的情况修改，可以使用内网地址
+
+<blockquote><p>$ /etc/hosts
+     10.144.140.88 CentOS
+$ /etc/sysconfig/network
+     HOSTNAME=10.144.140.88</p></blockquote></li>
+</ol>
+
+
+<!-- more -->
+
+
+<ol>
+<li><p>关闭selinux</p>
+
+<blockquote><p>$ /etc/selinux/config
+     设置SELINUX=disabled</p></blockquote></li>
+<li><p>关闭防火墙</p>
+
+<blockquote><p>$ systemctl start firewalld.service*</p></blockquote></li>
+<li><p>安装依赖包</p>
+
+<blockquote><p>$ yum -y install binutils compat-libcap1  compat-libstdc++-33 compat-libstdc++-33<em>.i686 elfutils-libelf-devel gcc gcc-c++ glibc</em>.i686 glibc glibc-devel glibc-devel<em>.i686 ksh libgcc</em>.i686 libgcc libstdc++ libstdc++<em>.i686 libstdc++-devel libstdc++-devel</em>.i686 libaio libaio<em>.i686 libaio-devel libaio-devel</em>.i686 make sysstat unixODBC unixODBC<em>.i686 unixODBC-devel unixODBC-devel</em>.i686 libXp unzip</p></blockquote></li>
+<li><p>下载Oracle12c至/tmp目录，解压。</p></li>
+<li><p>添加安装用户和用户组</p>
+
+<blockquote><p>$ groupadd oinstall
+$ groupadd dba
+$ useradd -g oinstall -G dba oracle
+$ passwd oracle</p></blockquote></li>
+<li><p>添加安装目录</p>
+
+<blockquote><p>$ mkdir -p  /usr/local/oracle/product/12.1.0/dbhome_1
+$ chown -R oracle:oinstall /usr/local/oracle
+$ chmod -R 755 /usr/local/oracle</p></blockquote></li>
+<li><p>修改内核参数配置文件</p>
+
+<blockquote><p>fs.aio-max-nr = 1048576
+fs.file-max = 6815744
+kernel.shmall = 2097152
+kernel.shmmax = 1200000000
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048576</p>
+
+<p>$ sysctl –p //显示内核参数配置信息</p></blockquote></li>
+<li><p>修改用户限制文件</p>
+
+<blockquote><p>oracle              soft    nproc   2047
+oracle              hard    nproc   16384
+oracle              soft    nofile  1024
+oracle              hard    nofile  65536
+oracle              soft    stack   10240</p></blockquote></li>
+<li><p>修改文件/etc/pam.d/login
+在最后一个大项前面加入session    required     pam_limits.so</p></li>
+<li><p>修改文件/etc/profile，添加一下内容</p>
+
+<blockquote><p>  if [ $USER = &ldquo;oracle&rdquo; ]; then
+   if [ $SHELL = &ldquo;/bin/ksh&rdquo; ]; then
+        ulimit -p 16384
+        ulimit -n 65536
+    else
+        ulimit -u 16384 -n 65536
+    fi
+  fi</p></blockquote></li>
+<li><p>切换到oracle用户</p></li>
+<li><p>设置oracle用户的环境变量/home/oracle/.bash_profile
+TMP=/tmp; export TMP
+TMPDIR=$TMP; export TMPDIR
+ORACLE_HOSTNAME=10.144.140.88; export ORACLE_HOSTNAME
+ORACLE_BASE=/usr/local/oracle; export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/12.1.0/dbhome_1; export ORACLE_HOME
+ORACLE_SID=orcl; export ORACLE_SID
+PATH=$ORACLE_HOME/bin:/usr/sbin:$PATH; export PATH</p></li>
+<li><p>编辑静默安装响应文件</p>
+
+<blockquote><p>$ cp -R /tmp/database/response/  .
+$ cd response
+$ vim db_install.rsp</p></blockquote>
+
+<p>需要设置的选项如下：<br/>
+oracle.install.option=INSTALL_DB_SWONLY
+ORACLE_HOSTNAME=10.144.140.88
+UNIX_GROUP_NAME=oinstall
+INVENTORY_LOCATION=/usr/local/oracle/inventory
+SELECTED_LANGUAGES=en,zh_CN
+ORACLE_HOME=/usr/local/oracle/product/12.1.0/dbhome_1
+ORACLE_BASE=/usr/local/oracle
+oracle.install.db.InstallEdition=EE
+oracle.install.db.DBA_GROUP=dba
+oracle.install.db.OPER_GROUP=dba
+oracle.install.db.BACKUPDBA_GROUP=dba
+oracle.install.db.DGDBA_GROUP=dba
+oracle.install.db.KMDBA_GROUP=dba
+DECLINE_SECURITY_UPDATES=true</p></li>
+<li><p>添加swap空间，如果你有交换空间的话可以跳过这个步骤
+dd if=/dev/zero of=/home/swapfile bs=1M count=512
+mkswap /home/swapfile
+swapon /home/swapfile</p>
+
+<p>然后修改 /etc/fstab，加上：
+/home/swapfile swap swap defaults 0 0</p></li>
+<li><p>进入安装包目录/tmp/database/，执行安装</p>
+
+<blockquote><p>$ ./runInstaller -silent -noconfig -responseFile /home/oracle/response/db_install.rsp</p></blockquote></li>
+<li><p>可以通过top查看安装进程
+可以通过tail -f /usr/local/oracle/oraInventory/logs/installActions2016-03-12_04-40-06AM.log ，查看安装日志。</p></li>
+<li><p>安装完成，切换到root身份</p>
+
+<blockquote><p>$ sh /usr/local/oracle/inventory/orainstRoot.sh
+$ sh /usr/local/oracle/product/12.1.0/root.sh</p></blockquote></li>
+<li><p>重新登入oracle用户，以静默方式配置监听。如果未找到netca，请检查环境变量。</p>
+
+<blockquote><p>$ netca  /silent /responsefile /home/oracle/response/netca.rsp</p></blockquote></li>
+<li><p>通过netstat -nlpt，查看到端口1521正在被监听。</p></li>
+<li><p>以静默方式建立新库</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Apache源码安装]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html"/>
+    <updated>2016-03-14T18:40:11+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/Apache源码安装</id>
+    <content type="html"><![CDATA[<a name="L.................."></a>
+<h2>依赖文件下载</h2>
+
+<ul>
+<li>wget <a href="http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz">http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz</a></li>
+<li>wget <a href="http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz">http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz</a></li>
+<li>wget <a href="http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz">http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz</a></li>
+</ul>
+
+
+<!-- more -->
+
+
+<a name="L......apr.not.found......"></a>
+<h3>解决apr not found问题</h3>
+
+<blockquote><p>$ tar -zxf apr-1.4.5.tar.gz<br/>
+$ cd  apr-1.4.5<br/>
+$ ./configure &ndash;prefix=/usr/local/apr<br/>
+$ make &amp;&amp; make install</p></blockquote>
+
+<a name="L......APR-util.not.found......"></a>
+<h3>解决APR-util not found问题</h3>
+
+<blockquote><p>$ tar -zxf apr-util-1.3.12.tar.gz<br/>
+$ cd apr-util-1.3.12<br/>
+$ ./configure &ndash;prefix=/usr/local/apr-util &ndash;with-apr=/usr/local/apr/bin/apr-1-config<br/>
+$ make &amp;&amp; make install</p></blockquote>
+
+<a name="L......pcre......"></a>
+<h3>解决pcre问题</h3>
+
+<blockquote><p>$ unzip -o pcre-8.10.zip<br/>
+$ cd pcre-8.10<br/>
+$ ./configure &ndash;prefix=/usr/local/pcre<br/>
+$ make &amp;&amp; make install</p></blockquote>
+
+<a name="L......checking.whether.to.enable.mod_deflate....configure:.error:.mod_deflate.has.been.requested.but.can.not.be.built.due.to.prerequisite.failures"></a>
+<h3>解决checking whether to enable mod_deflate&hellip; configure: error: mod_deflate has been requested but can not be built due to prerequisite failures</h3>
+
+<blockquote><p>$ yum install gcc zlib-devel openssl-devel</p></blockquote>
+
+<a name="L......Apache......................................."></a>
+<h3>解压Apache源码，进入源码目录编译安装</h3>
+
+<blockquote><p>./configure &ndash;prefix=/usr/local/apache2 &ndash;enable-rewrite &ndash;enable-so &ndash;enable-headers &ndash;enable-expires &ndash;with-mpm=worker &ndash;enable-modules=most &ndash;enable-deflate  &ndash;with-apr=/usr/local/apr &ndash;with-apr-util=/usr/local/apr-util  &ndash;with-pcre=/usr/local/pcre</p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux中卸载OpenJDK，安装JDK]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/14/Linux%E4%B8%AD%E5%8D%B8%E8%BD%BDOpenJDK%EF%BC%8C%E5%AE%89%E8%A3%85JDK/index.html"/>
+    <updated>2016-03-14T18:38:42+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/14/Linux%E4%B8%AD%E5%8D%B8%E8%BD%BDOpenJDK%EF%BC%8C%E5%AE%89%E8%A3%85JDK/Linux中卸载OpenJDK，安装JDK</id>
+    <content type="html"><![CDATA[<a name="L............Linux......OpenJDK..."></a>
+<h4>首先查询Linux中的OpenJDK。</h4>
+
+<blockquote><p>rpm -qa | grep java<br/></p></blockquote>
+
+<a name="L......................................."></a>
+<h4>如果有就删除，没有就算了。</h4>
+
+<blockquote><p>rpm -e &ndash;nodeps java-1.8.0-openjdk<br/>
+rpm -e &ndash;nodeps javapackages-tools<br/>
+rpm -e &ndash;nodeps javapackages-tools<br/>
+rpm -e &ndash;nodeps java-1.8.0-openjdk-headless<br/>
+rpm -e &ndash;nodeps tzdata-java<br/>
+rpm -e &ndash;nodeps python-javapackages<br/></p></blockquote>
+
+<!-- more -->
+
+
+<a name="L......jdk.............usr.local...."></a>
+<h4>下载jdk，解压到/usr/local/中</h4>
+
+<blockquote><p>export JAVA_HOME=/usr/local/jdk1.8.0_73<br/>
+export PATH=$JAVA_HOME/bin:$PATH<br/>
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br/></p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[NAT网络问题]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/12/Linux%E4%B8%8B%E7%9A%84%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/index.html"/>
+    <updated>2016-03-12T20:10:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/12/Linux%E4%B8%8B%E7%9A%84%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/Linux下的网络问题</id>
+    <content type="html"><![CDATA[<p>最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。</p>
+
+<blockquote><p>$ route add default gw 10.0.2.2 dev eth0</p></blockquote>
+
+<!-- more -->
+
+
+<p>最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。</p>
+
+<blockquote><p>$ route add default gw 10.0.2.2 dev eth0</p></blockquote>
+
+<p>顺便说句，关闭NetworkManager后，网卡开机总是不能自启，设置ONBOOT=yes也不行，这时候发大招了。</p>
+
+<blockquote><p>$ chkconfig network on</p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part12--串口驱动设计]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/index.html"/>
+    <updated>2016-02-06T22:33:24+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/06/mini2440--part12--%E4%B8%B2%E5%8F%A3%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/mini2440--part12--串口驱动设计</id>
+    <content type="html"><![CDATA[<a name="TTY............"></a>
+<h2>TTY驱动架构</h2>
+
+<p>在Linux中，终端是一类字符型设备，它包括多种类型，通常使用tty来简称各种类型的终端设备。</p>
+
+<ul>
+<li><p>串口终端(/dev/ttyS*)
+串口终端是使用计算机串口连接的终端设备。Linux把每个串行端口都看作是一个字符设备。这些串行端口所对应的设备名称是/dev/ttySAC0、/dev/ttySAC1。</p></li>
+<li><p>控制台终端(/dev/console)
+在Linux中，计算机的输出设备通常被称为控制台的终端(Console),这里特指printk信息输出到的设备。/dev/console是一个虚拟设备，它需要映射到一个真正的tty上，比如通过内核启动参数“console=ttySAC0”就把console映射到了串口0上。</p></li>
+<li><p>虚拟终端(/dev/tty*,如tty1，tty2&hellip;)
+当用户登录时，使用的是虚拟终端。使用ctcl+alt+[F1-F6]组合键，我们就可以切换到tty1-tty6上，它们被称为虚拟终端，而tty0则是当前所使用虚拟终端的一个别名。</p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Linux tty子系统包含:tty核心,tty线路规程和tty驱动。tty核心是对整个tty设备的抽象,对用户提供统一的接口,tty线路规程是对传输数据的格式化,tty驱动则是面向tty设备的硬件驱动。</p>
+
+<p><img src="http://www.annpeter.cn/upload/2016/FEB/08/imgs/1454928983.png" alt="tty架构分析" /></p>
+
+<p>串口调用例程回溯，在Linux中串口底层调用位于(/drivers/serial/samsung.c 中的 s3c24xx_serial_start_tx)，我们在此函数中添加dump_stark()。然后重新编译我们的内核，重启开发板，我们就能清除的看到调用的堆栈回溯。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>[<span class="p">&lt;</span>c0035270<span class="p">&gt;</span>] <span class="p">(</span>dump_backtrace<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x10c) from [&lt;c033a868&gt;] (dump_stack+0x18/</span><span class="m">0</span>x<span class="m">1</span>c<span class="p">)</span>
+</span><span class='line'> r7:<span class="m">00000000</span> r6:c3901800 r5:c3901c02 r4:c046e0bc
+</span><span class='line'>[<span class="p">&lt;</span>c033a850<span class="p">&gt;</span>] <span class="p">(</span>dump_stack<span class="p">+</span><span class="m">0</span>x<span class="m">0</span>/<span class="m">0</span>x<span class="m">1</span>c<span class="p">)</span> from [<span class="p">&lt;</span>c01830a0<span class="p">&gt;</span>] <span class="p">(</span>s3c24xx_serial_start_tx<span class="p">+</span><span class="m">0</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c018308c<span class="p">&gt;</span>] <span class="p">(</span>s3c24xx_serial_start_tx<span class="p">+</span><span class="m">0</span>x<span class="m">0</span>/<span class="m">0</span>x<span class="m">64</span><span class="p">)</span> from [<span class="p">&lt;</span>c017f2ac<span class="p">&gt;</span>] <span class="p">(</span>uart_start<span class="p">+</span><span class="m">0</span><span class="p">)</span>
+</span><span class='line'> r5:c3901c02 r4:a0000013
+</span><span class='line'>[<span class="p">&lt;</span>c017f244<span class="p">&gt;</span>] <span class="p">(</span>uart_start<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x6c) from [&lt;c017f504&gt;] (uart_flush_chars+0x10/</span><span class="m">0</span>x<span class="m">1</span><span class="p">)</span>
+</span><span class='line'> r5:c3901c02 r4:<span class="m">00000002</span>
+</span><span class='line'>[<span class="p">&lt;</span>c017f4f4<span class="p">&gt;</span>] <span class="p">(</span>uart_flush_chars<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x14) from [&lt;c016bde8&gt;] (n_tty_write+0x230/</span><span class="m">0</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c016bbb8<span class="p">&gt;</span>] <span class="p">(</span>n_tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x448) from [&lt;c01693e0&gt;] (tty_write+0x14c/</span><span class="m">0</span>x<span class="m">244</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c0169294<span class="p">&gt;</span>] <span class="p">(</span>tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span>/<span class="m">0</span>x<span class="m">244</span><span class="p">)</span> from [<span class="p">&lt;</span>c0169560<span class="p">&gt;</span>] <span class="p">(</span>redirected_tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">88</span><span class="p">)</span>
+</span><span class='line'>[<span class="p">&lt;</span>c01694d8<span class="p">&gt;</span>] <span class="p">(</span>redirected_tty_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x98) from [&lt;c009e044&gt;] (vfs_write+0xb4/</span><span class="p">)</span>
+</span><span class='line'> r9:c39a0000 r8:c00310c8 r7:<span class="m">00000004</span> r6:c39a1f78 r5:<span class="m">40000000</span>
+</span><span class='line'>r4:c3939380
+</span><span class='line'>[<span class="p">&lt;</span>c009df90<span class="p">&gt;</span>] <span class="p">(</span>vfs_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0xe8) from [&lt;c009e15c&gt;] (sys_write+0x4c/</span><span class="m">0</span>x<span class="m">84</span><span class="p">)</span>
+</span><span class='line'> r7:<span class="m">00000004</span> r6:c3939380 r5:<span class="m">00000000</span> r4:<span class="m">00000000</span>
+</span><span class='line'>[<span class="p">&lt;</span>c009e110<span class="p">&gt;</span>] <span class="p">(</span>sys_write<span class="p">+</span><span class="m">0</span>x<span class="m">0</span><span class="sr">/0x84) from [&lt;c0030f20&gt;] (ret_fast_syscall+0x0/</span><span class="m">0</span>x<span class="m">28</span><span class="p">)</span>
+</span><span class='line'> r6:<span class="m">001</span>d<span class="m">27</span>f<span class="m">8</span> r5:<span class="m">40000000</span> r4:<span class="m">00000002</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L............"></a>
+<h2>串口驱动</h2>
+
+<p>UART驱动中的数据结构：</p>
+
+<ul>
+<li>UART驱动程序结构：<strong>struct uart_driver</strong></li>
+<li>UART端口结构：<strong>struct uart_port</strong></li>
+<li>UART相关操作函数结构：<strong>struct uart_ops</strong></li>
+<li>UART状态结构：struct uart_stat</li>
+<li>UART信息结构：struct uart_info</li>
+</ul>
+
+
+<p><img src="http://www.annpeter.cn/upload/2016/FEB/08/imgs/1454946151.jpg" alt="uart驱动常用的数据结构" /></p>
+
+<p>串口的初始化工作：
+在linux中，串口的初始化工作主要在(drivers/serial/samsung.c 和 s3c2440.c中)
+1. 注册串口驱动程序，使用函数 int uart_register_driver(struct uart_driver *drv);
+2. 初始化(在平台设备中注册设备，当设备与驱动匹配时，调用probe进行初始化)</p>
+
+<ul>
+<li>取出相应的uart_port</li>
+<li>初始化uart_port
+
+<ul>
+<li>获取虚拟基地址</li>
+<li>获取中断号</li>
+<li>复位FIFO</li>
+</ul>
+</li>
+<li>添加uart_port，使用函数int uart_add_one_port(struct uart_driver <em>drv, struct uart_port </em>uport);</li>
+<li>创建属性文件，使用函数int device_create_file(struct device <em>dev, struct device_attribute </em>attr);</li>
+<li>初始化动态频率调节</li>
+</ul>
+
+
+<p>串口发送数据：</p>
+
+<p>串口接收数据：</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part11--总线设备驱动]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/index.html"/>
+    <updated>2016-02-05T22:33:24+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/05/mini2440--part11--%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/mini2440--part11--总线设备驱动</id>
+    <content type="html"><![CDATA[<a name="L........................"></a>
+<h1>总线设备驱动模型</h1>
+
+<a name="L......"></a>
+<h2>总线</h2>
+
+<ul>
+<li>总线结构描述
+在Linux内核中，总线由bus_type结构表示，定义在&lt;linux/device.h></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">bus_type</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//总线名称</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//驱动与设备的匹配函数</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<ul>
+<li><p>注册总线
+bus_register(struct bus_type* bus);
+若成功，新的总线将被添加进系统，并可在/sys/bus下看到相应的目录。</p></li>
+<li><p>注销总线
+  void bus_unregister(struct bus_type* bus);</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: bus.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Sun 07 Feb 2016 10:11:28 AM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/kernel.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/device.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">ap_match</span><span class="p">(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">bus_type</span> <span class="n">bus</span><span class="o">=</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ap_bus&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">ap_match</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">bus_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">bus_register</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">bus_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">bus_unregister</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">bus_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">bus_exit</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L......"></a>
+<h2>驱动</h2>
+
+<p>(1) 结构描述
+在Linux内核中，驱动由device_driver结构表示</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">device_driver</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//驱动名称</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">bus_type</span><span class="o">*</span> <span class="n">bus</span><span class="p">;</span><span class="c1">//驱动所在总线</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//一个总线上可能挂载多个设备，如USB总线可能挂载无线鼠标，无线网卡等等，当总线匹配到该</span>
+</span><span class='line'>  <span class="c1">//驱动可以处理该设备时，调用prove函数来处理设备。所以probe由总线调用。</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">*</span> <span class="n">dev</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(2) 注册
+int driver_register(struct device_driver* drv);
+注册成功后，driver的信息会在/sys/bus/相应的总线目录下面</p>
+
+<p>(3) 注销
+void driver_unregister(struct device_driver* drv)</p>
+
+<a name="L......"></a>
+<h2>设备</h2>
+
+<p>(1) 结构描述
+在Linux内核中，设备由struct device结构表示。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">device</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备的名字</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">bus_type</span><span class="o">*</span> <span class="n">bus</span><span class="p">;</span> <span class="c1">//设备所在总线</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(2) 注册
+int device_register(struct device* dev);</p>
+
+<p>(3) 注销
+void device_unregister(struce device* dev);</p>
+
+<p>总结：在系统中，我们首先注册总线。然后注册驱动和设备(这两者次序可以颠倒)，总线的match函数比较挂在该总线的驱动和设备是否匹配，如果匹配返回1，否则返回0。匹配成后，总线调用该驱动先前注册好的probe函数执行。</p>
+
+<a name="L........................"></a>
+<h1>平台总线驱动设计</h1>
+
+<p>平台总线(Platform bus)是linux2.6内核中加入的一种虚拟总线，其优势在于采用了总线的模型对设备与驱动进行管理，提高了程序的可移植性。关于platform bus的定义在drivers/base/Platform.c(paltform_bus_type)中。
+总线设备和驱动的匹配通过platform_match函数完成，主要依据设备id和设备名称来完成匹配工作。</p>
+
+<a name="L......"></a>
+<h2>设备</h2>
+
+<p>在Linux中，平台设备使用struct platform_device来描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">platform_device</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//设备名称</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span> <span class="c1">//设备编号，配合设备名使用</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">device</span> <span class="n">dev</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">u32</span> <span class="n">num_resources</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">resource</span><span class="o">*</span> <span class="n">resource</span><span class="p">;</span><span class="c1">//设备资源，基地址，中断号等</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">resource</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">resource_size_t</span> <span class="n">start</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">resource_size_t</span> <span class="n">end</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">flags</span><span class="p">;</span>    <span class="c1">//资源类型</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">resource</span><span class="o">*</span> <span class="n">parent</span><span class="p">,</span> <span class="o">*</span> <span class="n">sibling</span><span class="p">,</span> <span class="o">*</span> <span class="n">child</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>注册平台设备，使用函数
+int platform_device_register(struct platform_device *pdev);</p></li>
+<li><p>注销平台设备，使用函数
+int platform_device_unregister(struct platform_device *pdev);</p></li>
+</ol>
+
+
+<a name="L......"></a>
+<h2>驱动</h2>
+
+<p>Linux中平台驱动使用struct platform_driver来描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">platform_driver</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">probe</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">*</span><span class="p">);</span><span class="c1">//找到设备时调用的函数</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">remove</span><span class="p">)(</span><span class="k">struct</span> <span class="n">platform_device</span><span class="o">*</span><span class="p">);</span><span class="c1">//在删除设备的时候调用的函数</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">device_driver</span> <span class="n">driver</span><span class="p">;</span><span class="c1">//一般保存设备的名字等信息，用于驱动和设备匹配时使用</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>驱动注册，使用函数
+int platform_driver_register(struct platform driver*);</p></li>
+<li><p>驱动注销，使用函数
+int platform_driver_unregister(struct platform driver*);</p></li>
+</ol>
+
+
+<p>在驱动中，我们首先在模块初始化的时候向内核注册该驱动，找到与之匹配的设备，在找到设备后在probe函数中获取设备的硬件信息，初始化设备，这样可以提高驱动的可移植性。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part10--阻塞型驱动程序]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/05/mini2440--part10--%E9%98%BB%E5%A1%9E%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/index.html"/>
+    <updated>2016-02-05T02:19:55+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/05/mini2440--part10--%E9%98%BB%E5%A1%9E%E5%9E%8B%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/mini2440--part10--阻塞型驱动程序</id>
+    <content type="html"><![CDATA[<p>当一个设备无法立刻满足用户的读写请求时，驱动程序应当(缺省地)阻塞进程，使他进入等待(睡眠)状态，直到请求可以得到满足。</p>
+
+<!-- more -->
+
+
+<a name="L.................."></a>
+<h4>内核等待队列</h4>
+
+<p>将需要阻塞的进程放入内核等待队列中，当条件得到满足，等待队列中的线程会被执行。</p>
+
+<ol>
+<li><p>定义等待队列
+ wait_queue_head_t my_queue;</p></li>
+<li><p>初始化等待队列
+ init_waitqueue_head(&amp;my_queue);</p></li>
+<li><p>定义加初始化等待队列
+ DECLARE_AWIT_QUEUE_HEAD(my_queue);</p></li>
+<li><p>进入等待队列，睡眠</p>
+
+<ul>
+<li><p>wait_event(queue, condition);
+当condition(布尔表达式)为真时，立刻返回(即表示现在有数据，不用等待)；否则让进程进入TASK_UNINTERRUPTIBLE模式的睡眠，并挂在queue参数所指定的等待队列上。</p></li>
+<li><p>wait_event_interruptible(queue, condition);
+当condition(布尔表达式)为真时，立刻返回(即表示现在有数据，不用等待)；否则让进程进入TASK_INTERRUPTIBLE模式的睡眠，并挂在queue参数所指定的等待队列上。</p></li>
+<li><p>wait_event_killable(queue, conditiion);
+当condition(布尔表达式)为真时，立即返回(即表示现在有数据，不用等待)；否则让进程进入TASK_KILLABLE的睡眠，并挂在queue参数所指定的等待队列上。</p></li>
+</ul>
+</li>
+<li><p>从等待队列中唤醒进程</p>
+
+<ul>
+<li><p>wake_up(wait_queue_t* q);
+从等待队列q中唤醒状态为TASK_UNINTERRUPTIBLE、TASK_INTERRUPTIBLE、TASK_KILLABLE的所有进程。</p></li>
+<li><p>wake_up_interruptible(wait_queue_t* q);
+从等待队列q中唤醒状态为TASK_INTERRUPTIABLE的进程。</p></li>
+</ul>
+</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part09--混杂设备驱动--按键驱动]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/03/mini2440--part09--%E6%B7%B7%E6%9D%82%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8--%E6%8C%89%E9%94%AE%E9%A9%B1%E5%8A%A8/index.html"/>
+    <updated>2016-02-03T16:43:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/03/mini2440--part09--%E6%B7%B7%E6%9D%82%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8--%E6%8C%89%E9%94%AE%E9%A9%B1%E5%8A%A8/mini2440--part09--混杂设备驱动--按键驱动</id>
+    <content type="html"><![CDATA[<p>在Linux系统中,存在一类字符设备,它们拥有相同的主设备号(10),但次设备号不同,我们称这类设备为混杂设备(miscdevice)。所有的混杂设备形成一个链表,对设备访问时内核根据次设备号查找到相应的混杂设备。</p>
+
+<!-- more -->
+
+
+<p>Linux中使用struct miscdevice来描述一个混杂设备，在这个结构中，共有6个成员，我们需要初始化前三个成员，链表成员由Linux内核管理。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">miscdevice</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">minor</span><span class="p">;</span>
+</span><span class='line'>    <span class="cm">/* 次设备号*/</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="cm">/* 设备名*/</span>
+</span><span class='line'>    <span class="k">const</span> <span class="k">struct</span> <span class="n">file_operations</span> <span class="o">*</span><span class="n">fops</span><span class="p">;</span> <span class="cm">/*文件操作*/</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">device</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">device</span> <span class="o">*</span><span class="n">this_device</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li><p>首先，我们需要初始化miscdevice这个结构</p></li>
+<li><p>然后使用misc_register函数来注册一个混杂设备驱动。int misc_register(struct miscdevice* misc)；</p></li>
+<li><p>最后使用misc_deregister(struct miscdevice* misc);</p></li>
+</ol>
+
+
+<a name="L............"></a>
+<h2>按键去抖</h2>
+
+<p>按键所用开关为机械弹性开关,当机械触点断开、闭合时,由于机械触点的弹性作用,开关不会马上稳定地接通或断开。因而在闭合及断开的瞬间总是伴随有一连串的抖动,当我们按下开关,可以发现有多次中断被触发。</p>
+
+<p>按键去抖动的方法主要有二种,一种是硬件电路去抖动;另一种就是软件延时去抖。而延时又一般分为二种,一种是for循环等待,另一种是定时器延时。在操作系统中,由于效率方面的原因,一般不允许使用for循环来等待,只能使用定时器。</p>
+
+<p>Linux内核使用struct timer_list来描述一个定时器:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">timer_list</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">entry</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">expires</span><span class="p">;</span>  <span class="c1">//超时时间</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">function</span><span class="p">)(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">);</span>   <span class="c1">//操作函数</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">tvec_base</span> <span class="o">*</span><span class="n">base</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>去抖步骤：</p>
+
+<ol>
+<li>定义定时器变量</li>
+<li>初始化定时器，使用init_timer初始化，设置超时函数</li>
+<li>add_timer注册定时器</li>
+<li>mod_timer启动定时器，设置超时时间，启动。(定时器只会超时一次，如果要实现循环，在超时函数中再次调用mod_timer即可)</li>
+</ol>
+
+
+<a name="L........................"></a>
+<h3>按键驱动混杂实现</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: key.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Thu 04 Feb 2016 09:31:04 AM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/miscdevice.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/fs.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;asm/io.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/interrupt.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">irq_type</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">irq</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">number</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="k">struct</span> <span class="n">irq_type</span> <span class="n">key_irq</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">=</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">IRQ_EINT8</span><span class="p">,</span> <span class="s">&quot;key0&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">IRQ_EINT11</span><span class="p">,</span> <span class="s">&quot;key1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">IRQ_EINT13</span><span class="p">,</span> <span class="s">&quot;key2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">IRQ_EINT14</span><span class="p">,</span> <span class="s">&quot;key3&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">IRQ_EINT15</span><span class="p">,</span> <span class="s">&quot;key4&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">IRQ_EINT19</span><span class="p">,</span> <span class="s">&quot;key5&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">},</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">irqreturn_t</span> <span class="nf">key_int_handler</span><span class="p">(</span><span class="kt">int</span> <span class="n">irq</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">dev_id</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">//1. 检测是否发生按键中断</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//2.清除已经产生的按键中断</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//3.打印按下的按键，属于中断处理下半部，可以放在工作队列中，减少中断时间</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">irq_type</span><span class="o">*</span> <span class="n">nirq</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">irq_type</span><span class="o">*</span><span class="p">)(</span><span class="n">dev_id</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">printk</span><span class="p">(</span><span class="s">&quot;the key is %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nirq</span><span class="o">-&gt;</span><span class="n">number</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#define GPGCON 0x56000060</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">key_hw_init</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">unsigned</span> <span class="kt">int</span><span class="o">*</span> <span class="n">gpg_con</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">gpg_con</span> <span class="o">=</span> <span class="n">ioremap</span><span class="p">(</span><span class="n">GPGCON</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="n">data</span> <span class="o">=</span> <span class="n">readl</span><span class="p">(</span><span class="n">gpg_con</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">data</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="p">((</span><span class="mh">0x3</span><span class="o">&lt;&lt;</span><span class="mi">0</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x3</span><span class="o">&lt;&lt;</span><span class="mi">6</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x3</span><span class="o">&lt;&lt;</span><span class="mi">10</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x3</span><span class="o">&lt;&lt;</span><span class="mi">12</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x3</span><span class="o">&lt;&lt;</span><span class="mi">14</span><span class="o">|</span><span class="p">(</span><span class="mh">0x3</span><span class="o">&lt;&lt;</span><span class="mi">22</span><span class="p">)));</span>
+</span><span class='line'>  <span class="n">data</span> <span class="o">|=</span> <span class="p">((</span><span class="mh">0x2</span><span class="o">&lt;&lt;</span><span class="mi">0</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x2</span><span class="o">&lt;&lt;</span><span class="mi">6</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x2</span><span class="o">&lt;&lt;</span><span class="mi">10</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x2</span><span class="o">&lt;&lt;</span><span class="mi">12</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x2</span><span class="o">&lt;&lt;</span><span class="mi">14</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="mh">0x2</span><span class="o">&lt;&lt;</span><span class="mi">22</span><span class="p">));</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="n">writel</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpg_con</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">key_open</span><span class="p">(</span><span class="k">struct</span> <span class="n">inode</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">file</span><span class="o">*</span> <span class="n">filp</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">const</span> <span class="k">struct</span> <span class="n">file_operations</span> <span class="n">key_fops</span><span class="o">=</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">key_open</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">miscdevice</span> <span class="n">key_miscdevice</span><span class="o">=</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">minor</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">name</span>  <span class="o">=</span> <span class="s">&quot;ap_key&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">fops</span>  <span class="o">=</span> <span class="o">&amp;</span><span class="n">key_fops</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">key_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">misc_register</span><span class="p">(</span><span class="o">&amp;</span><span class="n">key_miscdevice</span><span class="p">);</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="n">key_hw_init</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//注册中断</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">ret</span> <span class="o">=</span> <span class="n">request_irq</span><span class="p">(</span><span class="n">key_irq</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">irq</span><span class="p">,</span> <span class="n">key_int_handler</span><span class="p">,</span> <span class="n">IRQF_SHARED</span><span class="p">,</span>
+</span><span class='line'>                  <span class="n">key_irq</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">key_irq</span><span class="p">[</span><span class="n">i</span><span class="p">]));</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">ret</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">printk</span><span class="p">(</span><span class="s">&quot;key int success</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">printk</span><span class="p">(</span><span class="s">&quot;key int error, return code is %d&quot;</span><span class="p">,</span> <span class="n">ret</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">key_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">misc_deregister</span><span class="p">(</span><span class="o">&amp;</span><span class="n">key_miscdevice</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//中断注销</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">key_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">key_exit</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part08--Linux中断处理过程]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/index.html"/>
+    <updated>2016-02-02T01:59:45+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/02/02/mini2440--part08--Linux%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B/mini2440--part08--Linux中断处理过程</id>
+    <content type="html"><![CDATA[<p>Linux中断处理过程，不同平台在中断入口时的处理可能有所不同。
+1. 在entry-armv.S中定义了中断统一的入口__irq_svc。
+2. 然后执行entry-armv.S中的irq_handler，获取中断号
+3. 调用irq.c中的asm_do_IRQ
+4. 调用irq.c中的generic_handle_irq，在这个过程中取得irq_desc
+5. 调用irq.c中的generic_handle_irq_desc
+6. 最后根据irq_desc中action中的用户事先设置好的handler，调用处理例程。</p>
+
+<!-- more -->
+
+
+<a name="L............"></a>
+<h3>中断注册</h3>
+
+<p>Linux使用request_irq函数注册中断。</p>
+
+<blockquote><p>int request_irq(unsigned int irq, void (<em>handler)(int, void</em>, struct pt_regs<em>), unsigned long flags, const char</em> devname, void* dev_id);<br>
+参数:<br>
+irq：中断号<br>
+handler：中断处理函数<br>
+flags：与中断管理有关的选项<br>
+devname：设备名<br>
+dev_id：共享中断时使用<br></p></blockquote>
+
+<p>在flag参数中，可以选择一些与中断管理有关的选项，如：
+* IRQF_DISABLED(SA_INTERRUPT)：如果设置该位，表示这是一个“快速”中断处理程序；如果没有设置这位，那么是一个“慢速”中断处理程序。
+* IRQF_SHARED(SA_SHIRQ)：该位表明该中断号是多个设备共享的。</p>
+
+<a name="L.............................."></a>
+<h4>中断处理函数的流程：</h4>
+
+<ol>
+<li>检查设备是否产生了中断</li>
+<li>清除中断产生标志</li>
+<li>相应的硬件操作</li>
+</ol>
+
+
+<p>快速中断和慢速中断的主要区别在于：快速中断保证中断处理的原子性(不被打断)，而慢速中断则不保证。也就是“开启中断”标志位(处理器IF)在运行快速中断处理程序时是关闭的，因次在服务该中断时，不会被其它类型的中断打断；而调用慢速中断处理时，其它类型中断仍然可以得到服务。</p>
+
+<p>中断处理程序的特别之处是在中断上下文中运行的，它的行为受到某些限制：</p>
+
+<ol>
+<li>不能使用可能引起阻塞的函数</li>
+<li>不能使用可能引起调度的函数</li>
+</ol>
+
+
+<a name="L............"></a>
+<h3>中断注销</h3>
+
+<p>当设备不再需要使用中断时(通常在驱动卸载时), 应当把它们注销, 使用函数:void free_irq(unsigned int irq, void *dev_id)，dev_id用于共享中断时使用。</p>
+
+<a name="L.................."></a>
+<h2>中断分层处理</h2>
+
+<p>在Linux中断中，当中断类型为慢速中断时，同类设备中断不能嵌套；当中断类型为快速中断时，当一个中断例程在执行时，其它中断都会被忽略。</p>
+
+<p>中断分层技术主要是减少中断处理的时间。中断分层主要分为和硬件相关的操作(上半部，中断处理程序，即：中断上下文中执行)、检测和处理(下半部，内核中执行)。</p>
+
+<ul>
+<li>上半部:当中断发生时,它进行相应地硬件读写,并“登记”该中断。通常由中断处理程序充当上半部。</li>
+<li>下半部:在系统空闲的时候对上半部“登记”的中断进行后续处理。</li>
+</ul>
+
+
+<a name="L.........................................."></a>
+<h4>中断分层技术主要有三种方式：</h4>
+
+<ol>
+<li>中断嵌套</li>
+<li>中断分层方式</li>
+<li>工作队列</li>
+</ol>
+
+
+<p>工作队列是一种将任务推后执行的形式,他把推后的任务交由一个内核线程去执行。这样下半部会在进程上下文执行,它允许重新调度甚至睡眠。 每个被推后的任务叫做“工作”,由这些工作组成的队列称为工作队列。</p>
+
+<p><img src="http://www.annpeter.cn/upload/2016/FEB/06/imgs/1454705882.png" alt="工作队列工作流程图" />
+<img src="http://www.annpeter.cn/upload/2016/FEB/06/imgs/1454705885.png" alt="工作队列流程数据结构" /></p>
+
+<p>Linux内核使用struct workqueue_struct来描述一个工作队列,使用struct work_struct来描述一个工作项。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">workqueue_struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">cpu_workqueue_struct</span> <span class="o">*</span><span class="n">cpu_wq</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span> <span class="cm">/*workqueue name*/</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">singlethread</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">freezeable</span><span class="p">;</span> <span class="cm">/* Freeze threads during suspend */</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rt</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">work_struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">atomic_long_t</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">entry</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">work_func_t</span> <span class="n">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="kt">work_func_t</span><span class="p">)(</span><span class="k">struct</span> <span class="n">work_struct</span> <span class="o">*</span><span class="n">work</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>创建工作队列 create_workqueue</li>
+<li>创建工作 INIT_WORK</li>
+<li>提交工作 queue_work</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: queue.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Sat 06 Feb 2016 05:05:59 AM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>  <span class="c1">//工作队列必须遵守GPL协议</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">workqueue_struct</span><span class="o">*</span> <span class="n">ap_workqueue</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">work_struct</span><span class="o">*</span> <span class="n">work1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">work1_func</span><span class="p">(</span><span class="k">struct</span> <span class="n">work_struct</span><span class="o">*</span> <span class="n">work</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">printk</span><span class="p">(</span><span class="s">&quot;this is work1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">que_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">//1.创建工作队列</span>
+</span><span class='line'>  <span class="c1">//在多数情况下，驱动程序并不需要自己创建工作队列，只需要定义工作，提交到</span>
+</span><span class='line'>  <span class="c1">//内核默认的工作队列keventd_wq即可,在提交工作时，使用schedule_work函数</span>
+</span><span class='line'>  <span class="c1">//简化操作int schedule_work(struct work_struct *work)；</span>
+</span><span class='line'>  <span class="n">ap_workqueue</span> <span class="o">=</span> <span class="n">create_workqueue</span><span class="p">(</span><span class="s">&quot;ap_workqueue&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">work1</span> <span class="o">=</span> <span class="n">kmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">work_struct</span><span class="p">),</span> <span class="n">GFP_KERNEL</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">//2.创建工作</span>
+</span><span class='line'>  <span class="n">INIT_WORK</span><span class="p">(</span><span class="n">work1</span><span class="p">,</span> <span class="n">work1_func</span><span class="p">);</span> 
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//3.提交工作到工作队列</span>
+</span><span class='line'>  <span class="n">queue_work</span><span class="p">(</span><span class="n">ap_workqueue</span><span class="p">,</span> <span class="n">work1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">que_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">que_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">que_exit</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part07--Mini2440LED驱动]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/28/mini2440--part07--Mini2440LED%E9%A9%B1%E5%8A%A8/index.html"/>
+    <updated>2016-01-28T02:55:45+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/28/mini2440--part07--Mini2440LED%E9%A9%B1%E5%8A%A8/mini2440--part07--Mini2440LED驱动</id>
+    <content type="html"><![CDATA[<p>本文主要实现了，在Linux中驱动mini2440的LED。</p>
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: led_module.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Wed 03 Feb 2016 04:45:37 PM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;asm/io.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/fs.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/cdev.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &quot;./led_module.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">cdev</span> <span class="n">led_dev</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">led_no</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#define GPBCON 0x56000010</span>
+</span><span class='line'><span class="cp">#define GPBDAT 0x56000014</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span><span class="o">*</span> <span class="n">led_con</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span><span class="o">*</span> <span class="n">led_dat</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">led_open</span><span class="p">(</span><span class="k">struct</span> <span class="n">inode</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="k">struct</span> <span class="n">file</span><span class="o">*</span> <span class="n">filp</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">led_con</span> <span class="o">=</span> <span class="n">ioremap</span><span class="p">(</span><span class="n">GPBCON</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">led_dat</span> <span class="o">=</span> <span class="n">ioremap</span><span class="p">(</span><span class="n">GPBDAT</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">writel</span><span class="p">(</span><span class="mh">0x00015400</span><span class="p">,</span> <span class="n">led_con</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">printk</span><span class="p">(</span><span class="s">&quot;led is open&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">long</span> <span class="nf">led_ioctl</span><span class="p">(</span><span class="k">struct</span> <span class="n">file</span><span class="o">*</span> <span class="n">filp</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">cmd</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">arg</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">switch</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nl">LED_ON</span><span class="p">:</span>
+</span><span class='line'>          <span class="n">writel</span><span class="p">(</span><span class="mh">0x00000000</span><span class="p">,</span> <span class="n">led_dat</span><span class="p">);</span>
+</span><span class='line'>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nl">LED_OFF</span><span class="p">:</span>
+</span><span class='line'>          <span class="n">writel</span><span class="p">(</span><span class="mh">0xFFFFFFFF</span><span class="p">,</span> <span class="n">led_dat</span><span class="p">);</span>
+</span><span class='line'>          <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">const</span> <span class="k">struct</span> <span class="n">file_operations</span> <span class="n">led_fops</span><span class="o">=</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">open</span>         <span class="o">=</span> <span class="n">led_open</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">unlocked_ioctl</span>  <span class="o">=</span> <span class="n">led_ioctl</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">led_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">cdev_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">led_dev</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">led_fops</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">alloc_chrdev_region</span><span class="p">(</span><span class="o">&amp;</span><span class="n">led_no</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;ap_led&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">cdev_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">led_dev</span><span class="p">,</span> <span class="n">led_no</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">led_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">cdev_del</span><span class="p">(</span><span class="o">&amp;</span><span class="n">led_dev</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">unregister_chrdev_region</span><span class="p">(</span><span class="n">led_no</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">led_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">led_exit</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='Makefile'><span class='line'><span class="nv">obj-m</span> <span class="o">:=</span> led_module.o
+</span><span class='line'><span class="nv">MDIR</span>  <span class="o">:=</span> /home/annpeter/Desktop/linux-mini2440/
+</span><span class='line'><span class="nf">all</span><span class="o">:</span>
+</span><span class='line'>  make -C <span class="k">$(</span>MDIR<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-
+</span><span class='line'>
+</span><span class='line'><span class="nf">clean</span><span class="o">:</span>
+</span><span class='line'>  rm -rf *.o *.order *.symvers
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: led_test.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Thu 04 Feb 2016 02:16:07 AM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &quot;ap_io.h&quot;</span>
+</span><span class='line'><span class="cp">#include &quot;./led_module.h&quot;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/types.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;fcntl.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/stat.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;sys/ioctl.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">&quot;/dev/ap_led&quot;</span><span class="p">,</span> <span class="n">O_RDWR</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">print_error</span><span class="p">(</span><span class="s">&quot;error args</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="n">print_info</span><span class="p">(</span><span class="s">&quot;please use:./led_test 1 to open the led</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="n">print_info</span><span class="p">(</span><span class="s">&quot;           ./led_test 0 to close the led</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">print_error</span><span class="p">(</span><span class="s">&quot;dev open err</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">cmd</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">cmd</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">LED_ON</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">LED_OFF</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part06--Linux内核模块介绍]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/27/mini2440--part06--Linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/index.html"/>
+    <updated>2016-01-27T06:29:11+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/27/mini2440--part06--Linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D/mini2440--part06--Linux内核模块介绍</id>
+    <content type="html"><![CDATA[<p>内核模块特点：</p>
+
+<ol>
+<li>模块本身不被编译进内核文件(zImage或者bzImage)</li>
+<li>可以根据需求，在内核运行期间动态的安装或者卸载。</li>
+</ol>
+
+
+<!-- more -->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="sr">//</span>安装insmod
+</span><span class='line'>$ insmod <span class="p">~</span><span class="sr">/Desktop/</span>dnw_usb.ko
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span>卸载rmmod
+</span><span class='line'>$ rmmod dnw_usb
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span>查看lsmod
+</span><span class='line'>$ lsmod
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L.................."></a>
+<h3>内核模块编写</h3>
+
+<p>内核模块包括</p>
+
+<ol>
+<li>头文件&lt;linux/init.h>,&lt;linux/module.h></li>
+<li>加载函数module_init(void*)</li>
+<li>卸载函数module_exit(void*)</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cm">/*************************************************************************</span>
+</span><span class='line'><span class="cm">    &gt; File Name: hello_module.c</span>
+</span><span class='line'><span class="cm">    &gt; Author: AnnPeter</span>
+</span><span class='line'><span class="cm">    &gt; Mail: 864587669@qq.com</span>
+</span><span class='line'><span class="cm">    &gt; Created Time: Sun 31 Jan 2016 05:44:56 PM CST</span>
+</span><span class='line'><span class="cm"> ************************************************************************/</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;linux/init.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;linux/module.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">int</span> <span class="nf">hello_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">print</span><span class="p">(</span><span class="n">KERN_WARNING</span><span class="s">&quot;hello,world!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">hello_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span><span class="s">&quot;Goodbye,word!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">module_init</span><span class="p">(</span><span class="n">hello_init</span><span class="p">);</span>
+</span><span class='line'><span class="n">module_exit</span><span class="p">(</span><span class="n">hello_exit</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L..............."></a>
+<h2>内核可选项</h2>
+
+<a name="L............"></a>
+<h3>模块声明</h3>
+
+<ol>
+<li>MODULE_LICENSE(&ldquo;遵守的协议&rdquo;);       声明该模块遵守的许可证协议，如：“GPL”、“GPL v2”等。</li>
+<li>MODULE_AUTHOR(&ldquo;作者&rdquo;);     声明模块的作者</li>
+<li>MODULE_DESCRIPTION(&ldquo;模块的功能描述&rdquo;); 声明模块的功能</li>
+<li>MODULE_VERSION(&ldquo;V1.0&rdquo;);  声明模块的版本</li>
+</ol>
+
+
+<a name="L............"></a>
+<h3>模块参数</h3>
+
+<p>通过宏module_param指定保存模块参数的变量，模块参数可用于在加载模块时传递参数给模块
+module_param(name, type, perm);</p>
+
+<ul>
+<li>name:变量的名称</li>
+<li>type:变量类型，bool:布尔型,int:整型,charp:字符串型</li>
+<li>perm:访问权限。S_IRUGO:读权限，S_IWUSR:写权限</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>int <span class="k">a</span> <span class="p">=</span> <span class="m">3</span>;
+</span><span class='line'>char * str;
+</span><span class='line'>module_param<span class="p">(</span><span class="k">a</span><span class="p">,</span> int<span class="p">,</span> S_IRUGO<span class="p">|</span>S_IWUSR<span class="p">)</span>; <span class="sr">//</span>安装的时候insmod hello.ko <span class="k">a</span><span class="p">=</span><span class="m">10</span>
+</span><span class='line'>module_param<span class="p">(</span>str<span class="p">,</span> charp<span class="p">,</span> S_IRUGO<span class="p">)</span>;        <span class="sr">//</span>安装的时候insmod hello.ko str<span class="p">=</span>abcd
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L............"></a>
+<h3>符号导出</h3>
+
+<p>如果一个模块中的函数希望提供给其它模块使用，则这个模块不仅要实现这个函数，还要将这个函数导出<br>
+EXPORT_SYMBOL(符号名);<br>
+EXPORT_SYMBOL_GPL(符号名);<br>
+说明：其中EXPORT_SYMBOL_GPL只能用于导出包含GPL许可证的模块。<br></p>
+
+<a name="L............"></a>
+<h2>内核链表</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>/*************************************************************************
+</span><span class='line'>    <span class="p">&gt;</span> File Name: student.<span class="k">c</span>
+</span><span class='line'>    <span class="p">&gt;</span> Author: AnnPeter
+</span><span class='line'>    <span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span>
+</span><span class='line'>    <span class="p">&gt;</span> Created Time: Mon <span class="m">01</span> Feb <span class="m">2016</span> <span class="m">11</span>:<span class="m">44</span>:<span class="m">59</span> PM CST
+</span><span class='line'> ************************************************************************/
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>#<span class="nb">include</span> <span class="p">&lt;</span>linux/module.<span class="k">h</span><span class="p">&gt;</span>
+</span><span class='line'>#<span class="nb">include</span> <span class="p">&lt;</span>linux/init.<span class="k">h</span><span class="p">&gt;</span>
+</span><span class='line'>#<span class="nb">include</span> <span class="p">&lt;</span>linux/<span class="nb">list</span>.<span class="k">h</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>struct stu
+</span><span class='line'>{
+</span><span class='line'>  int <span class="k">num</span>;
+</span><span class='line'>  int eng;
+</span><span class='line'>  int math;
+</span><span class='line'>  struct list_head <span class="nb">list</span>;
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>struct list_head stu_head;
+</span><span class='line'>struct stu stu1<span class="p">,</span> stu2<span class="p">,</span> stu3;
+</span><span class='line'>struct list_head* pos;
+</span><span class='line'>struct stu* tmp;
+</span><span class='line'>
+</span><span class='line'>int mylist_init<span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  INIT_LIST_HEAD<span class="p">(</span>&amp;stu_head<span class="p">)</span>;
+</span><span class='line'>
+</span><span class='line'>  stu1.<span class="k">num</span> <span class="p">=</span> <span class="m">1</span>;
+</span><span class='line'>  stu1.eng <span class="p">=</span> <span class="m">90</span>;
+</span><span class='line'>  stu1.math <span class="p">=</span> <span class="m">90</span>;
+</span><span class='line'>  list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu1.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+</span><span class='line'>
+</span><span class='line'>  stu2.<span class="k">num</span> <span class="p">=</span> <span class="m">2</span>;
+</span><span class='line'>  stu2.eng <span class="p">=</span> <span class="m">91</span>;
+</span><span class='line'>  stu2.math <span class="p">=</span> <span class="m">91</span>;
+</span><span class='line'>  list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu2.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+</span><span class='line'>  
+</span><span class='line'>  stu3.<span class="k">num</span> <span class="p">=</span> <span class="m">3</span>;
+</span><span class='line'>  stu3.eng <span class="p">=</span> <span class="m">92</span>;
+</span><span class='line'>  stu3.math <span class="p">=</span> <span class="m">92</span>;
+</span><span class='line'>  list_add_tail<span class="p">(</span>&amp;<span class="p">(</span>stu3.<span class="nb">list</span><span class="p">),</span> &amp;stu_head<span class="p">)</span>;
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  list_for_each<span class="p">(</span>pos<span class="p">,</span> &amp;stu_head<span class="p">)</span>
+</span><span class='line'>  {
+</span><span class='line'>      tmp <span class="p">=</span> list_entry<span class="p">(</span>pos<span class="p">,</span> struct stu<span class="p">,</span> <span class="nb">list</span><span class="p">)</span>;
+</span><span class='line'>      printk<span class="p">(</span><span class="s2">&quot;num is %d.\n&quot;</span><span class="p">,</span> tmp<span class="p">-&gt;</span><span class="k">num</span><span class="p">)</span>;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="m">0</span>;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>void mylist_exit<span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  list_del<span class="p">(</span>&amp;<span class="p">(</span>stu1.<span class="nb">list</span><span class="p">))</span>;
+</span><span class='line'>
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>module_init<span class="p">(</span>mylist_init<span class="p">)</span>;
+</span><span class='line'>module_exit<span class="p">(</span>mylist_exit<span class="p">)</span>;
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part05--驱动开发概述]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/26/mini2440--part05--%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E6%A6%82%E8%BF%B0/index.html"/>
+    <updated>2016-01-26T11:21:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/26/mini2440--part05--%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E6%A6%82%E8%BF%B0/mini2440--part05--驱动开发概述</id>
+    <content type="html"><![CDATA[<a name="L..............."></a>
+<h3>驱动分类：</h3>
+
+<ul>
+<li>常规分类：字符设备、块设备、网络设备</li>
+<li><p>总线分类法：USB设备、PCI设备、平台总线设备</p></li>
+<li><p>字符设备：是一种按字节来访问的设备,字符驱动则负责驱动字符设备,这样的驱动通常实现 open, close, read和write 系统调用。例:串口,LED,按键。</p></li>
+<li><p>块设备：在大部分的Unix系统中, 块设备定义为:以块(通常是512字节)为最小传输单位的设备,块设备不能按字节处理数据。而Linux则允许块设备传送任意数目的字节。因此,块和字符设备的区别仅仅是驱动的与内核的接口不同。常见的块设备包括硬盘,flash,SD卡&hellip;</p></li>
+<li><p>网络接口：可以是一个硬件设备,如网卡; 但也可以是一个纯粹的软件设备, 比如回环接口(lo).一个网络接口负责发送和接收数据报文。</p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<a name="L....................."></a>
+<h3>硬件访问技术：</h3>
+
+<p>在Linux系统中，无论是内核程序还是应用程序,都只能使用虚拟地址,而芯片手册中给出的硬件寄存器地址或者RAM地址则是物理地址,无法直接使用,因此,我们读写寄存器的要将它的物理地址映射为虚拟地址。</p>
+
+<ul>
+<li>动态地址映射：在驱动程序中采用ioremap函数将物理地址映射为虚拟地址。
+函数原型：void * ioremap(physaddr, size)
+参数： physaddr:待映射物理地址，size：映射的区域长度
+返回值：映射后的虚拟地址</li>
+<li>静态映射：Linux系统根据用户事先指定的映射关系，在内核启动时，自动的将物理地址映射为虚拟地址。
+静态地址映射，用户通过map_desc(Linux在分模块在很多地方都有map_desc的实例，他们通过本模块的iotable_init函数进行初始化)结构来指明物理地址与虚拟地址的映射关系。</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">map_desc</span><span class="p">{</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="kt">long</span> <span class="k">virtual</span><span class="p">;</span> <span class="c1">//映射后的虚拟地址</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">pfn</span><span class="p">;</span>  <span class="c1">//物理地址所在的页帧号</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span>   <span class="c1">//映射长度</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">type</span><span class="p">;</span> <span class="c1">//映射的设备类型</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="c1">//pfn:在驱动程序中，利用__phys_to_pfn(物理地址)可以计算出物理地址所在的物理页帧号</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在完成地址映射后，就可以读写寄存器了，Linux内核提供了一系列函数，用来读写寄存器。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">unsigned</span> <span class="n">ioread8</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="n">ioread16</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="n">ioread32</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="n">readb</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="n">readw</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">unsigned</span> <span class="n">readl</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="n">iowrite8</span><span class="p">(</span><span class="n">u8</span> <span class="n">value</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">iowrite16</span><span class="p">(</span><span class="n">u16</span> <span class="n">value</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">iowrite32</span><span class="p">(</span><span class="n">u32</span> <span class="n">value</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">writeb</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">value</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">writew</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">value</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">writel</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">value</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L.................."></a>
+<h2>字符设备驱动</h2>
+
+<p><img src="http://www.annpeter.cn/upload/2016/FEB/02/imgs/1454427439.png" alt="字符设备访问方式示意图" /></p>
+
+<a name="L........................................................................................................................................................."></a>
+<h3>通过字符设备文件，应用程序可以使用相应的字符设备驱动程序来控制字符设备。创建字符设备的方法一般有两种：</h3>
+
+<ol>
+<li><p>使用mknod命令：mknod /dev/文件名 c 主设备号 次设备号 (c表明这是一个字符文件，主设备号用来表示一个特定的驱动程序。次设备号用来表示使用该驱动程序的各设备)
+使用cat /proc/devices,可以查看设备文件所对应的设备号</p>
+
+<p>范例：先安装驱动模块，然后使用cat /proc/devices，查看本模块设备的主设备号，然后使用mknode命令创建设备，主设备号为查出来的设备号，从设备号可取0~255内的值。</p></li>
+<li><p>使用函数在驱动程序中创建</p></li>
+</ol>
+
+
+<a name="L............"></a>
+<h3>驱动模型</h3>
+
+<ol>
+<li>驱动初始化</li>
+<li>分配设备描述结构</li>
+<li>初始化设备描述结构</li>
+<li>注册设备描述结构</li>
+<li>硬件初始化</li>
+<li>实现设备操作</li>
+<li>驱动注销</li>
+</ol>
+
+
+<p>在任何一种驱动模型中，设备都会用内核中的一种结构来描述。其中字符设备在内核中使用struct cdev来描述。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">cdev</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">kobject</span> <span class="n">kobj</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">module</span><span class="o">*</span> <span class="n">owner</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">const</span> <span class="k">struct</span> <span class="n">file_operation</span><span class="o">*</span> <span class="n">ops</span><span class="p">;</span> <span class="c1">//设备操作集</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">list_head</span> <span class="n">list</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">dev_t</span> <span class="n">dev</span><span class="p">;</span>  <span class="c1">//设备号，dev_t实际上就是u32类型</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">count</span><span class="p">;</span> <span class="c1">//设备数</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Linux内核中使用dev_t类型来定义设备号，dev_t实质是32位的unsigned int，其中高12位为主设备号，低20位为次设备号。关于设备号的组合拆分，请看下面代码。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="c1">//知道主设备号，次设备号，组合形成设备号</span>
+</span><span class='line'><span class="kt">dev_t</span> <span class="n">dev</span> <span class="o">=</span> <span class="n">MKDEV</span><span class="p">(</span><span class="err">主设备号</span><span class="p">,</span> <span class="err">次设备号</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//从dev_t中分解出主设备号</span>
+</span><span class='line'><span class="err">主设备号</span> <span class="o">=</span> <span class="n">MAJOR</span><span class="p">(</span><span class="kt">dev_t</span> <span class="n">dev</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//从dev_t中分解出次设备号</span>
+</span><span class='line'><span class="err">次设备号</span> <span class="o">=</span> <span class="n">MINOR</span><span class="p">(</span><span class="kt">dev_t</span> <span class="n">dev</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L..........................."></a>
+<h3>为设备分配主设备号</h3>
+
+<ol>
+<li>静态申请：开发者自己选择一个数字作为主设备号，然后通过函数register_chrdev_region向内核申请使用。缺点是：如果申请使用的设备号已经被内核中的其它驱动使用了，则申请失败。</li>
+<li>动态分配：使用alloc_chrdev_region由内核分配一个可用的主设备号。优点：不会发送冲突。</li>
+</ol>
+
+
+<p>不论我们使用哪种方法进行分配，都应该在驱动退出时，使用unregister_chrdev_region函数释放这些设备号。</p>
+
+<a name="L..............."></a>
+<h3>操作函数集</h3>
+
+<p>struct file_operations是一个函数指针的集合，定义能在设备上进行的操作。结构中的函数指针指向驱动中的函数，这些函数实现一个针对设备的操作，对于不支持的操作则设置函数指针为NULL，例如。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="k">struct</span> <span class="n">file_operations</span> <span class="n">dev_fops</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">llseek</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">dev_read</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">write</span> <span class="o">=</span> <span class="n">dev_write</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">ioctl</span> <span class="o">=</span> <span class="n">dev_ioctl</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">dev_open</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">.</span><span class="n">release</span> <span class="o">=</span> <span class="n">dev_release</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<a name="L.................."></a>
+<h2>字符设备驱动</h2>
+
+<ol>
+<li>驱动初始化
+
+<ul>
+<li>分配cdev</li>
+<li>初始化cdev</li>
+<li>注册cdev</li>
+<li>硬件初始化</li>
+</ul>
+</li>
+<li>实现设备操作
+
+<ul>
+<li>open</li>
+<li>read</li>
+<li>write</li>
+<li>lseek</li>
+<li>close</li>
+</ul>
+</li>
+<li>驱动注销</li>
+</ol>
+
+
+<a name="cdev......................................................"></a>
+<h4>cdev变量的定义可以采用静态和动态两种方法</h4>
+
+<ul>
+<li>静态分配struct cdev mdev;</li>
+<li>动态分配struct cdev* pdev = cdev_alloc();</li>
+</ul>
+
+
+<a name="L........................"></a>
+<h4>描述结构的初始化</h4>
+
+<blockquote><p>struct cdev的初始化使用cdev_init函数完成。<br>
+cdev_init(struct cdev <em>cdev, const struct file_operations </em>fops)<br>
+参数：cdev:待初始化的cdev结构<br>
+    fops：设备对应的操作函数集<br>
+<br>
+字符设备的注册使用cdev_add函数来完成
+cdev_add(struct cdev* p, dev_t dev, unsigned count)<br>
+参数：p：待添加到内核的字符设备结构<br>
+    dev：设备号<br>
+    count：该类设备的设备个数<br></p></blockquote>
+
+<a name="L....................."></a>
+<h4>实现设备的操作</h4>
+
+<ol>
+<li><p>int (<em>open)(struct inode</em>, struct file*);//打开设备，响应open系统调用open设备方法是驱动程序用来为以后的操作完成初始化准备工作的。在大部分驱动程序中，open完成：标明次设备号和启动设备的工作。</p></li>
+<li><p>int (<em>release)(struct inode</em>, struct file*); //关闭设备，响应close系统调用</p></li>
+<li><p>loff_t (<em>llseek)(struct inode</em>, loff_t, int) //重定位读写指针，响应lseek系统调用</p></li>
+<li><p>ssize_t (<em>read)(struct file</em> filp, char __user<em> buff, size_t count, loff_t</em> offp);  //从设备读取数据，响应read系统调用
+参数：filp:与字符设备文件关联的file结构指针, 由内核创建。
+  buff : 从设备读取到的数据,需要保存到的位置。由read系统调用提供该参数。
+  count: 请求传输的数据量,由read系统调用提供该参数。
+  offp: 文件的读写位置,由内核从file结构中取出后,传递进来。
+read设备的方法通常完成两件事：1. 从设备中读取数据（属于硬件访问类的操作）；2. 将数据返回给应用程序
+buff参数是来源于用户空间的指针，这类指针都不能能被内核代码直接引用，必须使用专门的函数
+int copy_from_user(void<em> to, const void __user</em> from, int n);
+int copy_to_user(void<em> __user</em> to, const void* from, int n);</p></li>
+<li><p>ssize_t (<em>write)(struct file</em>, const char __user<em>, size_t, loff_t</em>); //向设备写入数据，响应write系统调用
+write设备方法通常完成两件事：1. 从应用程序提供的地址中取出数据， 2. 将数据写入设备(属于硬件访问类的操作)</p></li>
+<li><p>struct file
+在Linux系统中，每打开一个文件，在内核中都会关联一个struct file，它由内核在打开时创建，在文件关闭后释放。
+重要成员：loff_t f_pos;    //文件读写指针
+struct file_operations* f_op;   //该文件所对应的操作</p></li>
+<li><p>struct inode
+每一个存在于文件系统内的文件都会关联一个inode结构，该结构主要用来记录文件物理上的信息。因此，它和代表打开文件的file结构是不相同的。一个文件没有被打开时不会关联file结构，但却会关联一个inode结构。
+重要成员：dev_t i_rdev:设备号</p></li>
+</ol>
+
+
+<a name="L............"></a>
+<h4>注销驱动</h4>
+
+<p>当我们从内核中卸载驱动程序的时候,需要使用cdev_del函数来完成字符设备的注销</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part04--Linux系统调用]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/25/mini2440--part04--Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/index.html"/>
+    <updated>2016-01-25T05:06:35+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/25/mini2440--part04--Linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/mini2440--part04--Linux系统调用</id>
+    <content type="html"><![CDATA[<p>一般进程是不能访问内核的。它不能访问内核所占内存空间也不能调用内核函数。CPU硬件决定了这些（这就是为什么它被称作"保护模式"）。为了和用户空间上运行的进程进行交互，内核提供了一组接口。透过该接口，应用程序可以访问硬件设备和其他操作系统资源。在Linux中，系统调用是用户空间访问内核的惟一手段；除异常和中断外，它们是内核惟一的合法入口。</p>
+
+<!-- more -->
+
+
+<a name="L....................."></a>
+<h4>系统调用的实现</h4>
+
+<p>应用程序通知内核的机制是靠软中断实现的。首先，用户程序为系统设置调用参数，其中一个参数是系统调用编号。参数设置完成后，程序执行“系统调用”指令。x86系统上的软中断由int产生。这个指令会导致一个异常：产生一个事件，这个事件会致使处理器切换到内核态并跳转到一个新的地址，并开始执行那里的异常处理程序。此时的异常处理程序实际上就是系统调用处理程序。它与硬件体系结构紧密相关。</p>
+
+<p>新地址的指令会保存程序的状态，计算出应该调用哪个系统调用，调用内核中实现那个系统调用的函数，恢复用户程序状态，然后将控制权返还给用户程序</p>
+
+<p>在entry-common.S中，应用程序将系统调用号设置至r7寄存器,然后内核根据事先设置好的calls.S中的sys_call_table找到对应系统调用(调用表的基地址由__NR_SYSCALL_BASE给出，可在Unistd.h中看到基地址和每个系统调用所对应的地址)。实现一个自己的系统调用，C函数的接口可放在printk.c中。</p>
+
+<a name="L......................................."></a>
+<h2>添加一个自己的系统调用函数</h2>
+
+<p>(1) 在kernel/printk.c中编写c调用接口</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>void ap_printk<span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  printl<span class="p">(</span><span class="s2">&quot;this is a new sys call!\n&quot;</span><span class="p">)</span>;
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(2) 在arch/arm/kernel/calls.S中调用该C函数，写在最后，记住相应的系统调用号</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>CALL<span class="p">(</span>ap_printk<span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(3) 在arch/arm/include/asm/unistd.h中在系统调用表中指定位置，偏移量为对应中断号</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>#<span class="nb">define</span> __NR_ap_printk    <span class="p">(</span>_NR_SYSCALL_BASE<span class="p">+</span><span class="m">365</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(4) 编写C语言测试程序</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>/*************************************************************************
+</span><span class='line'>  <span class="p">&gt;</span> File Name: test.<span class="k">c</span>
+</span><span class='line'>  <span class="p">&gt;</span> Author: AnnPeter
+</span><span class='line'>  <span class="p">&gt;</span> Mail: <span class="m">864587669</span>@qq.<span class="k">com</span>
+</span><span class='line'>  <span class="p">&gt;</span> Created Time: Tue <span class="m">02</span> Feb <span class="m">2016</span> <span class="m">05</span>:<span class="m">04</span>:<span class="m">40</span> PM CST
+</span><span class='line'> ************************************************************************/
+</span><span class='line'>
+</span><span class='line'>void ap_pk<span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  __asm__<span class="p">(</span>
+</span><span class='line'><span class="c">  &quot;ldr r7, =365 \n&quot;</span>
+</span><span class='line'><span class="c">  &quot;swi \n&quot;</span>
+</span><span class='line'>  :
+</span><span class='line'>  :
+</span><span class='line'>  :<span class="s2">&quot;memory&quot;</span><span class="p">)</span>;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>void <span class="k">main</span><span class="p">()</span>
+</span><span class='line'>{
+</span><span class='line'>  ap_pk<span class="p">()</span>;
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(5) 编译C函数，拷贝值arm中运行</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'>$ arm<span class="p">-</span>linux<span class="p">-</span>gcc <span class="p">-</span>static test.<span class="k">c</span> <span class="p">-</span><span class="k">o</span> test
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SourceInsight的使用]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/24/SourceInsight%E7%9A%84%E4%BD%BF%E7%94%A8/index.html"/>
+    <updated>2016-01-24T21:59:23+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/24/SourceInsight%E7%9A%84%E4%BD%BF%E7%94%A8/SourceInsight的使用</id>
+    <content type="html"><![CDATA[<p>本文主要介绍SourceInsight的简单使用，主要用于查看项目。</p>
+
+<!-- more -->
+
+
+<ol>
+<li>Project->New project新建一个项目，为每个项目设置自己的配置文件，设置项目信息路径</li>
+<li>Project->Add and Remove Project Files添加项目文件(最好把要分析的源码拷贝至SourceInsight中，以防要编译使用的源码在查看中被修改)，选择文件路径然后Add Tree。</li>
+<li>Options->Preferences->Display->Trim long path name with ellipses，取消该选项。在标题栏显示文件全路径</li>
+<li>Project->Default Project Settings，设置Project Source Directory。显示项目文件相对路径。</li>
+<li>Options->Document Options，File filer添加.s;.S。使项目能添加汇编文件，添加后需重新Add Files。</li>
+<li>Project->Rebuild Project，重新编译项目，使我们能方便查询到函数定义。</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part03--Linux文件系统制作]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/24/mini2440--part03--Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%88%B6%E4%BD%9C/index.html"/>
+    <updated>2016-01-24T20:20:24+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/24/mini2440--part03--Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%88%B6%E4%BD%9C/mini2440--part03--Linux文件系统制作</id>
+    <content type="html"><![CDATA[<p>本文主要介绍嵌入式Linux文件系统的制作，主要包括initramfs和NFS。</p>
+
+<!-- more -->
+
+
+<ol>
+<li><p>创建目录</p>
+
+<pre><code class="`vim"> $ mkdir rootfs
+ $ cd rootfs
+ $ mkdir bin dev etc lib proc sbin sys usr mnt tmp var
+ $ mkdir usr/bin usr/lib usr/sbin lib/modules lib/firmware
+</code></pre></li>
+<li><p>创建设备文件</p>
+
+<pre><code class="`vim"> $ cd rootfs/dev
+ $ mknod -m 666 console c 5 1
+ $ mknod -m 666 null c 1 3
+</code></pre></li>
+<li><p>加入配置文件</p>
+
+<pre><code class="`vim"> $ tar etc.tar.gz
+ $ mv -rf etc/* root/etc
+</code></pre></li>
+<li><p>添加内核模块</p>
+
+<pre><code class="`vim"> $ cd linux-mini2440
+ $ make modules ARCH=arm CROSS_COMPILE=arm-linux-
+ $ make modules_install ARCH=arm INSTALL_MOD_PATH=~/Desktop/rootfs
+</code></pre></li>
+<li><p>编译/安装BusyBox</p>
+
+<p> BusyBox 是一个集成了一百多个最常用linux命令和工具的软件。</p>
+
+<p>  配置BusyBox</p>
+
+<pre><code class="`vim"> $ make menuconfig
+
+ //BusyBox Setting -&gt; Build Options
+ //选中"Build BusyBox as a static binary(no shared libs)"
+ //Cross Compiler prefix(arm-linux-)
+
+ //BusyBox Setting -&gt; Installation Options
+ //选中"Don't use /usr", 选中该项可以避免BusyBox被安装到宿主机的/usr目录下，破坏宿主机系统。
+
+ //BusyBox I nstallation Prefix(/XXX/rootfs)
+ 该选项表面编译后的BusyBox的安装位置
+
+ //编译、安装
+ $ make
+ $ make install
+</code></pre></li>
+<li><p>挂载根文件系统
+根据存储设备的硬件特性、系统需求，在不同的文件系统类型有不同应用场合。主要的存储设备分为RAM和FLASH，常用的 文件系统类型有</p></li>
+<li>基于nand flash的文件系统：yaffs2、UbiFS</li>
+<li>基于nor flash的文件系统：jffs2</li>
+<li>基于内存的文件系统：ramdisk initramfs</li>
+<li><p>基于网络的文件系统：NFS</p>
+
+<pre><code class="vim">$ cd rootfs
+$ ln -s ./bin/busybox init
+
+//方案一
+//配置Linux内核，支持initramfs
+$ make menuconfig ARCH=arm
+//General setup
+//Initial RAM filesystem and RAM disk (initramfs/initrd) support
+//设置rootfs在宿主机上的位置
+
+//编译内核
+$ make uImage ARCH=arm CROSS_COMPILE=arm-linux-
+
+//使用uBoot下载内核后，设置环境变量
+$ setenv bootargs noinitrd console=ttySAC0,115200
+
+方案二
+//配置Linux内核，支持NFS
+$ make menuconfig ARCH=arm
+//General setup
+//取消Initial RAM filesystem and RAM disk (initramfs/initrd) support
+//在File systems-&gt;Nerwork File Systems选中Root file System on NFS
+
+//在宿主机上启动nfs服务器
+$ sudo apt-get install nfs-kernel-server
+$ mkdir /home/annpeter/Desktop/rootfs   //建立nfs服务器根目录
+$ sudo vim /etc/exports     //修改nfs服务器配置文件
+    在最后一行加入 /home/annpeter/Desktop/rootfs *(rw,sync,no_root_squash)
+$ sudo service nfs-kernel-server restart
+
+//在uboot中设置bootargs
+$ setenv bootargs noinitrd
+console=ttySAC0,115200 init=/init
+root=/dev/nfs rw
+nfsroot=192.168.1.2:/home/annpeter/Desktop/rootfs
+ip=192.168.1.123:192.168.1.2:192.168.1.1:25
+5.255.255.0::eth0:off
+</code></pre></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part02--Uboot的使用]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/24/mini2440--part02--Uboot%E7%9A%84%E4%BD%BF%E7%94%A8/index.html"/>
+    <updated>2016-01-24T17:16:35+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/24/mini2440--part02--Uboot%E7%9A%84%E4%BD%BF%E7%94%A8/mini2440--part02--Uboot的使用</id>
+    <content type="html"><![CDATA[<a name="Uboot............"></a>
+<h3>Uboot命令使用</h3>
+
+<ol>
+<li>printenv:查看环境变量，可查看到ipaddr，ethaddr，serverip等信息</li>
+<li>setenv:添加、修改、删除环境变量
+ setenv name value &hellip;添加或修改环境变量
+ setenv name 删除环境变量</li>
+<li>save(或saveenv)保存所有环境变量到flash中</li>
+</ol>
+
+
+<!-- more -->
+
+
+<ol>
+<li><p>tftp 通过网络下载文件</p>
+
+<ul>
+<li>在宿主机上搭建tftp服务器</li>
+</ul>
+
+
+<pre><code class="`vim"> $ sudo apt-get install tftpd-hpa
+ $ sudo apt-get install tftp-hpa(tftp-hpa是客户端，如果不许要可以不安装)
+
+ //配置tftp服务器
+ $ sudo vim /etc/default/tftpd-hpa
+ 将原来的内容修改为
+ TFTP_USERNAME="tftp"
+ TFTP_ADDRESS="0.0.0.0:69"
+ TFTP_DIRECTORY="tftp根目录" //服务器目录,需要设置权限为777
+ TFTP_OPTIONS="-l -c -s"
+
+ //重启tftp服务器
+ $ sudo service tftpd-hpa restart
+</code></pre>
+
+<ul>
+<li>在开发板上配置网络</li>
+</ul>
+
+
+<pre><code class="``vim">  $ setenv ethaddr 12:34:56:78:9A:BC
+  $ setenv ipaddr 192.168.1.123 //ip地址根据自己的网络环境设置
+  $ setenv serverip 192.168.1.2 //tftp服务器地址，根据自己网络环境设置
+  $ ping 192.168.1.2
+</code></pre>
+
+<ul>
+<li>将要下载的文件放在宿主机tftp根目录，开始下载</li>
+</ul>
+
+
+<pre><code class="``vim">  $ tftp 0x31000000 uImage
+</code></pre></li>
+<li><p>bootm {addr} {arg}</p>
+
+<pre><code class="`vim"> $ bootm 0x31000000
+</code></pre></li>
+<li><p>md显示内存区的内容
+ md采用十六进制和ASCII码两种形式来显示存储单元中的内容。
+ 这条命令还可以采用长度标识符md.l,md.w,md.b
+ md[.l, .w, .b] address</p></li>
+<li><p>mm修改内存，地址自动递增
+ mm [.b, .w, .l] address(如果发生了修改，想要结束，请输入空格然后回车)</p></li>
+<li><p>nand erase address(起始地址) len(长度)
+ 擦除address开始的，长度为len的区域</p></li>
+<li><p>nand write mem_addr(内存起始地址) flash_addr(flash起始地址) len(长度)
+ 将内存起始地址处，长度为len的数据写入flash起始地址处。</p></li>
+<li><p>nand read mem_addr(内存起始地址) flash_addr(flash起始地址) len（长度
+将flash起始地址处，长度为len的数据，读取到内存起始地址处。</p></li>
+<li><p>设置从nand flash 自动启动
+setenv bootcmd nand read 0x31000000 0x400000 0x500000 \; bootm 0x31000000</p></li>
+<li><p>设置自动下载内核到内存后启动
+setenv bootcmd tftp 0x31000000 uImage \; bootm 0x31000000</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[mini2440--part01--编译Linux内核]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/01/24/mini2440--part01--%E7%BC%96%E8%AF%91Linux%E5%86%85%E6%A0%B8/index.html"/>
+    <updated>2016-01-24T06:16:24+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/01/24/mini2440--part01--%E7%BC%96%E8%AF%91Linux%E5%86%85%E6%A0%B8/mini2440--part01--编译Linux内核</id>
+    <content type="html"><![CDATA[<a name="PC....................."></a>
+<h3>PC平台的内核编译</h3>
+
+<p>本文主要介绍嵌入式Linux内核的编译，使用平台为mini2440，其它平台需找到对应平台的内核代码，编译过程类似。</p>
+
+<!-- more -->
+
+
+<ol>
+<li><p>配置</p>
+
+<pre><code class="`vim"> $ make config:基于文本模式的交互式配置
+ $ make menuconfig:基于文本模式的菜单型配置
+</code></pre>
+
+<p> 内核配置通常在一个已有的配置文件基础上，通过修改得到新的配置文件，Linux内核提供了一系列可供参考的内核配置文件，位于arch/$cpu/configs；当然，对于PC平台,我们可以使用自己本机上的配置文件进行修改(位于/boot/config-XXX)。使用的时候将你的配置文件复制到源码根目录下并修改名字为.config</p></li>
+<li><p>编译内核, 将配置文件配好后，我们开始编译。</p>
+
+<pre><code class="`vim"> $ make bzImage V=1 (V=1表示显示详细信息)
+ //编译好的内核位于arch/&lt;cpu&gt;/boot/目录下
+</code></pre></li>
+<li><p>编译模块，在我们使用菜单型进行配置的时候，有的模块有三种选项(1.为空，即不选；2.*，表示编译到内核中；3.M，表示编译为内核模块,编译到内核中，在进行系统加载时，即会进入内存，但编译为内核模块，可以动态加载和卸载。)</p>
+
+<pre><code class="`vim"> $ make modules //编译内核模块
+
+ //将编译好的内核模块，从内核源代码目录，复制至本机的/lib/modules下的**,为打包做好准备
+ $ make modules_install
+</code></pre></li>
+<li><p>制作init ramdisk</p>
+
+<pre><code class="`vim"> $ mkinitrd initrd-$version $version //$version可以通过查询/lib/modules下的目录得到
+</code></pre></li>
+<li><p>安装内核</p>
+
+<pre><code class="`vim"> $ cp arch/x86/boot/bzImage  /boot/vmlinuz-$version
+ $ cp initrd-$version /boot/
+
+ //修改/etc/grub.conf
+</code></pre></li>
+<li><p>清理</p>
+
+<pre><code class="`vim"> $ make clean  //清除内核模块编译过程中的中间文件
+ $ make distclean //可清除配置文件
+</code></pre></li>
+</ol>
+
+
+<a name="ARM....................."></a>
+<h3>ARM平台的内核编译</h3>
+
+<ol>
+<li><p>配置</p>
+
+<pre><code class="`vim"> $ make menuconfig ARCH=arm
+</code></pre></li>
+<li><p>编译内核</p>
+
+<pre><code class="`vim"> $ make uImage ARCH=arm CROSS_COMPILE=arm-linux-
+</code></pre></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

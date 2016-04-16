@@ -1,0 +1,16 @@
+<div class="highlight"><pre><span class="c1">//target:动画作用于哪个组件</span>
+<span class="c1">//具有set、get方法的就是属性</span>
+<span class="n">ObjectAnimator</span> <span class="n">oa</span> <span class="o">=</span> <span class="n">ObjectAnimator</span><span class="o">.</span><span class="na">ofFloat</span><span class="o">(</span><span class="n">target</span><span class="o">,</span> <span class="n">propertyName</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+
+
+<span class="c1">//多个属性一起作用</span>
+<span class="n">AnimatorSet</span> <span class="n">set</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AnimatiorSet</span><span class="o">();</span>
+<span class="n">set</span><span class="o">.</span><span class="na">playSquetially</span><span class="o">();</span> <span class="c1">//顺序作用</span>
+<span class="n">set</span><span class="o">.</span><span class="na">playTogether</span><span class="o">();</span>   <span class="c1">//一起作用</span>
+
+<span class="c1">//还可以用xml文件定义属性动画</span>
+<span class="c1">//在res/animator文件夹下创建动画xml</span>
+<span class="n">Animator</span> <span class="n">at</span> <span class="o">=</span> <span class="n">AnimatorInflater</span><span class="o">.</span><span class="na">loadAnimator</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">animator</span><span class="o">.</span><span class="na">objanimator</span><span class="o">);</span>
+<span class="n">at</span><span class="o">.</span><span class="na">setTarget</span><span class="o">(</span><span class="n">target</span><span class="o">);</span>
+<span class="n">at</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</pre></div>

@@ -1,0 +1,14 @@
+<div class="highlight"><pre>$ sudo apt<span class="p">-</span><span class="k">get</span> install tftpd<span class="p">-</span>hpa
+$ sudo apt<span class="p">-</span><span class="k">get</span> install tftp<span class="p">-</span>hpa<span class="p">(</span>tftp<span class="p">-</span>hpa是客户端，如果不许要可以不安装<span class="p">)&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span><span class="sr">//</span>配置tftp服务器
+$ sudo <span class="k">vim</span> <span class="sr">/etc/</span>default/tftpd<span class="p">-</span>hpa
+将原来的内容修改为
+  TFTP_USERNAME<span class="p">=</span>&amp;ldquo;tftp&amp;rdquo;
+  TFTP_ADDRESS<span class="p">=</span>&amp;ldquo;<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">69</span>&amp;rdquo;
+  TFTP_DIRECTORY<span class="p">=</span>&amp;ldquo;tftp根目录&amp;rdquo; <span class="sr">//</span>服务器目录<span class="p">,</span>需要设置权限为<span class="m">777</span>
+  TFTP_OPTIONS<span class="p">=</span>&amp;ldquo;<span class="p">-</span><span class="k">l</span> <span class="p">-</span><span class="k">c</span> <span class="p">-</span><span class="k">s</span>&amp;rdquo;<span class="p">&lt;</span>/<span class="k">p</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="k">p</span><span class="p">&gt;</span> <span class="sr">//</span>重启tftp服务器
+ $ sudo service tftpd<span class="p">-</span>hpa restart
+</pre></div>

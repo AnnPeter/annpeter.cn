@@ -1,0 +1,44 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+
+	<span class="n">Uri</span> <span class="n">uri</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+	<span class="n">ContentResolver</span> <span class="n">cr</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+		<span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+		<span class="n">uri</span> <span class="o">=</span> <span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">&quot;content://com.example.contentprovider.provider.PeoplerProvider&quot;</span><span class="o">);</span>
+		<span class="c1">//通过Uri传递表名参数</span>
+		<span class="c1">//uri = Uri.parse(&quot;content://com.example.contentprovider.provider.PeoplerProvider/people&quot;);</span>
+		<span class="n">cr</span> <span class="o">=</span> <span class="n">getContentResolver</span><span class="o">();</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">insert</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">ContentValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ContentValues</span><span class="o">();</span>
+		<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;Peter&quot;</span><span class="o">);</span>
+		<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;phone&quot;</span><span class="o">,</span> <span class="s">&quot;123456&quot;</span><span class="o">);</span>
+		<span class="n">cr</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="n">uri</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">cr</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">uri</span><span class="o">,</span> <span class="s">&quot;name=?&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="s">&quot;AA&quot;</span><span class="o">});</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">updata</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">ContentValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ContentValues</span><span class="o">();</span>
+		<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;AA&quot;</span><span class="o">);</span>
+		<span class="n">cr</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">uri</span><span class="o">,</span> <span class="n">values</span><span class="o">,</span> <span class="s">&quot;name=?&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="s">&quot;Peter&quot;</span><span class="o">});</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">select</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">){</span>
+		<span class="n">Cursor</span> <span class="n">cursor</span> <span class="o">=</span> <span class="n">cr</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">uri</span><span class="o">,</span> <span class="kc">null</span> <span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+
+		<span class="k">while</span><span class="o">(</span><span class="n">cursor</span><span class="o">.</span><span class="na">moveToNext</span><span class="o">()){</span>
+			<span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">cursor</span><span class="o">.</span><span class="na">getColumnIndex</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
+			<span class="n">String</span> <span class="n">phone</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">cursor</span><span class="o">.</span><span class="na">getColumnIndex</span><span class="o">(</span><span class="s">&quot;phone&quot;</span><span class="o">));</span>
+
+			<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot;    &quot;</span> <span class="o">+</span> <span class="n">phone</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

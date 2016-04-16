@@ -1,0 +1,7 @@
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">bus_type</span><span class="p">{</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">;</span><span class="c1">//总线名称&lt;/p&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="c1">//驱动与设备的匹配函数</span>
+  <span class="kt">int</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span><span class="n">match</span><span class="p">)(</span><span class="k">struct</span> <span class="n">device</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">dev</span><span class="p">,</span> <span class="k">struct</span> <span class="n">device_driver</span><span class="o">*</span> <span class="n">drv</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>

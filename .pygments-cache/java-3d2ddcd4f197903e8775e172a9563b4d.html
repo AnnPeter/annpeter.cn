@@ -1,0 +1,53 @@
+<div class="highlight"><pre><span class="c1">//构建数据库管理类，继承自SQLiteOpenHelper，实现父类的抽象方法</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyOpenHelper</span>  <span class="kd">extends</span> <span class="n">SQLiteOpenHelper</span><span class="o">{</span>
+
+	<span class="kd">public</span> <span class="nf">MyOpenHelper</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">CursorFactory</span> <span class="n">factory</span><span class="o">,</span> <span class="kt">int</span> <span class="n">version</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">factory</span><span class="o">,</span> <span class="n">version</span><span class="o">);</span>
+
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">SQLiteDatabase</span> <span class="n">db</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">db</span><span class="o">.</span><span class="na">execSQL</span><span class="o">(</span><span class="s">&quot;create table person(_id integer primary key autoincrement, name char(20), salary char(20), phone char(11));&quot;</span><span class="o">);</span>
+
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onUpgrade</span><span class="o">(</span><span class="n">SQLiteDatabase</span> <span class="n">db</span><span class="o">,</span> <span class="kt">int</span> <span class="n">oldVersion</span><span class="o">,</span> <span class="kt">int</span> <span class="n">newVersion</span><span class="o">)</span> <span class="o">{</span>
+
+	<span class="o">}</span>
+
+<span class="o">}</span>
+
+
+<span class="c1">//getContext():junit测试框架获取虚拟上下文， 如果要使mHelper称为全局变量，则他不能在定义时初始化，</span>
+<span class="c1">//全局变量的初始化时测试框架还没有初始化完毕，虚拟上下文对象也没有初始化成功，getContext()</span>
+<span class="c1">//不能获取到实际对象，对于全局变量的初始化，可以重写父类的setUp()方法来初始化。</span>
+<span class="c1">//setUp()在测试框架初始化完成后调用，在测试方法调用前调用，还有一个父类的tearDown()方法，</span>
+<span class="c1">//在测试方法调用后调用，可以用于测试完成后的操作</span>
+
+<span class="n">MyOpenHelper</span> <span class="n">mHelper</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MyOpenHelper</span><span class="o">(</span><span class="n">getContext</span><span class="o">(),</span> <span class="s">&quot;people.db&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+<span class="c1">//如果数据库不存在，先创建数据库，再获取可读可写数据库对象；如果数据库存在，直接打开</span>
+<span class="n">SQLiteDatabase</span> <span class="n">db</span> <span class="o">=</span> <span class="n">mHelper</span><span class="o">.</span><span class="na">getWritableDatabase</span><span class="o">();</span>
+<span class="c1">//如果存储空间（内部存储，所以备份文件一般不采用数据库保存）满了，那么返回只读数据库对象</span>
+
+<span class="c1">//执行SQL语句－－用获取到的db对象，调用</span>
+<span class="n">db</span><span class="o">.</span><span class="na">execSQL</span><span class="o">();</span><span class="n">方法即可</span><span class="o">,</span><span class="n">可用于数据库创建</span><span class="err">，</span><span class="n">表创建</span><span class="err">，</span><span class="n">增加</span><span class="err">、</span><span class="n">修改</span><span class="err">、</span><span class="n">删除</span><span class="err">；</span><span class="n">db</span><span class="o">.</span><span class="na">rawQuery</span><span class="o">();</span><span class="n">用于查询</span>
+<span class="n">db</span><span class="o">.</span><span class="na">execSQL</span><span class="o">(</span><span class="s">&quot;insert into person(name, phone, salary) values(?, ?, ?)&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Object</span><span class="o">[]{</span><span class="s">&quot;AnnPeter&quot;</span><span class="o">,</span> <span class="s">&quot;12312341234&quot;</span><span class="o">,</span> <span class="s">&quot;60000&quot;</span><span class="o">});</span>
+
+<span class="c1">//Curosr中，通过列名获取值</span>
+<span class="k">while</span><span class="o">(</span><span class="n">curosr</span><span class="o">.</span><span class="na">moveToNext</span><span class="o">()){</span><span class="c1">//cursor初始化指向－1条记录</span>
+	<span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">cursor</span><span class="o">.</span><span class="na">getColumnIndex</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
+<span class="o">}</span>
+<span class="n">db</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>	<span class="c1">//关闭数据库连接</span>
+
+
+<span class="c1">//使用API来增删改查</span>
+<span class="c1">//插入，把待插入的数据封装至ContentValues对象中</span>
+<span class="c1">//ContentValue使用完后最好clear()一下，否则可能下次使用时，插入上次相同的记录会出现两个</span>
+<span class="n">ContentValues</span> <span class="n">values</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ContentValues</span><span class="o">();</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;AnnPeter&quot;</span><span class="o">);</span>
+<span class="n">values</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;phone&quot;</span><span class="o">,</span> <span class="s">&quot;12312341234&quot;</span><span class="o">);</span>
+<span class="n">db</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="s">&quot;person&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">values</span><span class="o">);</span>
+</pre></div>

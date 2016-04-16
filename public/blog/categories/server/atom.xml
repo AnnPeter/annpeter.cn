@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: server | AnnPeter's Blog]]></title>
+  <link href="http://www.annpeter.cn/blog/categories/server/atom.xml" rel="self"/>
+  <link href="http://www.annpeter.cn/"/>
+  <updated>2016-04-16T11:13:25+08:00</updated>
+  <id>http://www.annpeter.cn/</id>
+  <author>
+    <name><![CDATA[AnnPeter]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CentOS7安装Oracle12c]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/index.html"/>
+    <updated>2016-03-21T06:10:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/21/CentOS7%E5%AE%89%E8%A3%85Oracle12c/CentOS7安装Oracle12c</id>
+    <content type="html"><![CDATA[<p>首先请参考教程，卸载OpenJDK，安装JDK。</p>
+
+<ol>
+<li>修改hostname，这两个文件中的地址必须保持一致，根据自己的情况修改，可以使用内网地址
+
+<blockquote><p>$ /etc/hosts
+     10.144.140.88 CentOS
+$ /etc/sysconfig/network
+     HOSTNAME=10.144.140.88</p></blockquote></li>
+</ol>
+
+
+<!-- more -->
+
+
+<ol>
+<li><p>关闭selinux</p>
+
+<blockquote><p>$ /etc/selinux/config
+     设置SELINUX=disabled</p></blockquote></li>
+<li><p>关闭防火墙</p>
+
+<blockquote><p>$ systemctl start firewalld.service*</p></blockquote></li>
+<li><p>安装依赖包</p>
+
+<blockquote><p>$ yum -y install binutils compat-libcap1  compat-libstdc++-33 compat-libstdc++-33<em>.i686 elfutils-libelf-devel gcc gcc-c++ glibc</em>.i686 glibc glibc-devel glibc-devel<em>.i686 ksh libgcc</em>.i686 libgcc libstdc++ libstdc++<em>.i686 libstdc++-devel libstdc++-devel</em>.i686 libaio libaio<em>.i686 libaio-devel libaio-devel</em>.i686 make sysstat unixODBC unixODBC<em>.i686 unixODBC-devel unixODBC-devel</em>.i686 libXp unzip</p></blockquote></li>
+<li><p>下载Oracle12c至/tmp目录，解压。</p></li>
+<li><p>添加安装用户和用户组</p>
+
+<blockquote><p>$ groupadd oinstall
+$ groupadd dba
+$ useradd -g oinstall -G dba oracle
+$ passwd oracle</p></blockquote></li>
+<li><p>添加安装目录</p>
+
+<blockquote><p>$ mkdir -p  /usr/local/oracle/product/12.1.0/dbhome_1
+$ chown -R oracle:oinstall /usr/local/oracle
+$ chmod -R 755 /usr/local/oracle</p></blockquote></li>
+<li><p>修改内核参数配置文件</p>
+
+<blockquote><p>fs.aio-max-nr = 1048576
+fs.file-max = 6815744
+kernel.shmall = 2097152
+kernel.shmmax = 1200000000
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048576</p>
+
+<p>$ sysctl –p //显示内核参数配置信息</p></blockquote></li>
+<li><p>修改用户限制文件</p>
+
+<blockquote><p>oracle              soft    nproc   2047
+oracle              hard    nproc   16384
+oracle              soft    nofile  1024
+oracle              hard    nofile  65536
+oracle              soft    stack   10240</p></blockquote></li>
+<li><p>修改文件/etc/pam.d/login
+在最后一个大项前面加入session    required     pam_limits.so</p></li>
+<li><p>修改文件/etc/profile，添加一下内容</p>
+
+<blockquote><p>  if [ $USER = &ldquo;oracle&rdquo; ]; then
+   if [ $SHELL = &ldquo;/bin/ksh&rdquo; ]; then
+        ulimit -p 16384
+        ulimit -n 65536
+    else
+        ulimit -u 16384 -n 65536
+    fi
+  fi</p></blockquote></li>
+<li><p>切换到oracle用户</p></li>
+<li><p>设置oracle用户的环境变量/home/oracle/.bash_profile
+TMP=/tmp; export TMP
+TMPDIR=$TMP; export TMPDIR
+ORACLE_HOSTNAME=10.144.140.88; export ORACLE_HOSTNAME
+ORACLE_BASE=/usr/local/oracle; export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/12.1.0/dbhome_1; export ORACLE_HOME
+ORACLE_SID=orcl; export ORACLE_SID
+PATH=$ORACLE_HOME/bin:/usr/sbin:$PATH; export PATH</p></li>
+<li><p>编辑静默安装响应文件</p>
+
+<blockquote><p>$ cp -R /tmp/database/response/  .
+$ cd response
+$ vim db_install.rsp</p></blockquote>
+
+<p>需要设置的选项如下：<br/>
+oracle.install.option=INSTALL_DB_SWONLY
+ORACLE_HOSTNAME=10.144.140.88
+UNIX_GROUP_NAME=oinstall
+INVENTORY_LOCATION=/usr/local/oracle/inventory
+SELECTED_LANGUAGES=en,zh_CN
+ORACLE_HOME=/usr/local/oracle/product/12.1.0/dbhome_1
+ORACLE_BASE=/usr/local/oracle
+oracle.install.db.InstallEdition=EE
+oracle.install.db.DBA_GROUP=dba
+oracle.install.db.OPER_GROUP=dba
+oracle.install.db.BACKUPDBA_GROUP=dba
+oracle.install.db.DGDBA_GROUP=dba
+oracle.install.db.KMDBA_GROUP=dba
+DECLINE_SECURITY_UPDATES=true</p></li>
+<li><p>添加swap空间，如果你有交换空间的话可以跳过这个步骤
+dd if=/dev/zero of=/home/swapfile bs=1M count=512
+mkswap /home/swapfile
+swapon /home/swapfile</p>
+
+<p>然后修改 /etc/fstab，加上：
+/home/swapfile swap swap defaults 0 0</p></li>
+<li><p>进入安装包目录/tmp/database/，执行安装</p>
+
+<blockquote><p>$ ./runInstaller -silent -noconfig -responseFile /home/oracle/response/db_install.rsp</p></blockquote></li>
+<li><p>可以通过top查看安装进程
+可以通过tail -f /usr/local/oracle/oraInventory/logs/installActions2016-03-12_04-40-06AM.log ，查看安装日志。</p></li>
+<li><p>安装完成，切换到root身份</p>
+
+<blockquote><p>$ sh /usr/local/oracle/inventory/orainstRoot.sh
+$ sh /usr/local/oracle/product/12.1.0/root.sh</p></blockquote></li>
+<li><p>重新登入oracle用户，以静默方式配置监听。如果未找到netca，请检查环境变量。</p>
+
+<blockquote><p>$ netca  /silent /responsefile /home/oracle/response/netca.rsp</p></blockquote></li>
+<li><p>通过netstat -nlpt，查看到端口1521正在被监听。</p></li>
+<li><p>以静默方式建立新库</p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Apache源码安装]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/index.html"/>
+    <updated>2016-03-14T18:40:11+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/14/Apache%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85/Apache源码安装</id>
+    <content type="html"><![CDATA[<a name="L.................."></a>
+<h2>依赖文件下载</h2>
+
+<ul>
+<li>wget <a href="http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz">http://nchc.dl.sourceforge.net/project/pcre/pcre/8.37/pcre-8.37.tar.gz</a></li>
+<li>wget <a href="http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz">http://archive.apache.org/dist/apr/apr-1.4.5.tar.gz</a></li>
+<li>wget <a href="http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz">http://archive.apache.org/dist/apr/apr-util-1.3.12.tar.gz</a></li>
+</ul>
+
+
+<!-- more -->
+
+
+<a name="L......apr.not.found......"></a>
+<h3>解决apr not found问题</h3>
+
+<blockquote><p>$ tar -zxf apr-1.4.5.tar.gz<br/>
+$ cd  apr-1.4.5<br/>
+$ ./configure &ndash;prefix=/usr/local/apr<br/>
+$ make &amp;&amp; make install</p></blockquote>
+
+<a name="L......APR-util.not.found......"></a>
+<h3>解决APR-util not found问题</h3>
+
+<blockquote><p>$ tar -zxf apr-util-1.3.12.tar.gz<br/>
+$ cd apr-util-1.3.12<br/>
+$ ./configure &ndash;prefix=/usr/local/apr-util &ndash;with-apr=/usr/local/apr/bin/apr-1-config<br/>
+$ make &amp;&amp; make install</p></blockquote>
+
+<a name="L......pcre......"></a>
+<h3>解决pcre问题</h3>
+
+<blockquote><p>$ unzip -o pcre-8.10.zip<br/>
+$ cd pcre-8.10<br/>
+$ ./configure &ndash;prefix=/usr/local/pcre<br/>
+$ make &amp;&amp; make install</p></blockquote>
+
+<a name="L......checking.whether.to.enable.mod_deflate....configure:.error:.mod_deflate.has.been.requested.but.can.not.be.built.due.to.prerequisite.failures"></a>
+<h3>解决checking whether to enable mod_deflate&hellip; configure: error: mod_deflate has been requested but can not be built due to prerequisite failures</h3>
+
+<blockquote><p>$ yum install gcc zlib-devel openssl-devel</p></blockquote>
+
+<a name="L......Apache......................................."></a>
+<h3>解压Apache源码，进入源码目录编译安装</h3>
+
+<blockquote><p>./configure &ndash;prefix=/usr/local/apache2 &ndash;enable-rewrite &ndash;enable-so &ndash;enable-headers &ndash;enable-expires &ndash;with-mpm=worker &ndash;enable-modules=most &ndash;enable-deflate  &ndash;with-apr=/usr/local/apr &ndash;with-apr-util=/usr/local/apr-util  &ndash;with-pcre=/usr/local/pcre</p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux中卸载OpenJDK，安装JDK]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/14/Linux%E4%B8%AD%E5%8D%B8%E8%BD%BDOpenJDK%EF%BC%8C%E5%AE%89%E8%A3%85JDK/index.html"/>
+    <updated>2016-03-14T18:38:42+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/14/Linux%E4%B8%AD%E5%8D%B8%E8%BD%BDOpenJDK%EF%BC%8C%E5%AE%89%E8%A3%85JDK/Linux中卸载OpenJDK，安装JDK</id>
+    <content type="html"><![CDATA[<a name="L............Linux......OpenJDK..."></a>
+<h4>首先查询Linux中的OpenJDK。</h4>
+
+<blockquote><p>rpm -qa | grep java<br/></p></blockquote>
+
+<a name="L......................................."></a>
+<h4>如果有就删除，没有就算了。</h4>
+
+<blockquote><p>rpm -e &ndash;nodeps java-1.8.0-openjdk<br/>
+rpm -e &ndash;nodeps javapackages-tools<br/>
+rpm -e &ndash;nodeps javapackages-tools<br/>
+rpm -e &ndash;nodeps java-1.8.0-openjdk-headless<br/>
+rpm -e &ndash;nodeps tzdata-java<br/>
+rpm -e &ndash;nodeps python-javapackages<br/></p></blockquote>
+
+<!-- more -->
+
+
+<a name="L......jdk.............usr.local...."></a>
+<h4>下载jdk，解压到/usr/local/中</h4>
+
+<blockquote><p>export JAVA_HOME=/usr/local/jdk1.8.0_73<br/>
+export PATH=$JAVA_HOME/bin:$PATH<br/>
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar<br/></p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[NAT网络问题]]></title>
+    <link href="http://www.annpeter.cn/blog/2016/03/12/Linux%E4%B8%8B%E7%9A%84%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/index.html"/>
+    <updated>2016-03-12T20:10:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2016/03/12/Linux%E4%B8%8B%E7%9A%84%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98/Linux下的网络问题</id>
+    <content type="html"><![CDATA[<p>最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。</p>
+
+<blockquote><p>$ route add default gw 10.0.2.2 dev eth0</p></blockquote>
+
+<!-- more -->
+
+
+<p>最近配置CentOS虚拟机时遇到以下问题，当我配置NAT模式访问外网时。如果关闭NetworkManager(CentOS6.7)，手动进行配置。能够ping通网关(10.0.2.2，网关为啥是.2结尾，我还没有搞清楚)。但就是ping不通外网，开启NetworkManager就行了。在网上百度，Google半天之后发现。手动加上一条路由信息就行了。</p>
+
+<blockquote><p>$ route add default gw 10.0.2.2 dev eth0</p></blockquote>
+
+<p>顺便说句，关闭NetworkManager后，网卡开机总是不能自启，设置ONBOOT=yes也不行，这时候发大招了。</p>
+
+<blockquote><p>$ chkconfig network on</p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SSH远程连接信任]]></title>
+    <link href="http://www.annpeter.cn/blog/2015/11/19/SSH%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E4%BF%A1%E4%BB%BB/index.html"/>
+    <updated>2015-11-19T06:10:15+08:00</updated>
+    <id>http://www.annpeter.cn/blog/2015/11/19/SSH%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E4%BF%A1%E4%BB%BB/SSH远程连接信任</id>
+    <content type="html"><![CDATA[<p>首先在一台客户机上生成公钥</p>
+
+<blockquote><p>$ ssh-keygen -t rsa</p></blockquote>
+
+<p>然后将公钥拷贝到服务器上</p>
+
+<blockquote><p>$ scp authorized_keys.pub  annpeter@www.itpeter.cn:/home/annpeter/.ssh/authorized_keys</p></blockquote>
+
+<p><br/>
+注意：
+服务器上用户的.ssh文件权限一定要为700。否则还是需要密码认证。</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,175 @@
+---
+layout: post
+title: "mini2440--part11--总线设备驱动"
+date: 2016-02-05 14:33:24 +8012
+comments: true
+categories: ARM mini2440
+keywords: ARM,mini2440,总线设备驱动,博客,AnnPeter's Blog
+description: "mini2440--part11--总线设备驱动"
+zTree: true
+
+---
+
+
+#总线设备驱动模型
+##总线
+* 总线结构描述
+在Linux内核中，总线由bus_type结构表示，定义在&lt;linux/device.h>
+```cpp
+struct bus_type{
+	const char* name;//总线名称
+
+	//驱动与设备的匹配函数
+	int (*match)(struct device* dev, struct device_driver* drv);
+}
+```
+
+<!-- more -->
+
+* 注册总线
+bus_register(struct bus_type* bus);
+若成功，新的总线将被添加进系统，并可在/sys/bus下看到相应的目录。
+
+* 注销总线
+	void bus_unregister(struct bus_type* bus);
+
+```cpp
+/*************************************************************************
+    > File Name: bus.c
+    > Author: AnnPeter
+    > Mail: 864587669@qq.com
+    > Created Time: Sun 07 Feb 2016 10:11:28 AM CST
+ ************************************************************************/
+
+
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/device.h>
+
+MODULE_LICENSE("GPL");
+
+int ap_match(struct device* dev, struct device_driver* drv)
+{
+
+	return 0;
+}
+
+struct bus_type bus=
+{
+	.name = "ap_bus",
+	.match = ap_match,
+};
+
+int bus_init(void)
+{
+	bus_register(&bus);
+
+	return 0;
+}
+
+void bus_exit(void)
+{
+	bus_unregister(&bus);
+}
+
+module_init(bus_init);
+module_exit(bus_exit);
+
+```
+
+##驱动
+
+(1) 结构描述
+在Linux内核中，驱动由device_driver结构表示
+
+```cpp
+struct device_driver{
+	const char* name;//驱动名称
+	struct bus_type* bus;//驱动所在总线
+
+	//一个总线上可能挂载多个设备，如USB总线可能挂载无线鼠标，无线网卡等等，当总线匹配到该
+	//驱动可以处理该设备时，调用prove函数来处理设备。所以probe由总线调用。
+	int (*probe)(struct device* dev);
+}
+```
+
+(2) 注册
+int driver_register(struct device_driver* drv);
+注册成功后，driver的信息会在/sys/bus/相应的总线目录下面
+
+(3) 注销
+void driver_unregister(struct device_driver* drv)
+
+##设备
+
+(1) 结构描述
+在Linux内核中，设备由struct device结构表示。
+```cpp
+struct device{
+	const char* name;//设备的名字
+	struct bus_type* bus; //设备所在总线
+
+	...
+}
+```
+
+(2) 注册
+int device_register(struct device* dev);
+
+(3) 注销
+void device_unregister(struce device* dev);
+
+
+
+总结：在系统中，我们首先注册总线。然后注册驱动和设备(这两者次序可以颠倒)，总线的match函数比较挂在该总线的驱动和设备是否匹配，如果匹配返回1，否则返回0。匹配成后，总线调用该驱动先前注册好的probe函数执行。
+
+
+#平台总线驱动设计
+平台总线(Platform bus)是linux2.6内核中加入的一种虚拟总线，其优势在于采用了总线的模型对设备与驱动进行管理，提高了程序的可移植性。关于platform bus的定义在drivers/base/Platform.c(paltform_bus_type)中。
+总线设备和驱动的匹配通过platform_match函数完成，主要依据设备id和设备名称来完成匹配工作。
+
+##设备
+在Linux中，平台设备使用struct platform_device来描述
+```cpp
+struct platform_device{
+	const char* name;//设备名称
+    int id; //设备编号，配合设备名使用
+    struct device dev;
+    u32 num_resources;
+    struct resource* resource;//设备资源，基地址，中断号等
+}
+
+struct resource{
+	resource_size_t start;
+    resource_size_t end;
+    const char* name;
+    unsigned long flags;	//资源类型
+    struct resource* parent, * sibling, * child;
+}
+```
+1. 注册平台设备，使用函数
+int platform_device_register(struct platform_device *pdev);
+
+2. 注销平台设备，使用函数
+int platform_device_unregister(struct platform_device *pdev);
+
+##驱动
+Linux中平台驱动使用struct platform_driver来描述
+```cpp
+struct platform_driver{
+	int (*probe)(struct platform_device*);//找到设备时调用的函数
+    int (*remove)(struct platform_device*);//在删除设备的时候调用的函数
+	struct device_driver driver;//一般保存设备的名字等信息，用于驱动和设备匹配时使用
+
+    ...
+}
+```
+
+1. 驱动注册，使用函数
+int platform_driver_register(struct platform driver*);
+
+2. 驱动注销，使用函数
+int platform_driver_unregister(struct platform driver*);
+
+在驱动中，我们首先在模块初始化的时候向内核注册该驱动，找到与之匹配的设备，在找到设备后在probe函数中获取设备的硬件信息，初始化设备，这样可以提高驱动的可移植性。

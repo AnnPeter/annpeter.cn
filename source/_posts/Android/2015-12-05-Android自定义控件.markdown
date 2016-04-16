@@ -1,0 +1,53 @@
+---
+layout: post
+title: "Android自定义控件"
+date: 2015-12-05 14:35:21 +4125
+comments: true
+categories: Android
+keywords: Android,自定义控件,博客,AnnPeter's Blog
+description: "Android自定义控件"
+
+---
+
+###自定义控件步骤
+1. 测量：onMeasure 设置自己显示在屏幕上的宽高
+2. 布局：onLayout  设置自己显示在屏幕上的位置（只有在自定义ViewGroup中才用到）
+3. 绘制：onDraw    控制显示在屏幕上的样子（自定义ViewGroup时不需要这个）
+
+<!-- more -->
+
+####View和ViewGroup区别
+1. 他们都要进行测量操作
+2. View Group主要是控制View如何摆放，所以必须实现onLayout；View没有子view，所以不需要实现onLayout方法，但是必须实现onDraw
+
+####getHeight()和getMeasuredHeight()
+1. getMeasuredHeight():获取测量完的高度，只要在onMeasure方法执行完，就可以用它获取到宽高，在自定义控件中多使用这个；它获取到的宽高是控件本身的宽高，不受父布局影响
+2. getHeight():必须在onLayout方法执行完后，才能获取到宽高，宽高值是显示出来的宽高，因为如果父布局比子控件小，子控件会有隐藏的部分，不算在此高度中
+
+
+**在构造的时候为了获得控件view的宽高，可以主动通知系统去测量; 也可以监听系统是否测量来获取**
+
+```java
+//方法一：
+view.measure(0, 0);
+view.getMeasuredHeight();
+
+//方法二：
+view.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+	@Override
+	public void onGlobalLayout() {
+		//获取到height的值后，及时删除监听
+		view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+		view.getHeigh();
+	}
+});
+```
+
+###ViewGroup
+在ViewGroup中让自己的内容移动有以下几个方法
+
+1. layout(l, t, r, b)
+2. offsetTopAndBottom(offset)和offsetLeftAndRight(offset)
+3. scrollTo和scrollBy方法 注意：滚动的并不是ViewGroup本身的内容，而是它的矩形框，而且它是瞬间移动（可以使用动画或者Scroller解决）
+
+**一般我们不需要去重写ViewGroup的onMeasure方法，我们可以继承FrameLayout，利用它实现好的onMeasure方法**
